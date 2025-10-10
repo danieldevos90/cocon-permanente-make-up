@@ -1,0 +1,465 @@
+/**
+ * COCONPM Unified Button System
+ * Consistent buttons across ALL WooCommerce pages
+ * Shop, Product, Cart, Checkout
+ */
+
+/* ============================================
+   PRIMARY BUTTON - Main CTA
+   Used for: Add to Cart, Checkout, etc.
+   ============================================ */
+
+.coconpm-btn,
+.coconpm-btn-primary,
+button.coconpm-btn,
+button.coconpm-btn-primary,
+a.coconpm-btn,
+a.coconpm-btn-primary,
+input.coconpm-btn,
+input.coconpm-btn-primary {
+	/* Layout */
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	
+	/* Sizing */
+	padding: 12px 32px !important;
+	height: 48px !important;
+	min-height: 48px !important;
+	width: auto !important;
+	min-width: auto !important;
+	
+	/* Colors */
+	background-color: transparent !important;
+	background: transparent !important;
+	background-image: none !important;
+	border: 2px solid #C64193 !important;
+	color: #C64193 !important;
+	
+	/* Typography */
+	font-size: 16px !important;
+	font-weight: 500 !important;
+	line-height: 1.5 !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	white-space: nowrap !important;
+	
+	/* Visual */
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	cursor: pointer !important;
+	
+	/* Animation */
+	transition: all 0.3s ease !important;
+	
+	/* Reset */
+	margin: 0 !important;
+	box-sizing: border-box !important;
+	font-family: inherit !important;
+	letter-spacing: normal !important;
+	text-transform: none !important;
+}
+
+/* Hover State */
+.coconpm-btn:hover,
+.coconpm-btn-primary:hover,
+button.coconpm-btn:hover,
+button.coconpm-btn-primary:hover,
+a.coconpm-btn:hover,
+a.coconpm-btn-primary:hover,
+input.coconpm-btn:hover,
+input.coconpm-btn-primary:hover {
+	background-color: #C64193 !important;
+	background: #C64193 !important;
+	background-image: none !important;
+	color: #ffffff !important;
+	border-color: #C64193 !important;
+	box-shadow: none !important;
+}
+
+/* Focus State */
+.coconpm-btn:focus,
+.coconpm-btn-primary:focus,
+button.coconpm-btn:focus,
+button.coconpm-btn-primary:focus,
+a.coconpm-btn:focus,
+a.coconpm-btn-primary:focus,
+input.coconpm-btn:focus,
+input.coconpm-btn-primary:focus {
+	outline: none !important;
+	box-shadow: 0 0 0 3px rgba(198, 65, 147, 0.2) !important;
+}
+
+/* Disabled State */
+.coconpm-btn:disabled,
+.coconpm-btn-primary:disabled,
+button.coconpm-btn:disabled,
+button.coconpm-btn-primary:disabled,
+button.coconpm-btn.disabled,
+button.coconpm-btn-primary.disabled {
+	opacity: 0.5 !important;
+	cursor: not-allowed !important;
+	pointer-events: none !important;
+}
+
+/* ============================================
+   SECONDARY BUTTON - Less emphasis
+   Used for: View Cart, Continue Shopping, etc.
+   ============================================ */
+
+.coconpm-btn-secondary,
+button.coconpm-btn-secondary,
+a.coconpm-btn-secondary,
+input.coconpm-btn-secondary {
+	/* Same base as primary */
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 12px 32px !important;
+	height: 48px !important;
+	min-height: 48px !important;
+	width: auto !important;
+	min-width: auto !important;
+	
+	/* Different colors - Grey outline */
+	background-color: transparent !important;
+	background: transparent !important;
+	background-image: none !important;
+	border: 2px solid #666666 !important;
+	color: #666666 !important;
+	
+	/* Same typography & visual */
+	font-size: 16px !important;
+	font-weight: 500 !important;
+	line-height: 1.5 !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	white-space: nowrap !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	cursor: pointer !important;
+	transition: all 0.3s ease !important;
+	margin: 0 !important;
+	box-sizing: border-box !important;
+}
+
+.coconpm-btn-secondary:hover,
+button.coconpm-btn-secondary:hover,
+a.coconpm-btn-secondary:hover,
+input.coconpm-btn-secondary:hover {
+	background-color: #666666 !important;
+	background: #666666 !important;
+	color: #ffffff !important;
+	border-color: #666666 !important;
+}
+
+/* ============================================
+   FULL WIDTH BUTTON
+   Used for: Mobile layouts, checkout page
+   ============================================ */
+
+.coconpm-btn-block,
+.coconpm-btn-full,
+button.coconpm-btn-block,
+button.coconpm-btn-full,
+a.coconpm-btn-block,
+a.coconpm-btn-full {
+	width: 100% !important;
+	min-width: 100% !important;
+}
+
+/* ============================================
+   SMALL BUTTON
+   Used for: Compact spaces, mobile
+   ============================================ */
+
+.coconpm-btn-sm,
+button.coconpm-btn-sm,
+a.coconpm-btn-sm {
+	padding: 10px 24px !important;
+	height: 44px !important;
+	min-height: 44px !important;
+	font-size: 14px !important;
+}
+
+/* ============================================
+   LARGE BUTTON
+   Used for: Checkout, important CTAs
+   ============================================ */
+
+.coconpm-btn-lg,
+button.coconpm-btn-lg,
+a.coconpm-btn-lg {
+	padding: 16px 48px !important;
+	height: 56px !important;
+	min-height: 56px !important;
+	font-size: 18px !important;
+	font-weight: 600 !important;
+}
+
+/* ============================================
+   BUTTON GROUP
+   Multiple buttons side by side
+   ============================================ */
+
+.coconpm-btn-group {
+	display: flex;
+	align-items: stretch;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.coconpm-btn-group .coconpm-btn,
+.coconpm-btn-group button,
+.coconpm-btn-group a {
+	flex: 0 0 auto;
+}
+
+/* ============================================
+   WOOCOMMERCE SPECIFIC OVERRIDES
+   Apply coconpm-btn styling to WooCommerce buttons
+   ============================================ */
+
+/* Add to Cart Buttons */
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce-page a.button,
+.woocommerce-page button.button,
+.woocommerce-page input.button,
+.woocommerce-checkout a.button,
+.woocommerce-checkout button.button,
+.woocommerce-checkout input.button,
+body.woocommerce a.button,
+body.woocommerce button.button,
+body.woocommerce-checkout a.button,
+body.woocommerce-checkout button.button,
+.single_add_to_cart_button,
+button.single_add_to_cart_button,
+.woocommerce-cart .wc-proceed-to-checkout a.button,
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button,
+.woocommerce #payment #place_order,
+.woocommerce-checkout #payment #place_order,
+button#place_order,
+.woocommerce form.checkout_coupon button,
+.woocommerce form.checkout_coupon input.button,
+.checkout_coupon button[name="apply_coupon"],
+body.woocommerce-checkout form button,
+body.woocommerce-checkout form input.button {
+	/* Apply coconpm-btn styles */
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 12px 32px !important;
+	height: 48px !important;
+	min-height: 48px !important;
+	width: auto !important;
+	min-width: auto !important;
+	background-color: transparent !important;
+	background: transparent !important;
+	background-image: none !important;
+	border: 2px solid #C64193 !important;
+	color: #C64193 !important;
+	font-size: 16px !important;
+	font-weight: 500 !important;
+	line-height: 1.5 !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	white-space: nowrap !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	cursor: pointer !important;
+	transition: all 0.3s ease !important;
+	margin: 0 !important;
+	box-sizing: border-box !important;
+}
+
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover,
+.woocommerce-page a.button:hover,
+.woocommerce-page button.button:hover,
+.woocommerce-page input.button:hover,
+.woocommerce-checkout a.button:hover,
+.woocommerce-checkout button.button:hover,
+body.woocommerce a.button:hover,
+body.woocommerce button.button:hover,
+body.woocommerce-checkout a.button:hover,
+body.woocommerce-checkout button.button:hover,
+.single_add_to_cart_button:hover,
+button.single_add_to_cart_button:hover,
+.woocommerce-cart .wc-proceed-to-checkout a.button:hover,
+.woocommerce #payment #place_order:hover,
+button#place_order:hover,
+.woocommerce form.checkout_coupon button:hover,
+body.woocommerce-checkout form button:hover,
+body.woocommerce-checkout form input.button:hover {
+	background-color: #C64193 !important;
+	background: #C64193 !important;
+	color: #ffffff !important;
+	border-color: #C64193 !important;
+}
+
+/* Remove pseudo-elements from all buttons */
+.coconpm-btn::before,
+.coconpm-btn::after,
+.coconpm-btn-primary::before,
+.coconpm-btn-primary::after,
+.coconpm-btn-secondary::before,
+.coconpm-btn-secondary::after,
+.woocommerce a.button::before,
+.woocommerce a.button::after,
+.woocommerce button.button::before,
+.woocommerce button.button::after,
+.single_add_to_cart_button::before,
+.single_add_to_cart_button::after {
+	display: none !important;
+	content: none !important;
+	visibility: hidden !important;
+}
+
+/* ============================================
+   CHECKOUT PLACE ORDER BUTTON - Full Width
+   ============================================ */
+
+.woocommerce #payment #place_order,
+.woocommerce-checkout #payment #place_order,
+button#place_order,
+body.woocommerce-checkout #payment #place_order,
+body.woocommerce-checkout button#place_order,
+body.woocommerce-checkout .woocommerce-checkout #payment #place_order,
+#order_review #payment #place_order,
+.woocommerce-checkout-payment #place_order,
+body #payment #place_order {
+	/* Force coconpm-btn styling */
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	
+	/* Full width for checkout */
+	width: 100% !important;
+	min-width: 100% !important;
+	max-width: 100% !important;
+	
+	/* Larger size for checkout */
+	height: 56px !important;
+	min-height: 56px !important;
+	padding: 16px 48px !important;
+	
+	/* Colors - Pink */
+	background-color: transparent !important;
+	background: transparent !important;
+	background-image: none !important;
+	border: 2px solid #C64193 !important;
+	color: #C64193 !important;
+	
+	/* Typography */
+	font-size: 18px !important;
+	font-weight: 600 !important;
+	line-height: 1.5 !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	white-space: nowrap !important;
+	
+	/* Visual */
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	cursor: pointer !important;
+	
+	/* Animation */
+	transition: all 0.3s ease !important;
+	
+	/* Reset */
+	margin: 0 !important;
+	box-sizing: border-box !important;
+	font-family: inherit !important;
+	letter-spacing: normal !important;
+	text-transform: none !important;
+}
+
+.woocommerce #payment #place_order:hover,
+.woocommerce-checkout #payment #place_order:hover,
+button#place_order:hover,
+body.woocommerce-checkout #payment #place_order:hover,
+body #payment #place_order:hover {
+	background-color: #C64193 !important;
+	background: #C64193 !important;
+	background-image: none !important;
+	color: #ffffff !important;
+	border-color: #C64193 !important;
+	box-shadow: none !important;
+}
+
+/* Remove any pseudo-elements from Place Order button */
+#place_order::before,
+#place_order::after,
+button#place_order::before,
+button#place_order::after {
+	display: none !important;
+	content: none !important;
+	visibility: hidden !important;
+}
+
+/* ============================================
+   NOTICE BUTTONS (View Cart, etc.)
+   ============================================ */
+
+.woocommerce-message a.button,
+.woocommerce-message a.button.wc-forward,
+.woocommerce-message .button,
+.woocommerce-message .wc-forward,
+.woocommerce-info a.button,
+.woocommerce-error a.button {
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 12px 32px !important;
+	height: 48px !important;
+	min-height: 48px !important;
+	background-color: transparent !important;
+	background: transparent !important;
+	border: 2px solid #C64193 !important;
+	color: #C64193 !important;
+	font-size: 16px !important;
+	font-weight: 500 !important;
+	text-decoration: none !important;
+	border-radius: 0 !important;
+	transition: all 0.3s ease !important;
+}
+
+.woocommerce-message a.button:hover,
+.woocommerce-message .wc-forward:hover {
+	background-color: #C64193 !important;
+	color: #ffffff !important;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+	/* Stack buttons vertically on mobile */
+	.coconpm-btn-group {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	
+	.coconpm-btn-group .coconpm-btn,
+	.coconpm-btn-group button,
+	.coconpm-btn-group a {
+		width: 100% !important;
+	}
+	
+	/* Smaller buttons on mobile */
+	.coconpm-btn,
+	.coconpm-btn-primary,
+	.woocommerce a.button,
+	.woocommerce button.button,
+	.single_add_to_cart_button {
+		padding: 10px 24px !important;
+		height: 44px !important;
+		min-height: 44px !important;
+		font-size: 14px !important;
+	}
+}
+

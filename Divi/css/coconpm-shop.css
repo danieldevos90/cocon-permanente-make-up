@@ -1,0 +1,480 @@
+/**
+ * COCONPM Custom Shop/Archive Page Styles
+ * 100% Custom - No WooCommerce or Divi Conflicts
+ * Following same pattern as coconpm-cart.css and coconpm-product.css
+ */
+
+/* ============================================
+   SHOP PAGE CONTAINER
+   ============================================ */
+
+.coconpm-shop-page {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 40px 20px;
+	box-sizing: border-box;
+}
+
+/* ============================================
+   PAGE TITLE
+   ============================================ */
+
+.coconpm-shop-title {
+	font-size: 36px;
+	font-weight: 700;
+	color: #000000;
+	margin: 0 0 32px 0;
+	text-align: left;
+}
+
+/* ============================================
+   SHOP TOOLBAR (Result Count + Sorting)
+   ============================================ */
+
+.coconpm-shop-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 32px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+/* Result Count */
+.coconpm-shop-toolbar .woocommerce-result-count {
+	font-size: 14px;
+	color: #666666;
+	margin: 0;
+}
+
+/* Ordering Dropdown */
+.coconpm-shop-toolbar .woocommerce-ordering {
+	margin: 0;
+}
+
+.coconpm-shop-toolbar .woocommerce-ordering select {
+	border: 1px solid #e0e0e0;
+	border-radius: 0;
+	padding: 8px 32px 8px 12px;
+	background-color: #ffffff;
+	color: #333333;
+	font-size: 14px;
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	min-width: 200px;
+}
+
+.coconpm-shop-toolbar .woocommerce-ordering select:focus {
+	outline: none;
+	border-color: #C64193;
+}
+
+/* ============================================
+   PRODUCTS GRID
+   ============================================ */
+
+.coconpm-products-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 24px;
+	margin-bottom: 48px;
+}
+
+/* ============================================
+   PRODUCT CARD
+   ============================================ */
+
+.coconpm-product-card {
+	background: #ffffff;
+	border: 1px solid #f0f0f0;
+	transition: all 0.3s ease;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	position: relative;
+	overflow: visible;
+}
+
+.coconpm-product-card:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	border-color: #e0e0e0;
+}
+
+/* ============================================
+   PRODUCT CARD IMAGE
+   ============================================ */
+
+.coconpm-card-link {
+	display: block;
+	position: relative;
+	overflow: hidden;
+}
+
+.coconpm-card-image {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	background: #f5f5f5;
+}
+
+.coconpm-card-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.3s ease;
+}
+
+.coconpm-product-card:hover .coconpm-card-image img {
+	transform: scale(1.05);
+}
+
+/* Sale Badge */
+.coconpm-sale-badge {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	background: #BFA86C;
+	color: #ffffff;
+	padding: 6px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	z-index: 2;
+	letter-spacing: 0.5px;
+}
+
+/* ============================================
+   PRODUCT CARD BODY
+   ============================================ */
+
+.coconpm-card-body {
+	padding: 20px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	flex: 1;
+}
+
+/* ============================================
+   PRODUCT CARD HEADER (Title + Price)
+   ============================================ */
+
+.coconpm-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.coconpm-card-title {
+	flex: 1;
+	margin: 0;
+	font-size: 16px;
+	line-height: 1.4;
+	font-weight: 600;
+}
+
+.coconpm-card-title a {
+	color: #000000;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.coconpm-card-title a:hover {
+	color: #C64193;
+}
+
+.coconpm-card-price {
+	color: #C64193;
+	font-weight: 600;
+	font-size: 16px;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.coconpm-card-price .price,
+.coconpm-card-price .woocommerce-Price-amount,
+.coconpm-card-price .amount {
+	color: #C64193;
+	font-weight: 600;
+}
+
+/* Old/Strikethrough Price */
+.coconpm-card-price del,
+.coconpm-card-price del .amount {
+	color: #999999;
+	font-size: 14px;
+	font-weight: 400;
+	text-decoration: line-through;
+	margin-right: 8px;
+}
+
+/* Sale Price */
+.coconpm-card-price ins,
+.coconpm-card-price ins .amount {
+	text-decoration: none;
+	color: #C64193;
+	font-weight: 600;
+}
+
+/* ============================================
+   PRODUCT CARD EXCERPT
+   ============================================ */
+
+.coconpm-card-excerpt {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #666666;
+	flex: 1;
+}
+
+/* ============================================
+   PRODUCT CARD ACTIONS
+   ============================================ */
+
+.coconpm-card-actions {
+	margin-top: auto;
+	padding-top: 12px;
+}
+
+.coconpm-card-button {
+	display: block;
+	width: 100%;
+	padding: 12px 24px;
+	background-color: transparent;
+	border: 2px solid #C64193;
+	color: #C64193;
+	font-weight: 500;
+	font-size: 14px;
+	text-align: center;
+	text-decoration: none;
+	transition: all 0.3s ease;
+	cursor: pointer;
+	border-radius: 0;
+	white-space: nowrap;
+}
+
+.coconpm-card-button:hover {
+	background-color: #C64193;
+	color: #ffffff;
+	border-color: #C64193;
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+
+.coconpm-shop-pagination {
+	margin-top: 48px;
+	padding-top: 32px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.coconpm-shop-pagination .woocommerce-pagination {
+	text-align: center;
+}
+
+.coconpm-shop-pagination .woocommerce-pagination ul {
+	display: inline-flex;
+	gap: 8px;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.coconpm-shop-pagination .woocommerce-pagination ul li {
+	margin: 0;
+}
+
+.coconpm-shop-pagination .woocommerce-pagination ul li a,
+.coconpm-shop-pagination .woocommerce-pagination ul li span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid #e0e0e0;
+	background: #ffffff;
+	color: #333333;
+	text-decoration: none;
+	transition: all 0.3s ease;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.coconpm-shop-pagination .woocommerce-pagination ul li a:hover,
+.coconpm-shop-pagination .woocommerce-pagination ul li span.current {
+	background: #C64193;
+	color: #ffffff;
+	border-color: #C64193;
+}
+
+/* ============================================
+   NO PRODUCTS FOUND
+   ============================================ */
+
+.coconpm-no-products {
+	text-align: center;
+	padding: 80px 20px;
+}
+
+.coconpm-no-products .woocommerce-info,
+.coconpm-no-products .woocommerce-notice {
+	background: #f5f5f5;
+	border: 1px solid #e0e0e0;
+	padding: 24px 32px;
+	border-radius: 0;
+	color: #666666;
+	font-size: 16px;
+	display: inline-block;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Large Desktop (3 columns) */
+@media (max-width: 1200px) {
+	.coconpm-products-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+/* Tablet (2 columns) */
+@media (max-width: 992px) {
+	.coconpm-shop-page {
+		padding: 32px 16px;
+	}
+	
+	.coconpm-shop-title {
+		font-size: 32px;
+		margin-bottom: 24px;
+	}
+	
+	.coconpm-products-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 20px;
+	}
+	
+	.coconpm-shop-toolbar {
+		margin-bottom: 24px;
+	}
+}
+
+/* Mobile (1 column) */
+@media (max-width: 768px) {
+	.coconpm-shop-page {
+		padding: 24px 16px;
+	}
+	
+	.coconpm-shop-title {
+		font-size: 28px;
+		margin-bottom: 20px;
+	}
+	
+	.coconpm-shop-toolbar {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+	
+	.coconpm-shop-toolbar .woocommerce-ordering select {
+		width: 100%;
+		min-width: 100%;
+	}
+	
+	.coconpm-products-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
+	}
+	
+	.coconpm-card-body {
+		padding: 16px 12px;
+	}
+	
+	.coconpm-card-title {
+		font-size: 14px;
+	}
+	
+	.coconpm-card-price {
+		font-size: 14px;
+	}
+	
+	.coconpm-card-excerpt {
+		font-size: 13px;
+	}
+	
+	.coconpm-card-button {
+		padding: 10px 16px;
+		font-size: 13px;
+	}
+}
+
+/* Small Mobile (1 column) */
+@media (max-width: 576px) {
+	.coconpm-shop-page {
+		padding: 20px 12px;
+	}
+	
+	.coconpm-shop-title {
+		font-size: 24px;
+		margin-bottom: 16px;
+	}
+	
+	.coconpm-products-grid {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
+	
+	.coconpm-card-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+	
+	.coconpm-card-price {
+		white-space: normal;
+	}
+}
+
+/* ============================================
+   CATEGORY DESCRIPTION
+   ============================================ */
+
+.term-description {
+	margin-bottom: 32px;
+	padding: 20px;
+	background: #f9f9f9;
+	border: 1px solid #e0e0e0;
+	font-size: 15px;
+	line-height: 1.6;
+	color: #666666;
+}
+
+/* ============================================
+   ARCHIVE TITLE (For Category Pages)
+   ============================================ */
+
+.woocommerce-products-header {
+	margin-bottom: 32px;
+}
+
+.woocommerce-products-header__title {
+	font-size: 36px;
+	font-weight: 700;
+	color: #000000;
+	margin: 0 0 16px 0;
+}
+

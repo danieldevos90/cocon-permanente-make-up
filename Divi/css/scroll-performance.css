@@ -1,0 +1,50 @@
+/**
+ * Scroll Performance Optimizations - Aggressive Chrome Fix
+ * Simplified approach to fix Chrome scroll performance
+ */
+
+/* CRITICAL: Force hardware acceleration without excessive will-change */
+#main-header,
+.et-fixed-header,
+.et_pb_scroll_top {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Remove excessive containment that causes Chrome issues */
+.et_pb_section {
+    contain: paint;
+}
+
+/* CRITICAL: Disable all animations and transitions during scroll for Chrome */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Simplify fixed header - No will-change except during scroll */
+body {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+/* Remove all excessive containment that causes Chrome performance issues */
+img {
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* CRITICAL FIX: Disable smooth scroll as it causes Chrome lag */
+html {
+    scroll-behavior: auto !important;
+}
+
+/* Optimize WooCommerce product images only */
+.woocommerce-product-gallery__image img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+

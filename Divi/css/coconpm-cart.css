@@ -1,0 +1,532 @@
+/**
+ * COCONPM Custom Cart Layout
+ * Clean, minimal design inspired by WooCommerce Cart Blocks
+ * Version: 2.0.0
+ */
+
+/* ============================================
+   CART PAGE - MINIMAL CLEAN DESIGN
+   ============================================ */
+
+/* Two Column Grid Layout - 60/40 Split */
+.coconpm-cart-grid {
+	display: grid !important;
+	grid-template-columns: 3fr 2fr !important; /* 60/40 split */
+	gap: 60px !important;
+	max-width: 1400px !important;
+	margin: 0 auto !important;
+	padding: 40px 20px !important;
+	box-sizing: border-box !important;
+}
+
+/* Left Column - 60% */
+.coconpm-cart-left {
+	width: 100% !important;
+	min-width: 0 !important; /* Prevent overflow */
+	box-sizing: border-box !important;
+}
+
+/* Right Column - 40% */
+.coconpm-cart-right {
+	width: 100% !important;
+	min-width: 0 !important; /* Prevent overflow */
+	box-sizing: border-box !important;
+}
+
+/* Custom Cart Table - Clean Minimal */
+.coconpm-cart-table {
+	width: 100% !important;
+	max-width: 100% !important;
+	background: transparent !important;
+	box-sizing: border-box !important;
+}
+
+/* Table Header - Simple Grey Text */
+.coconpm-cart-header {
+	display: grid;
+	grid-template-columns: 40px 80px 1fr 100px 120px 100px;
+	gap: 12px;
+	padding: 12px 0;
+	border-bottom: 1px solid #ddd;
+	font-weight: 500;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #757575;
+}
+
+/* Cart Items Container */
+.coconpm-cart-items {
+	width: 100%;
+}
+
+/* Single Cart Item - Clean Row */
+.coconpm-cart-item {
+	display: grid;
+	grid-template-columns: 40px 80px 1fr 100px 120px 100px;
+	gap: 12px;
+	padding: 16px 0;
+	border-bottom: 1px solid #e5e5e5;
+	align-items: center;
+}
+
+/* Remove Button - Simple Text Link */
+.coconpm-item-remove {
+	text-align: center;
+}
+
+.coconpm-remove-btn,
+.coconpm-item-remove a {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	line-height: 18px;
+	text-align: center;
+	color: #757575;
+	text-decoration: none;
+	font-size: 16px;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	transition: all 0.2s ease;
+}
+
+.coconpm-remove-btn:hover,
+.coconpm-item-remove a:hover {
+	color: #C64193;
+	border-color: #C64193;
+}
+
+/* Product Thumbnail - Clean */
+.coconpm-item-thumb img {
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	border: 1px solid #e5e5e5;
+}
+
+/* Product Name */
+.coconpm-item-name {
+	font-weight: 400;
+	font-size: 14px;
+	color: #000;
+	line-height: 1.4;
+}
+
+.coconpm-item-name a {
+	color: #C64193;
+	text-decoration: none;
+	transition: opacity 0.2s ease;
+}
+
+.coconpm-item-name a:hover {
+	opacity: 0.7;
+}
+
+/* Product Price */
+.coconpm-item-price {
+	font-size: 14px;
+	font-weight: 400;
+	color: #000;
+}
+
+/* Quantity - Minimal Controls */
+.coconpm-item-qty {
+	text-align: center;
+}
+
+.coconpm-item-qty .quantity {
+	display: inline-flex;
+	align-items: center;
+	gap: 0;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.coconpm-item-qty .quantity input[type="number"],
+.coconpm-item-qty .quantity .qty {
+	width: 45px !important;
+	height: 32px !important;
+	text-align: center !important;
+	border: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	-moz-appearance: textfield;
+	background: white !important;
+}
+
+.coconpm-item-qty .quantity input[type="number"]::-webkit-outer-spin-button,
+.coconpm-item-qty .quantity input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.coconpm-item-qty .quantity .minus,
+.coconpm-item-qty .quantity .plus {
+	width: 28px;
+	height: 32px;
+	background: white;
+	border: none;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 400;
+	color: #757575;
+	transition: color 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.coconpm-item-qty .quantity .minus:hover,
+.coconpm-item-qty .quantity .plus:hover {
+	color: #C64193;
+}
+
+/* Subtotal */
+.coconpm-item-total {
+	text-align: right;
+	font-weight: 600;
+	font-size: 14px;
+	color: #000;
+}
+
+/* Cart Actions - Clean Minimal */
+.coconpm-cart-actions {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	padding: 16px 0;
+	background: transparent;
+	border-top: 1px solid #ddd;
+}
+
+.coconpm-coupon {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex: 0 1 auto;
+}
+
+.coconpm-coupon label {
+	font-weight: 400;
+	font-size: 12px;
+	color: #757575;
+	white-space: nowrap;
+	margin: 0;
+}
+
+.coconpm-coupon input.input-text,
+.coconpm-coupon input[type="text"] {
+	padding: 5px 8px !important;
+	border: 1px solid #ddd !important;
+	border-radius: 0 !important;
+	font-size: 12px !important;
+	height: 32px !important;
+	width: 110px !important;
+	box-shadow: none !important;
+	background: white !important;
+}
+
+.coconpm-coupon button,
+.coconpm-coupon .button,
+.coconpm-cart-actions button,
+.coconpm-cart-actions .button {
+	padding: 6px 12px !important;
+	height: 32px !important;
+	font-size: 12px !important;
+	white-space: nowrap;
+	background: transparent !important;
+	color: #C64193 !important;
+	border: 1px solid #C64193 !important;
+	border-radius: 0 !important;
+	font-weight: 500 !important;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	line-height: 1 !important;
+	min-height: 0 !important;
+	letter-spacing: 0 !important;
+	flex-shrink: 0;
+}
+
+.coconpm-coupon button:hover,
+.coconpm-coupon .button:hover,
+.coconpm-cart-actions button:hover,
+.coconpm-cart-actions .button:hover {
+	background: #C64193 !important;
+	color: white !important;
+	letter-spacing: 0 !important;
+	border-radius: 0 !important;
+}
+
+/* Cart Totals - Clean Minimal Box */
+.coconpm-cart-right .cart-collaterals {
+	width: 100% !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+	overflow: hidden !important;
+}
+
+.coconpm-cart-right .cart_totals {
+	width: 100% !important;
+	max-width: 100% !important;
+	background: white !important;
+	padding: 20px !important;
+	border: 1px solid #e5e5e5 !important;
+	border-radius: 4px !important;
+	float: none !important;
+	box-sizing: border-box !important;
+	overflow: hidden !important;
+}
+
+.coconpm-cart-right .cart_totals h2 {
+	font-size: 16px !important;
+	font-weight: 600 !important;
+	margin: 0 0 16px 0 !important;
+	padding: 0 0 12px 0 !important;
+	color: #000 !important;
+	text-align: left !important;
+	border-bottom: 1px solid #e5e5e5 !important;
+}
+
+.coconpm-cart-right .cart_totals table {
+	width: 100% !important;
+	border: none !important;
+	margin: 0 !important;
+}
+
+.coconpm-cart-right .cart_totals table th,
+.coconpm-cart-right .cart_totals table td {
+	padding: 10px 0 !important;
+	border: none !important;
+	border-bottom: 1px solid #f0f0f0 !important;
+	font-size: 14px !important;
+	line-height: 1.4 !important;
+}
+
+.coconpm-cart-right .cart_totals table th {
+	font-weight: 400 !important;
+	color: #757575 !important;
+	text-align: left !important;
+}
+
+.coconpm-cart-right .cart_totals table td {
+	text-align: right !important;
+	font-weight: 600 !important;
+	color: #000 !important;
+}
+
+/* Total Row */
+.coconpm-cart-right .cart_totals .order-total th {
+	font-size: 15px !important;
+	font-weight: 600 !important;
+	color: #000 !important;
+	padding-top: 12px !important;
+	border: none !important;
+}
+
+.coconpm-cart-right .cart_totals .order-total td {
+	font-size: 18px !important;
+	font-weight: 700 !important;
+	color: #C64193 !important;
+	padding-top: 12px !important;
+	border: none !important;
+}
+
+/* Proceed to Checkout Button - Clean */
+.coconpm-cart-right .wc-proceed-to-checkout {
+	margin-top: 16px !important;
+	width: 100% !important;
+}
+
+.coconpm-cart-right .wc-proceed-to-checkout a.checkout-button {
+	display: block !important;
+	width: 100% !important;
+	padding: 12px 20px !important;
+	height: auto !important;
+	min-height: 44px !important;
+	font-size: 15px !important;
+	font-weight: 500 !important;
+	text-align: center !important;
+	background: #C64193 !important;
+	color: #ffffff !important;
+	border: none !important;
+	border-radius: 0 !important;
+	text-decoration: none !important;
+	line-height: 1.4 !important;
+	box-shadow: none !important;
+	transition: background 0.2s ease !important;
+	letter-spacing: 0 !important;
+}
+
+.coconpm-cart-right .wc-proceed-to-checkout a.checkout-button:hover {
+	background: #a03377 !important;
+	letter-spacing: 0 !important;
+	border-radius: 0 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+	/* Tablet: Still 60/40 but smaller gap */
+	.coconpm-cart-grid {
+		grid-template-columns: 3fr 2fr !important;
+		gap: 40px !important;
+		padding: 30px 20px !important;
+	}
+}
+
+@media (max-width: 768px) {
+	/* Mobile: Single column stacked */
+	.coconpm-cart-grid {
+		grid-template-columns: 1fr !important;
+		gap: 30px !important;
+		padding: 20px 16px !important;
+	}
+}
+
+@media (max-width: 768px) {
+	.coconpm-cart-header {
+		display: none;
+	}
+	
+	.coconpm-cart-item {
+		display: block;
+		padding: 20px 0;
+	}
+	
+	.coconpm-item-remove {
+		float: right;
+		margin-bottom: 12px;
+	}
+	
+	.coconpm-item-thumb {
+		float: left;
+		margin-right: 16px;
+		margin-bottom: 12px;
+	}
+	
+	.coconpm-item-thumb img {
+		width: 80px;
+		height: 80px;
+	}
+	
+	.coconpm-item-name,
+	.coconpm-item-price,
+	.coconpm-item-qty,
+	.coconpm-item-total {
+		display: block;
+		text-align: left;
+		margin-bottom: 8px;
+	}
+	
+	.coconpm-item-qty {
+		clear: both;
+		padding-top: 12px;
+	}
+	
+	.coconpm-cart-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	
+	.coconpm-coupon {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
+	}
+	
+	.coconpm-coupon input.input-text,
+	.coconpm-coupon input[type="text"] {
+		width: 100% !important;
+	}
+	
+	.coconpm-coupon button,
+	.coconpm-cart-actions button {
+		width: 100% !important;
+	}
+}
+
+/* ============================================
+   CRITICAL OVERRIDES - Force Grid Layout
+   ============================================ */
+
+/* Force grid layout - override any theme conflicts */
+.woocommerce-cart .coconpm-cart-grid,
+.woocommerce-page .coconpm-cart-grid,
+body.woocommerce-cart .coconpm-cart-grid {
+	display: grid !important;
+	grid-template-columns: 3fr 2fr !important;
+	gap: 60px !important;
+	max-width: 1400px !important;
+	margin: 0 auto !important;
+	padding: 40px 20px !important;
+	box-sizing: border-box !important;
+}
+
+/* Force columns to stay within grid */
+.woocommerce-cart .coconpm-cart-left,
+.woocommerce-cart .coconpm-cart-right,
+.woocommerce-page .coconpm-cart-left,
+.woocommerce-page .coconpm-cart-right {
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
+	box-sizing: border-box !important;
+	overflow: hidden !important;
+}
+
+/* Override any float or positioning from theme */
+.woocommerce-cart .cart-collaterals,
+.woocommerce-cart .cart_totals,
+.woocommerce-page .cart-collaterals,
+.woocommerce-page .cart_totals {
+	float: none !important;
+	position: static !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+/* Override Divi theme button letter-spacing and border-radius */
+.woocommerce-cart .coconpm-coupon button,
+.woocommerce-cart .coconpm-coupon .button,
+.woocommerce-cart .coconpm-cart-actions button,
+.woocommerce-cart .coconpm-cart-actions .button,
+.woocommerce-page .coconpm-coupon button,
+.woocommerce-page .coconpm-coupon .button,
+.woocommerce-page .coconpm-cart-actions button,
+.woocommerce-page .coconpm-cart-actions .button,
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button,
+.woocommerce-page .wc-proceed-to-checkout a.checkout-button {
+	letter-spacing: 0 !important;
+	border-radius: 0 !important;
+}
+
+.woocommerce-cart .coconpm-coupon button:hover,
+.woocommerce-cart .coconpm-coupon .button:hover,
+.woocommerce-cart .coconpm-cart-actions button:hover,
+.woocommerce-cart .coconpm-cart-actions .button:hover,
+.woocommerce-page .coconpm-coupon button:hover,
+.woocommerce-page .coconpm-coupon .button:hover,
+.woocommerce-page .coconpm-cart-actions button:hover,
+.woocommerce-page .coconpm-cart-actions .button:hover,
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button:hover,
+.woocommerce-page .wc-proceed-to-checkout a.checkout-button:hover {
+	letter-spacing: 0 !important;
+	border-radius: 0 !important;
+}
+
+/* Mobile override */
+@media (max-width: 768px) {
+	.woocommerce-cart .coconpm-cart-grid,
+	.woocommerce-page .coconpm-cart-grid,
+	body.woocommerce-cart .coconpm-cart-grid {
+		grid-template-columns: 1fr !important;
+		gap: 30px !important;
+		padding: 20px 16px !important;
+	}
+}

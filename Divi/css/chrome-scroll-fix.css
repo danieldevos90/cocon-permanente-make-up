@@ -1,0 +1,97 @@
+/**
+ * ULTRA-AGGRESSIVE Chrome Scroll Fix
+ * Disables all known Chrome scroll performance bottlenecks
+ * Only loads for Chrome browsers
+ */
+
+/* CRITICAL: Disable ALL transitions and animations during scroll */
+*,
+*::before,
+*::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Force simple overflow */
+body,
+html {
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Disable smooth scroll completely */
+html {
+    scroll-behavior: auto !important;
+}
+
+/* Remove all will-change (causes Chrome to create too many layers) */
+* {
+    will-change: auto !important;
+}
+
+/* Disable parallax and scroll effects */
+.et_pb_section_parallax,
+.et_parallax_bg {
+    background-attachment: scroll !important;
+}
+
+/* Simplify fixed header */
+#main-header {
+    position: fixed !important;
+    will-change: transform !important;
+}
+
+/* Remove contain properties that cause Chrome issues */
+.et_pb_section,
+.et_pb_row,
+.et_pb_module,
+.et_pb_column {
+    contain: none !important;
+}
+
+/* Disable box-shadows on scroll (expensive) */
+.et-fixed-header {
+    box-shadow: none !important;
+}
+
+/* Optimize images */
+img {
+    image-rendering: -webkit-optimize-contrast;
+    will-change: auto !important;
+}
+
+/* Disable Divi animations on scroll */
+.et_pb_animation {
+    animation: none !important;
+}
+
+/* Remove backdrop-filter (very expensive in Chrome) */
+* {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Simplify any overlays */
+.et_pb_module_inner,
+.et_overlay {
+    will-change: auto !important;
+    transform: none !important;
+}
+
+/* Force hardware acceleration ONLY on fixed elements */
+#main-header,
+.et-fixed-header,
+.et_pb_scroll_top {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+/* Remove grid/flex complexity during scroll */
+.et_pb_section,
+.et_pb_row {
+    will-change: auto !important;
+}
+

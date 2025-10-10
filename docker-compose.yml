@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: cocon_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - cocon_network
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    container_name: cocon_wordpress
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 'true'
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('SCRIPT_DEBUG', true);
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./Divi:/var/www/html/wp-content/themes/Divi
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    networks:
+      - cocon_network
+
+  wp-cli:
+    depends_on:
+      - wordpress
+      - db
+    image: wordpress:cli
+    container_name: cocon_wp_cli
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./Divi:/var/www/html/wp-content/themes/Divi
+      - ./setup-wordpress.sh:/setup-wordpress.sh
+    networks:
+      - cocon_network
+    command: tail -f /dev/null
+
+volumes:
+  db_data:
+  wordpress_data:
+
+networks:
+  cocon_network:
+    driver: bridge
+
