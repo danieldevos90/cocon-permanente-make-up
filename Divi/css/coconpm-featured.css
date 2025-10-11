@@ -1,0 +1,294 @@
+/**
+ * COCONPM Featured Products Section Styles
+ * For use with [featured_products] shortcode on homepage
+ * Uses same coconpm-* classes as shop page for consistency
+ */
+
+/* ============================================
+   FEATURED PRODUCTS SECTION
+   ============================================ */
+
+.coconpm-featured-products {
+	width: 100%;
+	padding: 60px 0;
+	background: #ffffff;
+}
+
+.coconpm-featured-container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+	box-sizing: border-box;
+}
+
+/* ============================================
+   SECTION HEADER
+   ============================================ */
+
+.coconpm-featured-header {
+	margin-bottom: 40px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px;
+}
+
+.coconpm-featured-title {
+	font-size: 36px;
+	font-weight: 700;
+	color: #000000;
+	margin: 0;
+	line-height: 1.2;
+	text-align: left;
+}
+
+/* View All Link */
+.coconpm-featured-view-all {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: #BFA86C;
+	font-size: 15px;
+	font-weight: 500;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: all 0.3s ease;
+	border-bottom: 1px solid transparent;
+	padding-bottom: 2px;
+}
+
+.coconpm-featured-view-all:hover {
+	color: #9d8556;
+	border-bottom-color: #9d8556;
+}
+
+.coconpm-featured-view-all svg {
+	width: 16px;
+	height: 16px;
+	transition: transform 0.3s ease;
+}
+
+.coconpm-featured-view-all:hover svg {
+	transform: translateX(4px);
+}
+
+/* ============================================
+   FEATURED PRODUCTS GRID
+   ============================================ */
+
+/* Override shop grid styles with higher specificity */
+.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid {
+	display: grid;
+	gap: 24px;
+	margin: 0;
+	margin-bottom: 0;
+}
+
+/* Column variants - Fixed columns that don't stretch */
+/* Higher specificity to override shop CSS */
+.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-2 {
+	grid-template-columns: repeat(2, minmax(250px, 350px)) !important;
+	justify-content: start;
+}
+
+.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-3 {
+	grid-template-columns: repeat(3, minmax(240px, 350px)) !important;
+	justify-content: start;
+}
+
+.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4 {
+	grid-template-columns: repeat(4, minmax(240px, 300px)) !important;
+	justify-content: start;
+}
+
+.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5 {
+	grid-template-columns: repeat(5, minmax(200px, 240px)) !important;
+	justify-content: start;
+}
+
+.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
+	grid-template-columns: repeat(6, minmax(180px, 200px)) !important;
+	justify-content: start;
+}
+
+/* Product cards maintain consistent size */
+.coconpm-featured-products .coconpm-featured-grid .coconpm-product-card {
+	width: 100%;
+	height: 100%;
+}
+
+/* Smaller button text in featured products */
+.coconpm-featured-products .coconpm-btn,
+.coconpm-featured-products .coconpm-btn-primary,
+.coconpm-featured-products a.coconpm-btn,
+.coconpm-featured-products a.coconpm-btn-primary,
+.coconpm-featured-products button.coconpm-btn,
+.coconpm-featured-products button.coconpm-btn-primary {
+	font-size: 13px !important;
+	padding: 10px 24px !important;
+}
+
+/* ============================================
+   PRODUCT CARDS (inherit from shop styles)
+   ============================================ */
+
+/* Product cards inside featured section inherit all coconpm-product-card styles */
+.coconpm-featured-products .coconpm-product-card {
+	background: #ffffff;
+	border: 1px solid #f0f0f0;
+	transition: all 0.3s ease;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	position: relative;
+	overflow: visible;
+}
+
+.coconpm-featured-products .coconpm-product-card:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	border-color: #e0e0e0;
+	transform: translateY(-2px);
+}
+
+/* ============================================
+   NO PRODUCTS MESSAGE
+   ============================================ */
+
+.coconpm-featured-products .coconpm-no-products {
+	text-align: center;
+	padding: 60px 20px;
+}
+
+.coconpm-featured-products .coconpm-no-products p {
+	background: #f5f5f5;
+	border: 1px solid #e0e0e0;
+	padding: 24px 32px;
+	color: #666666;
+	font-size: 16px;
+	display: inline-block;
+	margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Large Desktop - adjust 4+ columns to 3 columns */
+@media (max-width: 1200px) {
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
+		grid-template-columns: repeat(3, minmax(240px, 350px)) !important;
+		justify-content: start;
+	}
+}
+
+/* Tablet - 2 columns */
+@media (max-width: 992px) {
+	.coconpm-featured-products {
+		padding: 50px 0;
+	}
+	
+	.coconpm-featured-container {
+		padding: 0 16px;
+	}
+	
+	.coconpm-featured-title {
+		font-size: 32px;
+	}
+	
+	.coconpm-featured-header {
+		margin-bottom: 32px;
+	}
+	
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-2,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-3,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
+		grid-template-columns: repeat(2, minmax(250px, 400px)) !important;
+		justify-content: start;
+	}
+	
+	.coconpm-featured-grid {
+		gap: 20px;
+	}
+}
+
+/* Mobile - Keep 2 columns but adjust size */
+@media (max-width: 768px) {
+	.coconpm-featured-products {
+		padding: 40px 0;
+	}
+	
+	.coconpm-featured-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+		margin-bottom: 24px;
+	}
+	
+	.coconpm-featured-title {
+		font-size: 28px;
+	}
+	
+	.coconpm-featured-view-all {
+		font-size: 14px;
+	}
+	
+	.coconpm-featured-grid {
+		gap: 16px;
+	}
+	
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-2,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-3,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
+		grid-template-columns: repeat(2, minmax(160px, 1fr)) !important;
+		justify-content: start;
+	}
+}
+
+/* Small Mobile - 1 column (only on very small screens) */
+@media (max-width: 480px) {
+	.coconpm-featured-products {
+		padding: 32px 0;
+	}
+	
+	.coconpm-featured-container {
+		padding: 0 12px;
+	}
+	
+	.coconpm-featured-title {
+		font-size: 24px;
+	}
+	
+	.coconpm-featured-header {
+		margin-bottom: 20px;
+	}
+	
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-2,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-3,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
+		grid-template-columns: minmax(280px, 400px) !important;
+		justify-content: center;
+	}
+}
+
+/* ============================================
+   INTEGRATION WITH SHOP PAGE STYLES
+   ============================================ */
+
+/* 
+ * Note: This CSS file works together with coconpm-shop.css
+ * The product card styles (.coconpm-product-card, .coconpm-card-*) 
+ * are defined in coconpm-shop.css and will be inherited here.
+ * 
+ * Make sure coconpm-shop.css is loaded globally or enqueue it 
+ * along with this file.
+ */
+

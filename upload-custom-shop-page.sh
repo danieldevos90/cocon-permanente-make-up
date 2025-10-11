@@ -75,3 +75,4 @@ echo "   - Tablet (768-992px): 2 columns"
 echo "   - Mobile (<768px): 2 columns"
 echo "   - Small Mobile (<576px): 1 column"
 
+

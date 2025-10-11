@@ -38,3 +38,4 @@ echo ""
 echo "⚠️  Note: The Demo Product still has no images, so the left column will be empty"
 echo "   To test properly, add a featured image to the Demo Product in WordPress admin"
 
+

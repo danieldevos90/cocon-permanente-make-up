@@ -5,6 +5,34 @@
  */
 
 /* ============================================
+   EMPTY CART MESSAGE
+   ============================================ */
+
+/* Empty cart notice */
+.woocommerce-info,
+.cart-empty.woocommerce-info {
+	margin-bottom: 32px !important;
+	padding: 20px 24px !important;
+	background: #B8986D !important;
+	color: #000000 !important;
+	border: none !important;
+	border-radius: 0 !important;
+	font-size: 16px !important;
+}
+
+/* Return to shop button on empty cart */
+.woocommerce-info + .return-to-shop,
+.cart-empty + .return-to-shop {
+	margin-bottom: 60px !important; /* Add space below button */
+}
+
+.return-to-shop a.button,
+.return-to-shop .button {
+	letter-spacing: 0 !important; /* Remove excessive letter spacing */
+	text-transform: none !important;
+}
+
+/* ============================================
    CART PAGE - MINIMAL CLEAN DESIGN
    ============================================ */
 
@@ -518,6 +546,27 @@ body.woocommerce-cart .coconpm-cart-grid {
 .woocommerce-page .wc-proceed-to-checkout a.checkout-button:hover {
 	letter-spacing: 0 !important;
 	border-radius: 0 !important;
+}
+
+/* ============================================
+   ALL CART BUTTONS - FORCE NO LETTER SPACING
+   ============================================ */
+
+/* Remove letter spacing from ALL buttons on cart page */
+.woocommerce-cart a.button,
+.woocommerce-cart button.button,
+.woocommerce-cart input.button,
+.woocommerce-cart .button,
+.woocommerce-page a.button,
+.woocommerce-page button.button,
+.woocommerce-page input.button,
+.woocommerce-page .button,
+body.woocommerce-cart a.button,
+body.woocommerce-cart button.button,
+body.woocommerce-cart input.button,
+body.woocommerce-cart .button {
+	letter-spacing: 0 !important;
+	text-transform: none !important;
 }
 
 /* Mobile override */

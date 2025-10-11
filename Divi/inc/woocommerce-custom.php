@@ -16,19 +16,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Featured Products Shortcode
  * 
- * Usage: [featured_products limit="8" columns="4"]
+ * Usage: [coconpm_featured limit="8" columns="4" title="Featured Products"]
  */
-function cocon_featured_products_shortcode( $atts ) {
+function coconpm_featured_products_shortcode( $atts ) {
 	// Check if WooCommerce is active
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		return '';
 	}
 
 	$atts = shortcode_atts( array(
-		'limit'      => 8,
-		'columns'    => 4,
-		'orderby'    => 'rand',
-		'order'      => 'desc',
+		'limit'         => 8,
+		'columns'       => 4,
+		'orderby'       => 'rand',
+		'order'         => 'desc',
+		'title'         => '', // Optional section title
+		'view_all'      => '', // Optional "View All" link URL (e.g., "/winkel")
+		'view_all_text' => 'Bekijk alle producten', // Customizable link text
 	), $atts, 'featured_products' );
 
 	$query_args = array(
@@ -54,25 +57,44 @@ function cocon_featured_products_shortcode( $atts ) {
 
 	if ( $products->have_posts() ) :
 		?>
-		<div class="woocommerce">
-			<ul class="products columns-<?php echo esc_attr( $atts['columns'] ); ?>">
-				<?php
-				while ( $products->have_posts() ) :
-					$products->the_post();
-					wc_get_template_part( 'content', 'product' );
-				endwhile;
-				?>
-			</ul>
-		</div>
+		<section class="coconpm-featured-products">
+			<div class="coconpm-featured-container">
+				
+				<?php if ( ! empty( $atts['title'] ) ) : ?>
+					<div class="coconpm-featured-header">
+						<h2 class="coconpm-featured-title"><?php echo esc_html( $atts['title'] ); ?></h2>
+						<?php if ( ! empty( $atts['view_all'] ) ) : ?>
+							<a href="<?php echo esc_url( $atts['view_all'] ); ?>" class="coconpm-featured-view-all">
+								<?php echo esc_html( $atts['view_all_text'] ); ?>
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</a>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
+				
+				<div class="coconpm-products-grid coconpm-featured-grid coconpm-columns-<?php echo esc_attr( $atts['columns'] ); ?>">
+					<?php
+					while ( $products->have_posts() ) :
+						$products->the_post();
+						wc_get_template_part( 'content', 'product' );
+					endwhile;
+					?>
+				</div>
+			</div>
+		</section>
 		<?php
 		wp_reset_postdata();
 	else :
-		echo '<p>' . esc_html__( 'No featured products found.', 'Divi' ) . '</p>';
+		echo '<div class="coconpm-no-products"><p>' . esc_html__( 'No featured products found.', 'Divi' ) . '</p></div>';
 	endif;
 
 	return ob_get_clean();
 }
-add_shortcode( 'featured_products', 'cocon_featured_products_shortcode' );
+add_shortcode( 'coconpm_featured', 'coconpm_featured_products_shortcode' );
+// Also register the old name for backwards compatibility (but with lower priority)
+add_shortcode( 'featured_products', 'coconpm_featured_products_shortcode' );
 
 /**
  * Recent Products Shortcode
@@ -550,6 +572,63 @@ function cocon_enqueue_woocommerce_styles() {
 	wp_add_inline_style( 'cocon-woocommerce-custom', $inline_css );
 }
 add_action( 'wp_enqueue_scripts', 'cocon_enqueue_woocommerce_styles', 999 ); // High priority to load after Divi
+
+/**
+ * Enqueue Featured Products CSS globally
+ * This ensures [featured_products] shortcode works on any page
+ */
+function cocon_enqueue_featured_products_styles() {
+	// Only load if WooCommerce is active
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+	
+	$theme_version = et_get_theme_version();
+	
+	// Always enqueue shop CSS globally (needed for product cards)
+	$shop_css_url = get_template_directory_uri() . '/css/coconpm-shop.css';
+	$shop_css_path = get_template_directory() . '/css/coconpm-shop.css';
+	
+	if ( file_exists( $shop_css_path ) ) {
+		wp_enqueue_style(
+			'coconpm-shop-global',
+			$shop_css_url,
+			array( 'divi-style' ),
+			$theme_version . '-' . time()
+		);
+	}
+	
+	// Always enqueue featured products CSS globally
+	$featured_css_url = get_template_directory_uri() . '/css/coconpm-featured.css';
+	$featured_css_path = get_template_directory() . '/css/coconpm-featured.css';
+	
+	if ( file_exists( $featured_css_path ) ) {
+		wp_enqueue_style(
+			'coconpm-featured',
+			$featured_css_url,
+			array( 'coconpm-shop-global' ), // Load after shop CSS
+			$theme_version . '-' . time()
+		);
+		
+		// Debug log
+		error_log('✅ COCONPM FEATURED CSS LOADED');
+		error_log('CSS URL: ' . $featured_css_url);
+	}
+	
+	// Always enqueue buttons CSS globally
+	$button_css_url = get_template_directory_uri() . '/css/coconpm-buttons.css';
+	$button_css_path = get_template_directory() . '/css/coconpm-buttons.css';
+	
+	if ( file_exists( $button_css_path ) ) {
+		wp_enqueue_style(
+			'coconpm-buttons-global',
+			$button_css_url,
+			array( 'coconpm-shop-global' ),
+			$theme_version . '-' . time()
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cocon_enqueue_featured_products_styles', 20 ); // Load early
 
 /**
  * Force button styles in head - LAST override

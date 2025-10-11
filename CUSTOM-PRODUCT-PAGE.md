@@ -224,3 +224,4 @@ Both pages now use the **same pattern:**
 
 **Questions?** All styling is in `Divi/css/coconpm-product.css` - easy to modify!
 
+

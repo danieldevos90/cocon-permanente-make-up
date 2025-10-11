@@ -314,3 +314,4 @@ All styling is in `Divi/css/coconpm-shop.css`:
 
 **Questions?** All styling is in `Divi/css/coconpm-shop.css` - easy to modify!
 
+
