@@ -40,6 +40,26 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	<!-- Product Card Body -->
 	<div class="coconpm-card-body">
 		
+		<!-- Product Categories (Small, above title) -->
+		<?php 
+		$product_categories = get_the_terms( $product->get_id(), 'product_cat' );
+		if ( $product_categories && ! is_wp_error( $product_categories ) ) : 
+		?>
+			<div class="coconpm-card-category-small">
+				<?php 
+				$category_names = array();
+				foreach ( $product_categories as $category ) {
+					if ( $category->slug !== 'uncategorized' ) { // Skip default uncategorized
+						$category_names[] = esc_html( $category->name );
+					}
+				}
+				if ( ! empty( $category_names ) ) {
+					echo implode( ' • ', $category_names );
+				}
+				?>
+			</div>
+		<?php endif; ?>
+		
 		<!-- Product Title & Price Row -->
 		<div class="coconpm-card-header">
 			<h3 class="coconpm-card-title">

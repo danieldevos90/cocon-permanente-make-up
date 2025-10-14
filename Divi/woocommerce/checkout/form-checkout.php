@@ -1,6 +1,6 @@
 <?php
 /**
- * Checkout Form
+ * Checkout Form - Custom COCONPM Layout
  *
  * This template can be overridden by copying it to yourtheme/woocommerce/checkout/form-checkout.php.
  *
@@ -22,39 +22,84 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 
 ?>
 
-<form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+<div class="coconpm-checkout-page">
+	<div class="coconpm-checkout-wrapper">
+		
+		<form name="checkout" method="post" class="checkout woocommerce-checkout coconpm-checkout-form" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
 
-	<?php if ( $checkout->get_checkout_fields() ) : ?>
+			<div class="coconpm-checkout-grid">
+				
+				<!-- Left Column: Customer Details -->
+				<div class="coconpm-checkout-left">
+					
+					<?php if ( $checkout->get_checkout_fields() ) : ?>
 
-		<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
+						<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
 
-		<div class="col2-set" id="customer_details">
-			<div class="col-1">
-				<?php do_action( 'woocommerce_checkout_billing' ); ?>
-			</div>
+						<div class="coconpm-customer-details" id="customer_details">
+							
+							<!-- Billing Information -->
+							<div class="coconpm-checkout-section coconpm-billing-section">
+								<div class="coconpm-checkout-section-header">
+									<h3 class="coconpm-checkout-section-title"><?php esc_html_e( 'Billing details', 'woocommerce' ); ?></h3>
+								</div>
+								<div class="coconpm-checkout-section-body">
+									<?php do_action( 'woocommerce_checkout_billing' ); ?>
+								</div>
+							</div>
 
-			<div class="col-2">
-				<?php do_action( 'woocommerce_checkout_shipping' ); ?>
-			</div>
-		</div>
+							<!-- Shipping Information -->
+							<?php if ( WC()->cart->needs_shipping_address() === true ) : ?>
+								<div class="coconpm-checkout-section coconpm-shipping-section">
+									<div class="coconpm-checkout-section-header">
+										<h3 class="coconpm-checkout-section-title"><?php esc_html_e( 'Shipping details', 'woocommerce' ); ?></h3>
+									</div>
+									<div class="coconpm-checkout-section-body">
+										<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+									</div>
+								</div>
+							<?php endif; ?>
 
-		<?php do_action( 'woocommerce_checkout_after_customer_details' ); ?>
+						</div>
 
-	<?php endif; ?>
-	
-	<?php do_action( 'woocommerce_checkout_before_order_review_heading' ); ?>
-	
-	<h3 id="order_review_heading"><?php esc_html_e( 'Your order', 'woocommerce' ); ?></h3>
-	
-	<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
+						<?php do_action( 'woocommerce_checkout_after_customer_details' ); ?>
 
-	<div id="order_review" class="woocommerce-checkout-review-order">
-		<?php do_action( 'woocommerce_checkout_order_review' ); ?>
-	</div>
+					<?php endif; ?>
 
-	<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>
+					<!-- Additional Information -->
+					<?php do_action( 'woocommerce_checkout_before_order_review_heading' ); ?>
 
-</form>
+				</div>
+				
+				<!-- Right Column: Order Review -->
+				<div class="coconpm-checkout-right">
+					
+					<div class="coconpm-order-review">
+						<div class="coconpm-order-review-header">
+							<h3 class="coconpm-order-review-title" id="order_review_heading"><?php esc_html_e( 'Your order', 'woocommerce' ); ?></h3>
+						</div>
+						
+						<div class="coconpm-order-review-body">
+							
+							<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
+
+							<div id="order_review" class="woocommerce-checkout-review-order">
+								<?php do_action( 'woocommerce_checkout_order_review' ); ?>
+							</div>
+
+							<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>
+							
+						</div>
+					</div>
+
+				</div>
+
+			</div><!-- .coconpm-checkout-grid -->
+
+		</form>
+
+	</div><!-- .coconpm-checkout-wrapper -->
+</div><!-- .coconpm-checkout-page -->
 
 <?php do_action( 'woocommerce_after_checkout_form', $checkout ); ?>
 

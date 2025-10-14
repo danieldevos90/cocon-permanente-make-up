@@ -26,6 +26,53 @@ get_header();
 		do_action( 'woocommerce_archive_description' );
 		?>
 
+		<!-- Category Filter Section -->
+		<?php
+		$product_categories = get_terms( array(
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => true,
+			'exclude'    => array( get_option( 'default_product_cat' ) ), // Exclude uncategorized
+		) );
+
+		if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) :
+		?>
+			<div class="coconpm-category-filters">
+				<h3 class="coconpm-filter-title">Categorieën</h3>
+				<div class="coconpm-filter-buttons">
+					<a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" 
+					   class="coconpm-filter-btn <?php echo ( is_shop() && ! is_product_category() ) ? 'active' : ''; ?>">
+						Alle producten
+					</a>
+					<?php foreach ( $product_categories as $category ) : ?>
+						<a href="<?php echo esc_url( get_term_link( $category ) ); ?>" 
+						   class="coconpm-filter-btn <?php echo ( is_product_category( $category->slug ) ) ? 'active' : ''; ?>">
+							<?php echo esc_html( $category->name ); ?>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		<?php endif; ?>
+
+		<!-- Shipping & Return Policy Info -->
+		<div class="coconpm-info-boxes">
+			<div class="coconpm-info-box coconpm-shipping-info">
+				<div class="coconpm-info-content">
+					<strong>Verzending</strong><br>
+					Potloden: brievenbus<br>
+					Naalden: pakket<br>
+					<span class="coconpm-highlight">Gratis verzending vanaf €75</span> • Internationaal verzenden beschikbaar
+				</div>
+			</div>
+			
+			<div class="coconpm-info-box coconpm-return-info">
+				<div class="coconpm-info-content">
+					<strong>Retourbeleid</strong><br>
+					Make-up producten kunnen om hygiënische redenen <span class="coconpm-highlight">niet geretourneerd worden</span><br>
+					Andere producten: 14 dagen retourrecht
+				</div>
+			</div>
+		</div>
+
 		<?php if ( woocommerce_product_loop() ) : ?>
 
 			<!-- Toolbar: Result Count + Sorting -->

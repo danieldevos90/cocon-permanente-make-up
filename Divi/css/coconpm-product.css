@@ -154,6 +154,161 @@
 }
 
 /* ============================================
+   PRODUCT VARIATIONS (Dropdowns)
+   ============================================ */
+
+.coconpm-variations-table {
+	width: 100%;
+	border: none;
+	background: transparent;
+	margin-bottom: 24px;
+}
+
+.coconpm-variations-table tbody {
+	border: none;
+}
+
+.coconpm-variation-row {
+	border: none;
+	background: transparent;
+}
+
+.coconpm-variation-row th,
+.coconpm-variation-row td {
+	border: none;
+	background: transparent;
+	padding: 8px 0;
+	vertical-align: top;
+}
+
+.coconpm-variation-label {
+	width: 120px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #333333;
+	text-align: left;
+	padding-right: 16px;
+}
+
+.coconpm-variation-label label {
+	font-size: 14px;
+	font-weight: 600;
+	color: #333333;
+	margin: 0;
+}
+
+.coconpm-variation-select {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+/* Custom Dropdown Styling - Target WooCommerce generated selects */
+.coconpm-variations-table select,
+.coconpm-variation-select select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background-color: transparent;
+	background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="%23C64193" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	background-size: 16px;
+	border: 2px solid #C64193;
+	border-radius: 0;
+	color: #C64193;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 500;
+	height: 48px;
+	padding: 0 40px 0 16px;
+	min-width: 200px;
+	transition: all 0.3s ease;
+	box-sizing: border-box;
+}
+
+.coconpm-variations-table select:hover,
+.coconpm-variation-select select:hover {
+	border-color: #A0346D;
+	background-color: #fafafa;
+}
+
+.coconpm-variations-table select:focus,
+.coconpm-variation-select select:focus {
+	outline: none;
+	border-color: #A0346D;
+	background-color: #ffffff;
+	box-shadow: 0 0 0 3px rgba(192, 65, 147, 0.1);
+}
+
+/* Dropdown Options */
+.coconpm-variations-table select option,
+.coconpm-variation-select select option {
+	color: #333333;
+	background: #ffffff;
+	padding: 8px 16px;
+}
+
+.coconpm-variations-table select option:hover,
+.coconpm-variations-table select option:focus,
+.coconpm-variation-select select option:hover,
+.coconpm-variation-select select option:focus {
+	background-color: #f8f4f8;
+	color: #C64193;
+}
+
+/* Reset/Clear Link */
+.coconpm-reset-variations {
+	color: #999999;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 400;
+	transition: color 0.2s ease;
+	white-space: nowrap;
+}
+
+.coconpm-reset-variations:hover {
+	color: #C64193;
+	text-decoration: underline;
+}
+
+/* Override any WooCommerce default variation styles */
+.coconpm-variations-form .variations {
+	border: none !important;
+	background: transparent !important;
+	margin: 0 !important;
+}
+
+.coconpm-variations-form .variations tbody tr {
+	border: none !important;
+	background: transparent !important;
+}
+
+.coconpm-variations-form .variations tbody tr th,
+.coconpm-variations-form .variations tbody tr td {
+	border: none !important;
+	background: transparent !important;
+}
+
+.coconpm-variations-form .variations_form.cart {
+	margin: 0;
+	padding: 0;
+}
+
+/* Fix for default WooCommerce dropdown styling conflicts */
+.coconpm-variations-table select,
+.coconpm-variation-select select,
+select.coconpm-variation-dropdown {
+	margin: 0 !important;
+	padding: 0 40px 0 16px !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	background-color: transparent !important;
+	-webkit-box-shadow: none !important;
+}
+
+/* ============================================
    ADD TO CART SECTION
    ============================================ */
 
@@ -484,6 +639,46 @@
 		font-size: 15px;
 		margin-bottom: 16px;
 		padding-bottom: 16px;
+	}
+	
+	/* Mobile - Variations */
+	.coconpm-variations-table {
+		display: block;
+	}
+	
+	.coconpm-variations-table tbody {
+		display: block;
+	}
+	
+	.coconpm-variation-row {
+		display: block;
+		margin-bottom: 16px;
+	}
+	
+	.coconpm-variation-row th,
+	.coconpm-variation-row td {
+		display: block;
+		width: 100%;
+		padding: 4px 0;
+	}
+	
+	.coconpm-variation-label {
+		width: 100%;
+		padding-right: 0;
+		margin-bottom: 8px;
+	}
+	
+	.coconpm-variations-table select,
+	.coconpm-variation-select select {
+		width: 100%;
+		min-width: 100%;
+		font-size: 15px;
+	}
+	
+	.coconpm-variation-select {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
 	}
 	
 	.coconpm-add-to-cart form.cart {

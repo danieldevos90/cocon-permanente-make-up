@@ -330,6 +330,24 @@ function cocon_enqueue_woocommerce_styles() {
 	
 	error_log('✅ wp_enqueue_style() called for coconpm-buttons (unified button system)');
 	
+	// Enqueue Product Gallery JavaScript
+	wp_enqueue_script(
+		'coconpm-product-gallery',
+		get_template_directory_uri() . '/js/product-gallery.js',
+		array( 'jquery' ),
+		$theme_version . '-' . time(),
+		true
+	);
+	
+	// Enqueue Product Variations JavaScript (for variant image switching)
+	wp_enqueue_script(
+		'coconpm-product-variations',
+		get_template_directory_uri() . '/js/product-variations.js',
+		array( 'jquery', 'wc-add-to-cart-variation' ),
+		$theme_version . '-' . time(),
+		true
+	);
+	
 	// Add console log in footer to confirm CSS loaded
 	add_action( 'wp_footer', function() use ( $button_css_url, $theme_version, $button_css_path ) {
 		?>
@@ -434,7 +452,41 @@ function cocon_enqueue_woocommerce_styles() {
 				console.log('📁 CSS File:', '<?php echo esc_js($cart_css_url); ?>');
 				console.log('🔢 Version:', '<?php echo esc_js($theme_version . '-' . time()); ?>');
 				console.log('📋 File exists:', '<?php echo file_exists($cart_css_path) ? "YES ✅" : "NO ❌"; ?>');
-				console.log('🎨 CSS should be loaded as stylesheet #25 or higher');
+				console.log('🎨 CSS should be loaded as stylesheet');
+			</script>
+			<?php
+		}, 999 );
+	}
+	
+	// Enqueue Custom Checkout CSS on checkout page
+	if ( is_checkout() ) {
+		$checkout_css_url = get_template_directory_uri() . '/css/coconpm-checkout.css';
+		$checkout_css_path = get_template_directory() . '/css/coconpm-checkout.css';
+		
+		error_log('💳 CHECKOUT PAGE DETECTED - Loading coconpm-checkout.css');
+		error_log('CSS URL: ' . $checkout_css_url);
+		error_log('CSS File exists: ' . (file_exists($checkout_css_path) ? 'YES' : 'NO - FILE MISSING!'));
+		
+		wp_enqueue_style(
+			'coconpm-checkout',
+			$checkout_css_url,
+			array( 'woocommerce-general', 'woocommerce-layout' ), // Load AFTER WooCommerce CSS
+			$theme_version . '-' . time() // Cache buster for development
+		);
+		
+		error_log('✅ wp_enqueue_style() called for coconpm-checkout');
+		
+		// Add console log in footer to confirm CSS loaded
+		add_action( 'wp_footer', function() use ( $checkout_css_url, $theme_version, $checkout_css_path ) {
+			?>
+			<script>
+				console.log('%c✅ COCONPM CHECKOUT CSS LOADED!', 'background: #4CAF50; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;');
+				console.log('📁 CSS File:', '<?php echo esc_js($checkout_css_url); ?>');
+				console.log('🔢 Version:', '<?php echo esc_js($theme_version . '-' . time()); ?>');
+				console.log('📋 File exists:', '<?php echo file_exists($checkout_css_path) ? "YES ✅" : "NO ❌"; ?>');
+				console.log('🎨 CSS should be loaded as stylesheet');
+				console.log('🔧 2-Column Layout should be active');
+				console.log('⚫ Coupon message should be BLACK');
 			</script>
 			<?php
 		}, 999 );

@@ -1493,26 +1493,26 @@ form.woocommerce-ordering {
 .woocommerce-message,
 .woocommerce-info,
 .woocommerce-error {
-	padding: 0.875rem 1.25rem !important;
+	padding: 12px 16px !important;
 	margin-bottom: 1rem !important;
-	border: 1px solid #e8e8e8 !important;
+	border: none !important;
 	border-radius: 0 !important;
-	background: transparent !important;
+	background: #f9f9f9 !important;
 	color: var(--wc-text-color) !important;
 	list-style: none !important;
-	font-size: 15px !important;
-	line-height: 1.6 !important;
+	font-size: 14px !important;
+	line-height: 1.5 !important;
 	display: flex !important;
 	align-items: center !important;
 	justify-content: space-between !important;
 	flex-wrap: wrap !important;
 	gap: 1rem !important;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+	box-shadow: none !important;
 }
 
-/* Success Message - Subtle Green Left Border */
+/* Success Message - No border for minimal look */
 .woocommerce-message {
-	border-left: 2px solid #C64193 !important;
+	/* No special styling - use default minimal style */
 }
 
 /* Error Message - Subtle Red Left Border */

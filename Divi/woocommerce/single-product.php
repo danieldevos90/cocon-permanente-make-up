@@ -71,6 +71,26 @@ if ( ! $product ) {
 							<?php woocommerce_template_single_add_to_cart(); ?>
 						</div>
 						
+						<!-- Shipping & Return Policy Info -->
+						<div class="coconpm-info-boxes coconpm-product-info-boxes">
+							<div class="coconpm-info-box coconpm-shipping-info">
+								<div class="coconpm-info-content">
+									<strong>Verzending</strong><br>
+									Potloden: brievenbus<br>
+									Naalden: pakket<br>
+									<span class="coconpm-highlight">Gratis vanaf €75</span>
+								</div>
+							</div>
+							
+							<div class="coconpm-info-box coconpm-return-info">
+								<div class="coconpm-info-content">
+									<strong>Retourbeleid</strong><br>
+									Make-up: <span class="coconpm-highlight">niet retourneerbaar</span><br>
+									Andere: 14 dagen retourrecht
+								</div>
+							</div>
+						</div>
+						
 						<!-- Product Meta (SKU, Categories, Tags) -->
 						<div class="coconpm-product-meta">
 							<?php woocommerce_template_single_meta(); ?>
