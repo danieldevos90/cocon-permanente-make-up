@@ -11,11 +11,12 @@
 
 .woocommerce-checkout .woocommerce,
 body.woocommerce-checkout .woocommerce {
-	max-width: 1280px;
+	max-width: 1440px;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 48px 24px;
+	padding: 48px 32px;
 	box-sizing: border-box;
+	width: 100%;
 }
 
 /* Two-column grid on the form itself */
@@ -48,42 +49,42 @@ body.woocommerce-checkout form.woocommerce-checkout .col2-set#customer_details {
 	padding-top: 0 !important;
 }
 
-/* Right column: order review heading – force row 1 so it aligns with Factuurgegevens */
+/* Right column: hide the separate h3#order_review_heading – we'll add a header inside #order_review instead */
 .woocommerce-checkout form.woocommerce-checkout > #order_review_heading,
 body.woocommerce-checkout form.woocommerce-checkout > #order_review_heading {
-	grid-column: 2 !important;
-	grid-row: 1 !important;
-	align-self: start !important;
-	margin: 0 !important;
-	margin-top: 0 !important;
-	padding: 20px 24px !important;
-	background: #fafafa !important;
-	border: 1px solid #e8e8e8 !important;
-	border-bottom: none !important;
-	border-left: 4px solid #C64193 !important;
-	border-radius: 4px 4px 0 0 !important;
-	font-size: 17px !important;
-	font-weight: 600 !important;
-	color: #1a1a1a !important;
-	box-sizing: border-box !important;
+	display: none !important;
 }
 
-/* Right column: order review table + payment (card body) – row 2, top-aligned */
+/* Right column: order review card (header + table + payment) – single unified card in grid row 1 */
 .woocommerce-checkout form.woocommerce-checkout > #order_review,
 body.woocommerce-checkout form.woocommerce-checkout > #order_review {
 	grid-column: 2 !important;
-	grid-row: 2 !important;
+	grid-row: 1 / -1 !important; /* span all rows so it aligns with left column */
 	align-self: start !important;
 	margin: 0 !important;
-	margin-top: 0 !important;
 	padding: 0 !important;
 	background: #fff !important;
 	border: 1px solid #e8e8e8 !important;
-	border-top: none !important;
-	border-radius: 0 0 4px 4px !important;
+	border-radius: 4px !important;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
 	position: sticky !important;
 	top: 24px !important;
+	box-sizing: border-box !important;
+	overflow: hidden !important;
+}
+
+/* Order review: add header via ::before pseudo-element */
+.woocommerce-checkout form.woocommerce-checkout > #order_review::before,
+body.woocommerce-checkout form.woocommerce-checkout > #order_review::before {
+	content: "Je bestelling" !important;
+	display: block !important;
+	padding: 20px 24px !important;
+	background: #fafafa !important;
+	border-bottom: 1px solid #eee !important;
+	border-left: 4px solid #C64193 !important;
+	font-size: 17px !important;
+	font-weight: 600 !important;
+	color: #1a1a1a !important;
 	box-sizing: border-box !important;
 }
 
@@ -144,16 +145,85 @@ body.woocommerce-checkout .col2-set .col-1 .woocommerce-billing-fields__field-wr
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
-.woocommerce-checkout .col2-set .col-2 .woocommerce-shipping-fields h3,
-body.woocommerce-checkout .col2-set .col-2 .woocommerce-shipping-fields h3 {
-	margin: 0 !important;
-	padding: 20px 24px !important;
+/* “Verzenden naar een ander adres?” – pink background, white text (button style) */
+.woocommerce-checkout .col2-set .col-2 .woocommerce-shipping-fields h3#ship-to-different-address,
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address,
+body.woocommerce-checkout .col2-set .col-2 .woocommerce-shipping-fields h3#ship-to-different-address,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address,
+.coconpm-checkout-section-body .woocommerce-shipping-fields h3#ship-to-different-address {
+	display: block !important;
+	visibility: visible !important;
+	width: 100% !important;
+	box-sizing: border-box !important;
+	margin: 0 0 16px 0 !important;
+	padding: 16px 20px !important;
 	background: #fafafa !important;
-	border-bottom: 1px solid #eee !important;
-	border-left: 4px solid #C64193 !important;
-	font-size: 17px !important;
-	font-weight: 600 !important;
-	color: #1a1a1a !important;
+	border: 1px solid #e8e8e8 !important;
+	border-radius: 4px !important;
+	font-size: 15px !important;
+	font-weight: 500 !important;
+	color: #333 !important;
+	transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address:hover,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address:hover {
+	background: #f5f5f5 !important;
+	border-color: #d8d8d8 !important;
+}
+
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address .woocommerce-form__label,
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address label,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address .woocommerce-form__label,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address label {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: space-between !important;
+	gap: 12px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	color: #333 !important;
+	font-weight: 500 !important;
+	cursor: pointer !important;
+	width: 100% !important;
+}
+
+/* Chevron icon via ::after on label */
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address label::after,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address label::after {
+	content: "" !important;
+	display: inline-block !important;
+	width: 10px !important;
+	height: 10px !important;
+	border-right: 2px solid #C64193 !important;
+	border-bottom: 2px solid #C64193 !important;
+	transform: rotate(-45deg) !important;
+	transition: transform 0.25s ease !important;
+	flex-shrink: 0 !important;
+	margin-left: auto !important;
+}
+
+/* Rotate chevron when checkbox is checked (section open) */
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address:has(input:checked) label::after,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address:has(input:checked) label::after {
+	transform: rotate(45deg) !important;
+}
+
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address span,
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address span {
+	color: #333 !important;
+	flex: 1 !important;
+}
+
+/* Hide the actual checkbox – chevron replaces it */
+.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address input[type="checkbox"],
+body.woocommerce-checkout .woocommerce-shipping-fields h3#ship-to-different-address input[type="checkbox"] {
+	position: absolute !important;
+	opacity: 0 !important;
+	width: 0 !important;
+	height: 0 !important;
+	margin: 0 !important;
+	pointer-events: none !important;
 }
 
 .woocommerce-checkout .col2-set .col-2 .woocommerce-shipping-fields__field-wrapper,
@@ -257,7 +327,7 @@ body.woocommerce-checkout .col2-set .col-2 .woocommerce-additional-fields__field
 	}
 }
 
-/* Default checkout: single column on small screens */
+/* Default checkout: single column on small screens + keep fields visible on mobile */
 @media (max-width: 992px) {
 	.woocommerce-checkout form.woocommerce-checkout,
 	body.woocommerce-checkout form.woocommerce-checkout {
@@ -268,11 +338,28 @@ body.woocommerce-checkout .col2-set .col-2 .woocommerce-additional-fields__field
 	.woocommerce-checkout form.woocommerce-checkout > #customer_details,
 	body.woocommerce-checkout form.woocommerce-checkout > #customer_details {
 		grid-row: auto !important;
+		display: block !important;
+		visibility: visible !important;
+		overflow: visible !important;
 	}
 
-	.woocommerce-checkout form.woocommerce-checkout > #order_review_heading,
+	/* Keep col2-set and field wrappers visible on tablet/mobile */
+	.woocommerce-checkout .col2-set,
+	.woocommerce-checkout .col2-set .col-1,
+	.woocommerce-checkout .col2-set .col-2,
+	.woocommerce-checkout .woocommerce-billing-fields,
+	.woocommerce-checkout .woocommerce-billing-fields__field-wrapper,
+	body.woocommerce-checkout .col2-set,
+	body.woocommerce-checkout .col2-set .col-1,
+	body.woocommerce-checkout .col2-set .col-2,
+	body.woocommerce-checkout .woocommerce-billing-fields,
+	body.woocommerce-checkout .woocommerce-billing-fields__field-wrapper {
+		display: block !important;
+		visibility: visible !important;
+		overflow: visible !important;
+	}
+
 	.woocommerce-checkout form.woocommerce-checkout > #order_review,
-	body.woocommerce-checkout form.woocommerce-checkout > #order_review_heading,
 	body.woocommerce-checkout form.woocommerce-checkout > #order_review {
 		grid-column: 1 !important;
 	}
@@ -284,13 +371,236 @@ body.woocommerce-checkout .col2-set .col-2 .woocommerce-additional-fields__field
 	.woocommerce-checkout .woocommerce,
 	body.woocommerce-checkout .woocommerce {
 		padding: 32px 20px !important;
+		max-width: 100% !important;
+		width: 100% !important;
+		box-sizing: border-box !important;
+	}
+
+	.woocommerce-checkout form.woocommerce-checkout,
+	body.woocommerce-checkout form.woocommerce-checkout {
+		max-width: 100% !important;
+		min-width: 0 !important;
 	}
 }
 
 @media (max-width: 768px) {
+	/* WooCommerce checkout: 0 padding on mobile */
 	.woocommerce-checkout .woocommerce,
 	body.woocommerce-checkout .woocommerce {
-		padding: 24px 16px !important;
+		padding: 0 !important;
+		max-width: 100% !important;
+		width: 100% !important;
+		overflow-x: hidden !important;
+		box-sizing: border-box !important;
+	}
+
+	.woocommerce-checkout form.woocommerce-checkout,
+	body.woocommerce-checkout form.woocommerce-checkout {
+		overflow: visible !important;
+		min-height: 0 !important;
+		width: 100% !important;
+		max-width: 100% !important;
+		min-width: 0 !important;
+		box-sizing: border-box !important;
+	}
+
+	.woocommerce-checkout form.woocommerce-checkout > #customer_details,
+	.woocommerce-checkout form.woocommerce-checkout > #order_review,
+	body.woocommerce-checkout form.woocommerce-checkout > #customer_details,
+	body.woocommerce-checkout form.woocommerce-checkout > #order_review {
+		max-width: 100% !important;
+		min-width: 0 !important;
+		box-sizing: border-box !important;
+	}
+
+	/* Order review table: mobile-proof layout so right column (prices, shipping, total) is never cut off */
+	.woocommerce-checkout .woocommerce-checkout-review-order-table,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table {
+		table-layout: fixed !important;
+		width: 100% !important;
+		max-width: 100% !important;
+		box-sizing: border-box !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-name,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .product-name,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-name,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .product-name,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table thead th.product-name,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .product-name {
+		width: 58% !important;
+		max-width: 58% !important;
+		word-wrap: break-word !important;
+		overflow-wrap: break-word !important;
+		word-break: break-word !important;
+		min-width: 0 !important;
+		box-sizing: border-box !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-total,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .product-total,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-total,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .product-total,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table thead th.product-total,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .product-total {
+		width: 42% !important;
+		min-width: 0 !important;
+		box-sizing: border-box !important;
+		text-align: right !important;
+		white-space: nowrap !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table tbody .product-total,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot td,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table tbody .product-total,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot td,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table tbody .product-total,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table tfoot td {
+		text-align: right !important;
+	}
+
+	/* Shipping methods in table: wrap and constrain so they don't overflow */
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .woocommerce-shipping-methods {
+		list-style: none !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods li,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods li,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .woocommerce-shipping-methods li {
+		display: flex !important;
+		align-items: center !important;
+		flex-wrap: wrap !important;
+		gap: 8px !important;
+		margin-bottom: 6px !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods img,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods img,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .woocommerce-shipping-methods img {
+		max-width: 60px !important;
+		height: auto !important;
+		vertical-align: middle !important;
+	}
+
+	/* Order total cell: allow VAT text to wrap inside the cell */
+	.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot .order-total td,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot .order-total td,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table tfoot .order-total td {
+		white-space: normal !important;
+		word-wrap: break-word !important;
+		overflow-wrap: break-word !important;
+	}
+
+	/* Keep order review container from causing horizontal scroll */
+	.woocommerce-checkout #order_review,
+	body.woocommerce-checkout #order_review,
+	.coconpm-order-review-body #order_review {
+		min-width: 0 !important;
+		overflow-x: hidden !important;
+		max-width: 100% !important;
+	}
+
+	/* Inputs and selects full width but never overflow */
+	.woocommerce-checkout .form-row input,
+	.woocommerce-checkout .form-row select,
+	.woocommerce-checkout .form-row textarea,
+	.woocommerce-checkout .woocommerce-input-wrapper,
+	body.woocommerce-checkout .form-row input,
+	body.woocommerce-checkout .form-row select,
+	body.woocommerce-checkout .form-row textarea,
+	body.woocommerce-checkout .woocommerce-input-wrapper {
+		max-width: 100% !important;
+		box-sizing: border-box !important;
+	}
+
+	/* Force checkout form and field containers visible on mobile (except shipping field wrapper – that is toggled by "Verzenden naar een ander adres?") */
+	.woocommerce-checkout .col2-set,
+	.woocommerce-checkout .col2-set .col-1,
+	.woocommerce-checkout .col2-set .col-2,
+	.woocommerce-checkout .woocommerce-billing-fields,
+	.woocommerce-checkout .woocommerce-billing-fields__field-wrapper,
+	.woocommerce-checkout .woocommerce-shipping-fields,
+	.woocommerce-checkout .woocommerce-additional-fields,
+	.woocommerce-checkout .woocommerce-additional-fields__field-wrapper,
+	body.woocommerce-checkout .col2-set,
+	body.woocommerce-checkout .col2-set .col-1,
+	body.woocommerce-checkout .col2-set .col-2,
+	body.woocommerce-checkout .woocommerce-billing-fields,
+	body.woocommerce-checkout .woocommerce-billing-fields__field-wrapper,
+	body.woocommerce-checkout .woocommerce-shipping-fields,
+	body.woocommerce-checkout .woocommerce-additional-fields,
+	body.woocommerce-checkout .woocommerce-additional-fields__field-wrapper {
+		display: block !important;
+		visibility: visible !important;
+		overflow: visible !important;
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	.woocommerce-checkout .form-row,
+	.woocommerce-checkout .woocommerce-billing-fields .form-row,
+	.woocommerce-checkout .woocommerce-shipping-fields .form-row,
+	body.woocommerce-checkout .form-row,
+	body.woocommerce-checkout .woocommerce-billing-fields .form-row,
+	body.woocommerce-checkout .woocommerce-shipping-fields .form-row {
+		display: block !important;
+		visibility: visible !important;
+	}
+}
+
+/* Very small screens – 0 padding, tighter order table */
+@media (max-width: 480px) {
+	.woocommerce-checkout .woocommerce,
+	body.woocommerce-checkout .woocommerce {
+		padding: 0 !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table thead th,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table tbody td,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot th,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot td,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table thead th,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table tbody td,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot th,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table tfoot td,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table thead th,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table tbody td,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table tfoot th,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table tfoot td {
+		padding-left: 10px !important;
+		padding-right: 10px !important;
+		font-size: 13px !important;
+	}
+
+	/* Slightly more space for right column on very small screens */
+	.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-name,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .product-name,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-name,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .product-name,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table thead th.product-name,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .product-name {
+		width: 52% !important;
+		max-width: 52% !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-total,
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .product-total,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table thead th.product-total,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .product-total,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table thead th.product-total,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .product-total {
+		width: 48% !important;
+	}
+
+	.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods img,
+	body.woocommerce-checkout .woocommerce-checkout-review-order-table .woocommerce-shipping-methods img,
+	.coconpm-order-review-body .woocommerce-checkout-review-order-table .woocommerce-shipping-methods img {
+		max-width: 48px !important;
 	}
 }
 
@@ -300,9 +610,9 @@ body.woocommerce-checkout .col2-set .col-2 .woocommerce-additional-fields__field
 
 .coconpm-checkout-page {
 	width: 100%;
-	max-width: 1280px;
+	max-width: 1440px;
 	margin: 0 auto;
-	padding: 48px 24px;
+	padding: 48px 32px;
 	box-sizing: border-box;
 }
 
@@ -1098,9 +1408,9 @@ html body .woocommerce-form-coupon-toggle .showcoupon:hover,
 .woocommerce-page .coconpm-checkout-page,
 body.woocommerce-checkout .coconpm-checkout-page {
 	width: 100% !important;
-	max-width: 1280px !important;
+	max-width: 1440px !important;
 	margin: 0 auto !important;
-	padding: 48px 24px !important;
+	padding: 48px 32px !important;
 	box-sizing: border-box !important;
 }
 
@@ -1205,21 +1515,32 @@ html body .woocommerce-checkout .col2-set .col-2 {
    WOOCOMMERCE BILLING/SHIPPING FIELDS STYLING
    ============================================ */
 
-/* Billing fields container */
+/* Billing fields container – always visible */
 .woocommerce-billing-fields,
-.woocommerce-shipping-fields,
-.woocommerce-billing-fields__field-wrapper,
-.woocommerce-shipping-fields__field-wrapper {
+.woocommerce-billing-fields__field-wrapper {
 	width: 100% !important;
 	display: block !important;
 	visibility: visible !important;
 }
 
+/* Shipping fields container – wrapper visible; .shipping_address inside is toggled by WC JS via checkbox */
+.woocommerce-shipping-fields {
+	width: 100% !important;
+	display: block !important;
+	visibility: visible !important;
+}
+
+/* Do NOT force display on shipping field wrapper / .shipping_address so "Verzenden naar een ander adres?" can toggle the form */
+.woocommerce-shipping-fields__field-wrapper {
+	width: 100% !important;
+}
+
 /* Billing/Shipping section titles (when WC renders them outside our sections) */
+/* Billing/shipping section titles (exclude #ship-to-different-address which has its own pink style) */
 .woocommerce-billing-fields h3,
-.woocommerce-shipping-fields h3,
+.woocommerce-shipping-fields h3:not(#ship-to-different-address),
 html body .woocommerce-billing-fields h3,
-html body .woocommerce-shipping-fields h3 {
+html body .woocommerce-shipping-fields h3:not(#ship-to-different-address) {
 	display: block !important;
 	font-size: 17px !important;
 	font-weight: 600 !important;

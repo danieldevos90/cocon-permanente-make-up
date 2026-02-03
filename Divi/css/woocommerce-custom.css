@@ -39,6 +39,20 @@ body #main-content .wc-container {
 	padding: 48px 15px;
 }
 
+/* Mobile: .container 90% width on WooCommerce pages (instead of 80%) */
+@media (max-width: 768px) {
+	.woocommerce .container,
+	.woocommerce-page .container,
+	body.woocommerce .container,
+	body.woocommerce-page .container {
+		width: 90% !important;
+		max-width: 90% !important;
+		margin-left: auto !important;
+		margin-right: auto !important;
+		box-sizing: border-box !important;
+	}
+}
+
 /* Grid System */
 .wc-row {
 	display: flex;
