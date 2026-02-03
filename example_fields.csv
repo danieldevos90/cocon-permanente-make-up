@@ -1,0 +1,47 @@
+﻿CSV Column Name;Maps to product property;Example;Notes
+ID;id;100;Defining this will overwrite data for that ID on import.
+Type;type;simple, variation, virtual;Product Type. Valid values: simple, variable, grouped, external, variation, virtual, downloadable. Multiple types can be used CSV separated.
+SKU;sku;my-sku;Required. Auto-generated if missing.
+Name;name;My Product Name;Required.
+Published;status;1;1 for published, 0 for private, -1 for draft.
+Is featured?;featured;1;1 or 0
+Visibility in catalog;catalog_visibility;visible;Supported values: visible, catalog, search, hidden
+Short description;short_description;This is a product.;
+Description;description;This is more information about a product.;
+Date sale price starts;date_on_sale_from;07/06/2013;Date (start of day) or leave blank.
+Date sale price ends;date_on_sale_to;07/06/2013;Date (end of day) or leave blank.
+Tax status;tax_status;taxable;Supported values: taxable, shipping, none
+Tax class;tax_class;standard;Can use any existing tax class.
+In stock?;stock_status;1;1 or 0
+Stock;manage_stock / stock_quantity;20;Numeric stock level enables stock management. parent can be used for variations. Blank = no stock management.
+Low stock amount;low_stock_amount;3;Empty or a number
+Backorders allowed?;backorders;1;1, 0, or notify
+Sold individually?;sold_individually;1;1 or 0
+Weight (unit);weight;100;Parse only numbers.
+Length (unit);length;20;Parse only numbers.
+Width (unit);width;20;Parse only numbers.
+Height (unit);height;20;Parse only numbers.
+Allow customer reviews?;reviews_allowed;1;1 or 0
+Purchase Note;purchase_note;Thanks for buying it buddy.;
+Sale price;sale_price;20.99;Sale price.
+Regular price;regular_price;24.99;Regular price.
+Categories;category_ids;Category 1, Category 1 > Category 2;CSV list of categories. >used for hierarchy.
+Tags;tag_ids;Tag 1, Tag 2;CSV list of tags.
+Shipping class;shipping_class_id;Name;Name of shipping class
+Images;image_id / gallery_image_ids;http://somewhere.com/image.jpg, http://somewhere.com/image2.jpg;First is featured image.
+Download limit;download_limit;1;n/a or a limit.
+Download expiry days;download_expiry;1;n/a or a day limit.
+Parent;parent_id;id:100, SKU-1;Set parent ID. Used for variations. Can be just a numeric ID e.g. id:100or a SKU. Export will use SKU when possible.
+Grouped products;children;id:100, id:101, SKU-1, SKU-2;List of IDs. Can be just a numeric ID e.g. id:100or a SKU. Export will use SKU when possible.
+Upsells;upsell_ids;id:100, id:101, SKU-1, SKU-2;List of IDs. Can be just a numeric ID e.g. id:100or a SKU. Export will use SKU when possible.
+Cross-sells;cross_sell_ids;id:100, id:101, SKU-1, SKU-2;List of IDs. Can be just a numeric ID e.g. id:100or a SKU. Export will use SKU when possible.
+External URL;product_url;https://mercantile.wordpress.org/product/wordpress-pennant/;Product external URL.
+Button text;button_text;Buy on the WordPress swag store!;"Custom product ""buy"" button."
+Position;menu_order;1;Menu order, used for sorting.
+Attribute 1 name;attributes;Color;"Looks for global attribute or uses text if not found. Include as many as needed. ""Used for variations"" is set automatically."
+Attribute 1 value(s);attributes;Blue, Red, Green;List of values. Variations only need 1 value. First is used if multiple get provided.
+Attribute 1 default;default_attributes;Blue;Default value for variable products.
+Attribute 1 visible;attributes;1;"1 or 0. Mapping screen labels this as ""Attribute Visibility"""
+Attribute 1 global;attributes;1;"1 or 0. Mapping screen labels this as ""Is a global attribute?"""
+Download 1 name;downloads;Download 1;
+Download 1 URL;downloads;url.zip;

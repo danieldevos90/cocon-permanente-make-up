@@ -1,0 +1,16 @@
+# DirectAdmin MCP credentials and server
+.directadmin-mcp/
+.env
+*.env
+
+# Cursor settings (may contain tokens)
+.cursor/
+
+# OS files
+.DS_Store
+
+# Sensitive files
+ftp.md
+*.pem
+*.key
+credentials*
