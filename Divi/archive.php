@@ -1,7 +1,7 @@
 <?php
 /**
- * Blog Index Page Template
- * Custom COCONPM Blog Overview - 100% Custom Classes
+ * Blog Archive Page Template
+ * Custom COCONPM Blog Archive - 100% Custom Classes
  * 
  * @package Divi
  * @subpackage Blog
@@ -16,7 +16,19 @@ get_header();
 		<!-- Header: 2 Columns (Title + Subscribe | Description) -->
 		<div class="coconpm-blog-header">
 			<div class="coconpm-blog-header-left">
-				<h1 class="coconpm-blog-title">Blog</h1>
+				<?php
+				if ( is_category() ) {
+					echo '<h1 class="coconpm-blog-title">' . single_cat_title( '', false ) . '</h1>';
+				} elseif ( is_tag() ) {
+					echo '<h1 class="coconpm-blog-title">' . single_tag_title( '', false ) . '</h1>';
+				} elseif ( is_author() ) {
+					echo '<h1 class="coconpm-blog-title">' . get_the_author() . '</h1>';
+				} elseif ( is_date() ) {
+					echo '<h1 class="coconpm-blog-title">' . get_the_date( 'F Y' ) . '</h1>';
+				} else {
+					echo '<h1 class="coconpm-blog-title">Blog Archief</h1>';
+				}
+				?>
 				
 				<!-- Subscribe Form -->
 				<div class="coconpm-blog-subscribe">
@@ -25,10 +37,13 @@ get_header();
 			</div>
 			
 			<div class="coconpm-blog-header-right">
-				<p class="coconpm-blog-intro">
-					Welkom op onze blog! Hier vind je alle tips, tutorials en nieuws over permanente make-up. 
-					Blijf op de hoogte van de laatste trends en technieken in de PMU-wereld.
-				</p>
+				<?php
+				if ( term_description() ) {
+					echo '<p class="coconpm-blog-intro">' . term_description() . '</p>';
+				} else {
+					echo '<p class="coconpm-blog-intro">Welkom op onze blog! Hier vind je alle tips, tutorials en nieuws over permanente make-up. Blijf op de hoogte van de laatste trends en technieken in de PMU-wereld.</p>';
+				}
+				?>
 			</div>
 		</div>
 		
@@ -140,3 +155,4 @@ get_header();
 </div>
 
 <?php get_footer(); ?>
+

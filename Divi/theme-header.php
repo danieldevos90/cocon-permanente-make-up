@@ -272,6 +272,28 @@ $show_search_icon         = ( false !== et_get_option( 'show_search_icon', true 
 
 				<?php if ( $et_slide_header || is_customize_preview() ) : ?>
 					<span class="mobile_menu_bar et_pb_header_toggle et_toggle_<?php echo esc_attr( et_get_option( 'header_style', 'left' ) ); ?>_menu"></span>
+					
+					<?php
+					// Mobile cart icon - only show if WooCommerce is active and cart has items
+					if ( class_exists( 'woocommerce' ) && WC()->cart ) {
+						$cart_count = WC()->cart->get_cart_contents_count();
+						if ( $cart_count > 0 ) {
+							$cart_url = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : WC()->cart->get_cart_url();
+							echo '<div class="et_mobile_cart_container">';
+							echo '<a href="' . esc_url( $cart_url ) . '" class="et_mobile_cart_button">';
+							echo '<span class="et_mobile_cart_count">' . esc_html( $cart_count ) . '</span>';
+							echo '</a>';
+							echo '</div>';
+							
+							// Add debug console log
+							echo '<script>console.log("DEBUG: Mobile cart added to theme-header with ' . $cart_count . ' items");</script>';
+						} else {
+							echo '<script>console.log("DEBUG: Cart is empty, mobile cart not shown in theme-header");</script>';
+						}
+					} else {
+						echo '<script>console.log("DEBUG: WooCommerce not available for mobile cart in theme-header");</script>';
+					}
+					?>
 				<?php endif; ?>
 
 				<?php if ( $show_search_icon ) : ?>

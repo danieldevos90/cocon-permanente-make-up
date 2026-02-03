@@ -1186,6 +1186,52 @@ class ET_Builder_Module_Fullwidth_Menu extends ET_Builder_Module {
 	}
 
 	/**
+	 * Render mobile cart button.
+	 *
+	 * @since 4.0
+	 *
+	 * @return string
+	 */
+	protected function render_mobile_cart() {
+		// Debug: Always show debug info
+		$debug_output = '<script>console.log("Fullwidth Mobile Cart Debug: render_mobile_cart called");</script>';
+		
+		// Check if WooCommerce is active and cart exists
+		if ( ! class_exists( 'woocommerce' ) ) {
+			$debug_output .= '<script>console.log("Fullwidth Mobile Cart Debug: WooCommerce class not found");</script>';
+			return $debug_output;
+		}
+		
+		if ( ! WC()->cart ) {
+			$debug_output .= '<script>console.log("Fullwidth Mobile Cart Debug: WC()->cart not available");</script>';
+			return $debug_output;
+		}
+
+		// Get cart contents count
+		$items_number = WC()->cart->get_cart_contents_count();
+		$debug_output .= '<script>console.log("Fullwidth Mobile Cart Debug: Cart items count = ' . $items_number . '");</script>';
+		
+		// For debugging, always show the cart icon regardless of count
+		$url = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : WC()->cart->get_cart_url();
+		$debug_output .= '<script>console.log("Fullwidth Mobile Cart Debug: Cart URL = ' . esc_js( $url ) . '");</script>';
+		
+		$output = sprintf(
+			'<div class="et_pb_menu__mobile-cart-container" style="background: blue; padding: 10px; margin: 10px;">
+				<div style="color: white; font-size: 12px;">DEBUG: Fullwidth Mobile Cart (Items: %3$s)</div>
+				<a href="%1$s" class="et_pb_menu__mobile-cart-button">
+					<span class="et_pb_menu__mobile-cart-count">%2$s</span>
+				</a>
+			</div>',
+			esc_url( $url ),
+			esc_html( number_format_i18n( $items_number ) ),
+			$items_number
+		);
+
+		$debug_output .= '<script>console.log("Fullwidth Mobile Cart Debug: HTML output generated");</script>';
+		return $debug_output . $output;
+	}
+
+	/**
 	 * Renders the module output.
 	 *
 	 * @param  array  $attrs       List of attributes.
@@ -1195,6 +1241,9 @@ class ET_Builder_Module_Fullwidth_Menu extends ET_Builder_Module {
 	 * @return string
 	 */
 	public function render( $attrs, $content, $render_slug ) {
+		// Debug: Log that render method is called
+		$debug_render = '<script>console.log("DEBUG: FullwidthMenu render() method called with slug: ' . esc_js( $render_slug ) . '");</script>';
+		
 		$menu_slug         = self::$menu_slug;
 		$background_color  = $this->props['background_color'];
 		$menu_id           = $this->props['menu_id'];
@@ -1364,6 +1413,9 @@ class ET_Builder_Module_Fullwidth_Menu extends ET_Builder_Module {
 		$this->apply_icon_styles( $render_slug, 'search', '%%order_class%% .et_pb_menu__icon.et_pb_menu__search-button, %%order_class%% .et_pb_menu__icon.et_pb_menu__close-search-button' );
 		$this->apply_icon_styles( $render_slug, 'cart', '%%order_class%% .et_pb_menu__icon.et_pb_menu__cart-button' );
 
+		// Mobile cart icon styles
+		$this->apply_mobile_cart_styles( $render_slug );
+
 		// Background layout data attributes.
 		$data_background_layout = et_pb_background_layout_options()->get_background_layout_attrs( $this->props );
 
@@ -1402,13 +1454,20 @@ class ET_Builder_Module_Fullwidth_Menu extends ET_Builder_Module {
 			);
 		}
 
-		$mobile_menu = sprintf(
+		// Debug: Add console log for mobile menu generation
+		$mobile_cart_html = $this->render_mobile_cart();
+		$debug_mobile_menu = '<script>console.log("DEBUG: Fullwidth mobile menu being generated with cart HTML: ' . esc_js( strlen( $mobile_cart_html ) ) . ' characters");</script>';
+		
+		$mobile_menu = $debug_mobile_menu . sprintf(
 			'<div class="et_mobile_nav_menu">
 				<div class="mobile_nav closed%1$s">
 					<span class="mobile_menu_bar"></span>
 				</div>
+				%2$s
+				<div style="background: purple; color: white; padding: 5px; margin: 5px;">DEBUG: Fullwidth mobile menu container rendered</div>
 			</div>',
-			'upwards' === $submenu_direction ? ' et_pb_mobile_menu_upwards' : ''
+			'upwards' === $submenu_direction ? ' et_pb_mobile_menu_upwards' : '',
+			et_core_esc_previously( $mobile_cart_html )
 		);
 
 		if ( 'inline_centered_logo' === $menu_style ) {
@@ -1483,7 +1542,58 @@ class ET_Builder_Module_Fullwidth_Menu extends ET_Builder_Module {
 			);
 		}
 
-		return $output;
+		return $debug_render . $output;
+	}
+
+	/**
+	 * Apply mobile cart styles.
+	 *
+	 * @since 4.0
+	 *
+	 * @param string $render_slug
+	 *
+	 * @return void
+	 */
+	protected function apply_mobile_cart_styles( $render_slug ) {
+		$et_accent_color = et_builder_accent_color();
+		
+		// Mobile cart container styles - DEBUG: Always visible
+		$el_style = array(
+			'selector'    => '%%order_class%% .et_pb_menu__mobile-cart-container',
+			'declaration' => 'display: block !important; position: absolute; top: 60px; right: 0; z-index: 1000;',
+		);
+		ET_Builder_Element::set_style( $render_slug, $el_style );
+
+		// Add debug console log via CSS
+		$el_style = array(
+			'selector'    => '%%order_class%% .et_pb_menu__mobile-cart-container:before',
+			'declaration' => 'content: "DEBUG: Fullwidth mobile cart container found"; position: absolute; top: -20px; left: 0; background: cyan; color: black; font-size: 10px; padding: 2px;',
+		);
+		ET_Builder_Element::set_style( $render_slug, $el_style );
+
+		// Mobile cart button styles (gold circle like hamburger)
+		$el_style = array(
+			'selector'    => '%%order_class%% .et_pb_menu__mobile-cart-button',
+			'declaration' => sprintf(
+				'display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%%; background-color: %1$s; text-decoration: none; position: relative;',
+				esc_html( $et_accent_color )
+			),
+		);
+		ET_Builder_Element::set_style( $render_slug, $el_style );
+
+		// Cart icon (using ETModules icon font)
+		$el_style = array(
+			'selector'    => '%%order_class%% .et_pb_menu__mobile-cart-button:before',
+			'declaration' => 'content: "\\e07a"; font-family: "ETmodules"; font-size: 18px; color: white; line-height: 1;',
+		);
+		ET_Builder_Element::set_style( $render_slug, $el_style );
+
+		// Cart count badge
+		$el_style = array(
+			'selector'    => '%%order_class%% .et_pb_menu__mobile-cart-count',
+			'declaration' => 'position: absolute; top: -8px; right: -8px; background-color: #ff0000; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; line-height: 1;',
+		);
+		ET_Builder_Element::set_style( $render_slug, $el_style );
 	}
 }
 

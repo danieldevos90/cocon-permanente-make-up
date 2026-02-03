@@ -1,6 +1,7 @@
 /**
  * COCONPM Product Variations Handler
  * Handles variant selection and image gallery updates
+ * Updated to work with standard WooCommerce forms
  */
 
 (function($) {
@@ -11,7 +12,8 @@
 	function initVariationHandler() {
 		if (variationInitialized) return;
 		
-		const $variationsForm = $('.coconpm-variations-form');
+		// Use standard WooCommerce variations form class
+		const $variationsForm = $('.variations_form');
 		if (!$variationsForm.length) return;
 		
 		const $gallery = $('.cocon-product-gallery');
@@ -47,8 +49,8 @@
 			}, 100);
 		});
 		
-		// Handle reset variations
-		$variationsForm.on('click', '.coconpm-reset-variations', function(e) {
+		// Handle reset variations (using WooCommerce's standard reset link)
+		$variationsForm.on('click', '.reset_variations', function(e) {
 			e.preventDefault();
 			// Trigger WooCommerce reset
 			$variationsForm.find('select').val('').trigger('change');
@@ -135,6 +137,8 @@
 				// Update main image
 				$firstImage.find('img').attr({
 					'src': variation.image.src,
+					'srcset': variation.image.srcset || '',
+					'sizes': variation.image.sizes || '',
 					'alt': variation.image.alt || ''
 				});
 				

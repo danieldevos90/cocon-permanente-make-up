@@ -21,9 +21,15 @@ if ( $main_image_id ) {
 
 // Remove duplicates
 $attachment_ids = array_unique( $attachment_ids );
+
+// Ensure we have at least one image
+if ( empty( $attachment_ids ) && $main_image_id ) {
+	$attachment_ids = array( $main_image_id );
+}
 ?>
 
 <div class="cocon-product-gallery">
+	<?php if ( ! empty( $attachment_ids ) ) : ?>
 	<div class="wc-row g-3">
 		<?php if ( count( $attachment_ids ) > 1 ) : ?>
 			<!-- Vertical Thumbnails -->
@@ -77,6 +83,16 @@ $attachment_ids = array_unique( $attachment_ids );
 			</div>
 		</div>
 	</div>
+	<?php else : ?>
+		<!-- Fallback: No product images found -->
+		<div class="gallery-main-wrapper">
+			<div class="gallery-main-image">
+				<div class="gallery-image active">
+					<img src="<?php echo esc_url( wc_placeholder_img_src( 'full' ) ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" />
+				</div>
+			</div>
+		</div>
+	<?php endif; ?>
 </div>
 
 <?php

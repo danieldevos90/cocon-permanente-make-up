@@ -25,9 +25,13 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	<a href="<?php echo esc_url( get_permalink() ); ?>" class="coconpm-card-link">
 		<div class="coconpm-card-image">
 			<?php if ( has_post_thumbnail() ) : ?>
-				<?php the_post_thumbnail( 'woocommerce_thumbnail' ); ?>
+				<?php 
+				// Use 'large' size for better quality (1024x1024)
+				// Alternative sizes: 'medium_large' (768px), 'full' (original)
+				the_post_thumbnail( 'large', array( 'class' => 'coconpm-product-img' ) ); 
+				?>
 			<?php else : ?>
-				<img src="<?php echo esc_url( wc_placeholder_img_src() ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>">
+				<img src="<?php echo esc_url( wc_placeholder_img_src( 'large' ) ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="coconpm-product-img">
 			<?php endif; ?>
 			
 			<!-- Sale Badge -->
@@ -60,17 +64,16 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 			</div>
 		<?php endif; ?>
 		
-		<!-- Product Title & Price Row -->
-		<div class="coconpm-card-header">
-			<h3 class="coconpm-card-title">
-				<a href="<?php echo esc_url( get_permalink() ); ?>">
-					<?php the_title(); ?>
-				</a>
-			</h3>
-			
-			<div class="coconpm-card-price">
-				<?php echo $product->get_price_html(); ?>
-			</div>
+		<!-- Product Title -->
+		<h3 class="coconpm-card-title">
+			<a href="<?php echo esc_url( get_permalink() ); ?>">
+				<?php the_title(); ?>
+			</a>
+		</h3>
+		
+		<!-- Product Price -->
+		<div class="coconpm-card-price">
+			<?php echo $product->get_price_html(); ?>
 		</div>
 		
 		<!-- Product Short Description -->

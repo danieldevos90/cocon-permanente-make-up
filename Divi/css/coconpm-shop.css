@@ -251,12 +251,17 @@
 	box-sizing: border-box;
 }
 
-.coconpm-card-image img {
+.coconpm-card-image img,
+.coconpm-card-image .coconpm-product-img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 	display: block;
 	transition: transform 0.3s ease;
+	/* Ensure high quality rendering */
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	-ms-interpolation-mode: nearest-neighbor;
 }
 
 .coconpm-product-card:hover .coconpm-card-image img {
@@ -309,20 +314,11 @@
 }
 
 /* ============================================
-   PRODUCT CARD HEADER (Title + Price)
+   PRODUCT CARD TITLE & PRICE (Stacked)
    ============================================ */
 
-.coconpm-card-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	gap: 12px;
-	margin-bottom: 8px;
-}
-
 .coconpm-card-title {
-	flex: 1;
-	margin: 0;
+	margin: 0 0 8px 0;
 	font-size: 16px;
 	line-height: 1.4;
 	font-weight: 600;
@@ -345,9 +341,8 @@
 .coconpm-card-price {
 	color: #C64193;
 	font-weight: 600;
-	font-size: 16px;
-	white-space: nowrap;
-	flex-shrink: 0;
+	font-size: 18px;
+	margin-bottom: 12px;
 }
 
 .coconpm-card-price .price,

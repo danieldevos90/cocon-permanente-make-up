@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * 
  * Usage: [coconpm_featured limit="8" columns="4" title="Featured Products"]
  */
+if ( ! function_exists( 'coconpm_featured_products_shortcode' ) ) {
 function coconpm_featured_products_shortcode( $atts ) {
 	// Check if WooCommerce is active
 	if ( ! class_exists( 'WooCommerce' ) ) {
@@ -92,9 +93,10 @@ function coconpm_featured_products_shortcode( $atts ) {
 
 	return ob_get_clean();
 }
-add_shortcode( 'coconpm_featured', 'coconpm_featured_products_shortcode' );
-// Also register the old name for backwards compatibility (but with lower priority)
-add_shortcode( 'featured_products', 'coconpm_featured_products_shortcode' );
+	add_shortcode( 'coconpm_featured', 'coconpm_featured_products_shortcode' );
+	// Also register the old name for backwards compatibility (but with lower priority)
+	add_shortcode( 'featured_products', 'coconpm_featured_products_shortcode' );
+}
 
 /**
  * Recent Products Shortcode
@@ -265,6 +267,30 @@ function cocon_woocommerce_loop_columns() {
 	return 4; // 4 products per row
 }
 add_filter( 'loop_shop_columns', 'cocon_woocommerce_loop_columns' );
+
+/**
+ * Configure WooCommerce image sizes for better quality
+ */
+function cocon_woocommerce_image_dimensions() {
+	// Ensure WooCommerce thumbnails are high quality
+	update_option( 'woocommerce_thumbnail_image_width', 600 );
+	update_option( 'woocommerce_single_image_width', 1200 );
+	
+	// Disable hard crop to maintain aspect ratio
+	update_option( 'woocommerce_thumbnail_cropping', 'uncropped' );
+}
+add_action( 'after_switch_theme', 'cocon_woocommerce_image_dimensions', 1 );
+
+/**
+ * Force high quality images in product loops
+ * This runs on every page load to ensure product images use larger sizes
+ */
+function cocon_force_large_product_images() {
+	// Run this configuration on init
+	update_option( 'woocommerce_thumbnail_image_width', 600 );
+	update_option( 'woocommerce_single_image_width', 1200 );
+}
+add_action( 'init', 'cocon_force_large_product_images', 5 );
 
 /**
  * Customize number of products per page
@@ -476,17 +502,39 @@ function cocon_enqueue_woocommerce_styles() {
 		
 		error_log('✅ wp_enqueue_style() called for coconpm-checkout');
 		
+		// Enqueue mobile fix JavaScript
+		$checkout_js_url = get_template_directory_uri() . '/js/coconpm-checkout-mobile.js';
+		$checkout_js_path = get_template_directory() . '/js/coconpm-checkout-mobile.js';
+		
+		error_log('📱 Loading coconpm-checkout-mobile.js for mobile grid fix');
+		error_log('JS URL: ' . $checkout_js_url);
+		error_log('JS File exists: ' . (file_exists($checkout_js_path) ? 'YES' : 'NO - FILE MISSING!'));
+		
+		wp_enqueue_script(
+			'coconpm-checkout-mobile',
+			$checkout_js_url,
+			array( 'jquery' ),
+			$theme_version . '-' . time(),
+			true // Load in footer
+		);
+		
+		error_log('✅ wp_enqueue_script() called for coconpm-checkout-mobile');
+		
 		// Add console log in footer to confirm CSS loaded
-		add_action( 'wp_footer', function() use ( $checkout_css_url, $theme_version, $checkout_css_path ) {
+		add_action( 'wp_footer', function() use ( $checkout_css_url, $theme_version, $checkout_css_path, $checkout_js_url, $checkout_js_path ) {
 			?>
 			<script>
 				console.log('%c✅ COCONPM CHECKOUT CSS LOADED!', 'background: #4CAF50; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;');
 				console.log('📁 CSS File:', '<?php echo esc_js($checkout_css_url); ?>');
 				console.log('🔢 Version:', '<?php echo esc_js($theme_version . '-' . time()); ?>');
-				console.log('📋 File exists:', '<?php echo file_exists($checkout_css_path) ? "YES ✅" : "NO ❌"; ?>');
+				console.log('📋 CSS exists:', '<?php echo file_exists($checkout_css_path) ? "YES ✅" : "NO ❌"; ?>');
 				console.log('🎨 CSS should be loaded as stylesheet');
 				console.log('🔧 2-Column Layout should be active');
 				console.log('⚫ Coupon message should be BLACK');
+				console.log('%c📱 COCONPM MOBILE FIX JS LOADED!', 'background: #2196F3; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;');
+				console.log('📁 JS File:', '<?php echo esc_js($checkout_js_url); ?>');
+				console.log('📋 JS exists:', '<?php echo file_exists($checkout_js_path) ? "YES ✅" : "NO ❌"; ?>');
+				console.log('📱 Mobile grid fix: Single column on screens <= 992px');
 			</script>
 			<?php
 		}, 999 );
@@ -683,6 +731,72 @@ function cocon_enqueue_featured_products_styles() {
 add_action( 'wp_enqueue_scripts', 'cocon_enqueue_featured_products_styles', 20 ); // Load early
 
 /**
+ * Enqueue Blog CSS
+ * Load on blog archive and single post pages
+ */
+function cocon_enqueue_blog_styles() {
+	// Only load on blog pages (not WooCommerce pages, not page builder pages)
+	if ( ! is_singular( 'post' ) && ! is_archive() && ! is_home() ) {
+		return;
+	}
+	
+	// Skip if using page builder
+	if ( is_singular( 'post' ) ) {
+		$is_page_builder_used = et_pb_is_pagebuilder_used( get_the_ID() );
+		if ( $is_page_builder_used ) {
+			return;
+		}
+	}
+	
+	$theme_version = et_get_theme_version();
+	
+	// Enqueue Blog CSS
+	$blog_css_url = get_template_directory_uri() . '/css/coconpm-blog.css';
+	$blog_css_path = get_template_directory() . '/css/coconpm-blog.css';
+	
+	if ( file_exists( $blog_css_path ) ) {
+		wp_enqueue_style(
+			'coconpm-blog',
+			$blog_css_url,
+			array( 'divi-style' ),
+			$theme_version . '-' . time() // Cache buster for development
+		);
+		
+		// Enqueue Noptin popup JavaScript
+		$noptin_js_url = get_template_directory_uri() . '/js/coconpm-noptin-popup.js';
+		$noptin_js_path = get_template_directory() . '/js/coconpm-noptin-popup.js';
+		
+		if ( file_exists( $noptin_js_path ) ) {
+			wp_enqueue_script(
+				'coconpm-noptin-popup',
+				$noptin_js_url,
+				array( 'jquery' ),
+				$theme_version . '-' . time(),
+				true
+			);
+		}
+		
+		// Debug log
+		error_log('✅ COCONPM BLOG CSS LOADED');
+		error_log('CSS URL: ' . $blog_css_url);
+		error_log('Page Type: ' . ( is_singular( 'post' ) ? 'Single Post' : 'Blog Archive' ));
+		
+		// Add console log in footer to confirm CSS loaded
+		add_action( 'wp_footer', function() use ( $blog_css_url, $theme_version ) {
+			?>
+			<script>
+				console.log('%c✅ COCONPM BLOG CSS LOADED!', 'background: #9C27B0; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;');
+				console.log('📁 CSS File:', '<?php echo esc_js($blog_css_url); ?>');
+				console.log('🔢 Version:', '<?php echo esc_js($theme_version . '-' . time()); ?>');
+				console.log('🎨 Custom COCONPM blog styling active');
+			</script>
+			<?php
+		}, 999 );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cocon_enqueue_blog_styles', 20 );
+
+/**
  * Force button styles in head - LAST override
  * This runs at the very end of wp_head to ensure it overrides everything
  * ONLY on WooCommerce pages - not on home page!
@@ -847,9 +961,16 @@ function cocon_force_button_styles() {
 			border-color: #C64193 !important;
 		}
 		
-		/* GALLERY OVERRIDE - Hide default WooCommerce gallery */
+		/* GALLERY OVERRIDE - Hide default WooCommerce gallery but show custom gallery */
 		.woocommerce-product-gallery {
 			display: none !important;
+		}
+		
+		/* FORCE SHOW CUSTOM GALLERY */
+		.cocon-product-gallery {
+			display: block !important;
+			visibility: visible !important;
+			opacity: 1 !important;
 		}
 		
 		/* NOTICE BUTTONS - View Cart, etc. */

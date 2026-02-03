@@ -156,15 +156,172 @@ do_action( 'woocommerce_before_cart' ); ?>
 		<?php do_action( 'woocommerce_before_cart_collaterals' ); ?>
 
 		<div class="cart-collaterals">
-			<?php
-				/**
-				 * Cart collaterals hook.
-				 *
-				 * @hooked woocommerce_cross_sell_display
-				 * @hooked woocommerce_cart_totals - 10
-				 */
-				do_action( 'woocommerce_cart_collaterals' );
-			?>
+			<div class="cart_totals <?php echo ( WC()->customer->has_calculated_shipping() ) ? 'calculated_shipping' : ''; ?>">
+				
+				<?php do_action( 'woocommerce_before_cart_totals' ); ?>
+				
+				<h2><?php esc_html_e( 'Cart totals', 'woocommerce' ); ?></h2>
+				
+				<table cellspacing="0" class="shop_table shop_table_responsive">
+					
+					<tr class="cart-subtotal">
+						<th><?php esc_html_e( 'Subtotal', 'woocommerce' ); ?></th>
+						<td data-title="<?php esc_attr_e( 'Subtotal', 'woocommerce' ); ?>"><?php wc_cart_totals_subtotal_html(); ?></td>
+					</tr>
+					
+					<?php foreach ( WC()->cart->get_coupons() as $code => $coupon ) : ?>
+						<tr class="cart-discount coupon-<?php echo esc_attr( sanitize_title( $code ) ); ?>">
+							<th><?php wc_cart_totals_coupon_label( $coupon ); ?></th>
+							<td data-title="<?php echo esc_attr( wc_cart_totals_coupon_label( $coupon, false ) ); ?>"><?php wc_cart_totals_coupon_html( $coupon ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					
+					<?php if ( WC()->cart->needs_shipping() && WC()->cart->show_shipping() ) : ?>
+						
+						<?php do_action( 'woocommerce_cart_totals_before_shipping' ); ?>
+						
+						<?php
+						// Custom shipping display - show only free shipping when available
+						$packages = WC()->shipping()->get_packages();
+						$package = reset( $packages ); // Get first package
+						
+						if ( $package && isset( $package['rates'] ) && ! empty( $package['rates'] ) ) {
+							$available_methods = $package['rates'];
+							$chosen_method = isset( WC()->session->chosen_shipping_methods[0] ) ? WC()->session->chosen_shipping_methods[0] : '';
+							
+							// Check if free shipping is available
+							$has_free_shipping = false;
+							$free_shipping_method = null;
+							
+							foreach ( $available_methods as $method_id => $method ) {
+								if ( $method->cost == 0 || strpos( $method_id, 'free_shipping' ) !== false || strpos( strtolower( $method->label ), 'gratis' ) !== false ) {
+									$has_free_shipping = true;
+									$free_shipping_method = $method;
+									// If free shipping exists, select it
+									WC()->session->set( 'chosen_shipping_methods', array( $method_id ) );
+									break;
+								}
+							}
+							
+							// Display shipping options
+							?>
+							<tr class="woocommerce-shipping-totals shipping">
+								<th><?php echo esc_html( __( 'Shipping', 'woocommerce' ) ); ?></th>
+								<td data-title="<?php echo esc_attr( __( 'Shipping', 'woocommerce' ) ); ?>">
+									<?php if ( $has_free_shipping ) : ?>
+										<!-- Show only free shipping when available -->
+										<ul id="shipping_method" class="woocommerce-shipping-methods">
+											<li>
+												<input type="radio" name="shipping_method[0]" data-index="0" id="shipping_method_0_<?php echo esc_attr( sanitize_title( $free_shipping_method->id ) ); ?>" value="<?php echo esc_attr( $free_shipping_method->id ); ?>" class="shipping_method" checked="checked" />
+												<label for="shipping_method_0_<?php echo esc_attr( sanitize_title( $free_shipping_method->id ) ); ?>"><?php echo wp_kses_post( wc_cart_totals_shipping_method_label( $free_shipping_method ) ); ?></label>
+											</li>
+										</ul>
+									<?php else : ?>
+										<!-- Show all shipping methods when no free shipping -->
+										<ul id="shipping_method" class="woocommerce-shipping-methods">
+											<?php foreach ( $available_methods as $method ) : ?>
+												<li>
+													<input type="radio" name="shipping_method[0]" data-index="0" id="shipping_method_0_<?php echo esc_attr( sanitize_title( $method->id ) ); ?>" value="<?php echo esc_attr( $method->id ); ?>" class="shipping_method" <?php checked( $method->id, $chosen_method ); ?> />
+													<label for="shipping_method_0_<?php echo esc_attr( sanitize_title( $method->id ) ); ?>"><?php echo wp_kses_post( wc_cart_totals_shipping_method_label( $method ) ); ?></label>
+												</li>
+											<?php endforeach; ?>
+										</ul>
+									<?php endif; ?>
+									
+									<?php
+									// Show shipping address
+									if ( WC()->customer->get_shipping_postcode() ) {
+										?>
+										<p class="woocommerce-shipping-destination">
+											<?php
+											echo esc_html__( 'Shipping to', 'woocommerce' ) . ' <strong>' . esc_html( WC()->customer->get_shipping_postcode() ) . ' ' . esc_html( WC()->customer->get_shipping_city() ) . '</strong>.';
+											?>
+											<br>
+											<a href="<?php echo esc_url( wc_get_cart_url() ); ?>#calc_shipping" class="shipping-calculator-button"><?php echo esc_html__( 'Change address', 'woocommerce' ); ?></a>
+										</p>
+										<?php
+									}
+									?>
+								</td>
+							</tr>
+							<?php
+						} else {
+							// No shipping methods available or address not entered
+							?>
+							<tr class="shipping">
+								<th><?php esc_html_e( 'Shipping', 'woocommerce' ); ?></th>
+								<td data-title="<?php esc_attr_e( 'Shipping', 'woocommerce' ); ?>"><?php woocommerce_shipping_calculator(); ?></td>
+							</tr>
+							<?php
+						}
+						?>
+						
+						<?php do_action( 'woocommerce_cart_totals_after_shipping' ); ?>
+						
+					<?php elseif ( WC()->cart->needs_shipping() && 'yes' === get_option( 'woocommerce_enable_shipping_calc' ) ) : ?>
+						
+						<tr class="shipping">
+							<th><?php esc_html_e( 'Shipping', 'woocommerce' ); ?></th>
+							<td data-title="<?php esc_attr_e( 'Shipping', 'woocommerce' ); ?>"><?php woocommerce_shipping_calculator(); ?></td>
+						</tr>
+						
+					<?php endif; ?>
+					
+					<?php foreach ( WC()->cart->get_fees() as $fee ) : ?>
+						<tr class="fee">
+							<th><?php echo esc_html( $fee->name ); ?></th>
+							<td data-title="<?php echo esc_attr( $fee->name ); ?>"><?php wc_cart_totals_fee_html( $fee ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					
+					<?php
+					if ( wc_tax_enabled() && ! WC()->cart->display_prices_including_tax() ) {
+						$taxable_address = WC()->customer->get_taxable_address();
+						$estimated_text  = '';
+						
+						if ( WC()->customer->is_customer_outside_base() && ! WC()->customer->has_calculated_shipping() ) {
+							/* translators: %s location. */
+							$estimated_text = sprintf( ' <small>' . esc_html__( '(estimated for %s)', 'woocommerce' ) . '</small>', WC()->countries->estimated_for_prefix( $taxable_address[0] ) . WC()->countries->countries[ $taxable_address[0] ] );
+						}
+						
+						if ( 'itemized' === get_option( 'woocommerce_tax_total_display' ) ) {
+							foreach ( WC()->cart->get_tax_totals() as $code => $tax ) { // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+								?>
+								<tr class="tax-rate tax-rate-<?php echo esc_attr( sanitize_title( $code ) ); ?>">
+									<th><?php echo esc_html( $tax->label ) . $estimated_text; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
+									<td data-title="<?php echo esc_attr( $tax->label ); ?>"><?php echo wp_kses_post( $tax->formatted_amount ); ?></td>
+								</tr>
+								<?php
+							}
+						} else {
+							?>
+							<tr class="tax-total">
+								<th><?php echo esc_html( WC()->countries->tax_or_vat() ) . $estimated_text; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
+								<td data-title="<?php echo esc_attr( WC()->countries->tax_or_vat() ); ?>"><?php wc_cart_totals_taxes_total_html(); ?></td>
+							</tr>
+							<?php
+						}
+					}
+					?>
+					
+					<?php do_action( 'woocommerce_cart_totals_before_order_total' ); ?>
+					
+					<tr class="order-total">
+						<th><?php esc_html_e( 'Total', 'woocommerce' ); ?></th>
+						<td data-title="<?php esc_attr_e( 'Total', 'woocommerce' ); ?>"><?php wc_cart_totals_order_total_html(); ?></td>
+					</tr>
+					
+					<?php do_action( 'woocommerce_cart_totals_after_order_total' ); ?>
+					
+				</table>
+				
+				<div class="wc-proceed-to-checkout">
+					<?php do_action( 'woocommerce_proceed_to_checkout' ); ?>
+				</div>
+				
+				<?php do_action( 'woocommerce_after_cart_totals' ); ?>
+				
+			</div>
 		</div>
 	</div>
 

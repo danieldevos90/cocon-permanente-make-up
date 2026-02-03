@@ -1,0 +1,882 @@
+/**
+ * COCONPM Blog Styles
+ * Custom blog archive and single post styling
+ * 100% Custom Classes - No Bootstrap, No Divi Dependencies
+ * 
+ * Colors:
+ * - Primary Pink: #C64193
+ * - Fuchsia: #ff00ff
+ * - Text: #333
+ * - Gray: #666
+ */
+
+/* ====================================
+   BLOG ARCHIVE PAGE
+   ==================================== */
+
+.coconpm-blog-archive {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 60px 20px;
+}
+
+/* Header: 2 Columns (Title + Subscribe | Description) */
+.coconpm-blog-header {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 60px;
+	margin-bottom: 50px;
+	align-items: start;
+}
+
+.coconpm-blog-header-left {
+	/* Left column */
+}
+
+.coconpm-blog-header-right {
+	/* Right column */
+}
+
+/* Page Title - Matches shop title (et_pb_module_heading style) */
+.coconpm-blog-title {
+	font-size: 36px;
+	font-weight: 700;
+	color: #000000;
+	margin: 0;
+	padding-bottom: 0;
+	line-height: 1.2;
+	text-align: left;
+}
+
+/* Subscribe Form */
+.coconpm-blog-subscribe {
+	margin-top: 20px;
+}
+
+.coconpm-subscribe-form {
+	display: flex;
+	gap: 10px;
+	max-width: 450px;
+}
+
+.coconpm-subscribe-input {
+	flex: 1;
+	padding: 14px 20px;
+	border: 2px solid #e0e0e0;
+	font-size: 15px;
+	transition: all 0.3s ease;
+	font-family: inherit;
+}
+
+.coconpm-subscribe-input:focus {
+	outline: none;
+	border-color: #C64193;
+}
+
+.coconpm-subscribe-btn {
+	padding: 14px 30px;
+	background: #C64193;
+	color: #fff;
+	border: 2px solid #C64193;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	white-space: nowrap;
+	font-family: inherit;
+}
+
+.coconpm-subscribe-btn:hover {
+	background: #ff00ff;
+	border-color: #ff00ff;
+}
+
+/* Noptin Form Styling - Match Previous Custom Form */
+/* Override plugin wrapper inline styles */
+.coconpm-blog-subscribe .noptin-optin-main-wrapper {
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	--noptin-background-color: transparent !important;
+	--noptin-border-color: transparent !important;
+}
+
+/* Override form wrapper inline styles */
+.coconpm-blog-subscribe .noptin-optin-form-wrapper {
+	max-width: none !important;
+	min-height: auto !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.coconpm-blog-subscribe .noptin-optin-form {
+	max-width: 450px;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+/* Remove all backgrounds and padding from Noptin form containers */
+.coconpm-blog-subscribe .noptin-optin-form > * {
+	background: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+/* Hide Noptin form header (heading and description) */
+.coconpm-blog-subscribe .noptin-form-header {
+	display: none !important;
+}
+
+/* Style form footer/fields container to match previous flex layout */
+.coconpm-blog-subscribe .noptin-form-footer {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+.coconpm-blog-subscribe .noptin-form-fields {
+	display: flex !important;
+	gap: 10px;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: transparent !important;
+}
+
+/* Style email field wrapper */
+.coconpm-blog-subscribe .noptin-form-field-wrapper.noptin-form-field-email {
+	flex: 1;
+	min-width: 200px;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: transparent !important;
+}
+
+.coconpm-blog-subscribe .noptin-form-field-wrapper {
+	background: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.coconpm-blog-subscribe .noptin-form-field-wrapper .noptin-label {
+	display: none !important;
+}
+
+.coconpm-blog-subscribe .noptin-field-email {
+	background: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+/* Style email input to match previous styling */
+.coconpm-blog-subscribe .noptin-form-field__email {
+	flex: 1;
+	padding: 14px 20px !important;
+	border: 2px solid #e0e0e0 !important;
+	font-size: 15px !important;
+	transition: all 0.3s ease;
+	font-family: inherit;
+	width: 100%;
+	margin: 0;
+	border-radius: 0;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+.coconpm-blog-subscribe .noptin-form-field__email:focus {
+	outline: none;
+	border-color: #C64193 !important;
+}
+
+/* Style submit button wrapper */
+.coconpm-blog-subscribe .noptin-form-field-wrapper.noptin-form-field-submit {
+	margin: 0;
+	padding: 0;
+	flex-shrink: 0;
+}
+
+/* Style submit button to match previous styling */
+.coconpm-blog-subscribe .noptin-form-submit,
+.coconpm-blog-subscribe #noptin-form-1__submit {
+	padding: 14px 30px !important;
+	background: #C64193 !important;
+	color: #fff !important;
+	border: 2px solid #C64193 !important;
+	font-size: 15px !important;
+	font-weight: 600 !important;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	white-space: nowrap;
+	font-family: inherit;
+	border-radius: 0;
+	margin: 0;
+	width: auto;
+	min-width: auto;
+}
+
+.coconpm-blog-subscribe .noptin-form-submit:hover,
+.coconpm-blog-subscribe #noptin-form-1__submit:hover {
+	background: #ff00ff !important;
+	border-color: #ff00ff !important;
+}
+
+/* Hide privacy policy note */
+.coconpm-blog-subscribe .noptin-form-note {
+	display: none !important;
+}
+
+/* Style success/error messages */
+.coconpm-blog-subscribe .noptin-form-notice {
+	margin-top: 10px;
+	font-size: 14px;
+	width: 100%;
+}
+
+/* Description/Intro Text */
+.coconpm-blog-intro {
+	font-size: 16px;
+	color: #666;
+	line-height: 1.7;
+	margin: 0;
+	padding-top: 10px;
+}
+
+/* Tags Filter Bar */
+.coconpm-tags-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 50px;
+	padding: 25px;
+	background: #f9f9f9;
+	border-left: 4px solid #C64193;
+}
+
+.coconpm-tag-filter-btn {
+	display: inline-block;
+	padding: 8px 20px;
+	background: #fff;
+	color: #666;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 500;
+	border: 2px solid #e0e0e0;
+	transition: all 0.3s ease;
+}
+
+.coconpm-tag-filter-btn:hover {
+	border-color: #C64193;
+	color: #C64193;
+}
+
+.coconpm-tag-filter-btn.active {
+	background: #C64193;
+	color: #fff;
+	border-color: #C64193;
+}
+
+/* Blog Grid - 2 Columns */
+.coconpm-blog-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 40px;
+	margin-bottom: 60px;
+}
+
+/* Blog Card - Minimal Design */
+.coconpm-blog-card {
+	background: #fff;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	transition: all 0.3s ease;
+}
+
+.coconpm-blog-card:hover {
+	transform: translateY(-3px);
+}
+
+.coconpm-blog-image {
+	position: relative;
+	overflow: hidden;
+	aspect-ratio: 16 / 9;
+	background: #f5f5f5;
+}
+
+.coconpm-blog-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.4s ease;
+}
+
+.coconpm-blog-card:hover .coconpm-blog-image img {
+	transform: scale(1.08);
+}
+
+/* Placeholder for posts without images */
+.coconpm-blog-image.coconpm-no-image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f0f0f0;
+}
+
+.coconpm-placeholder-image svg {
+	color: #ccc;
+	opacity: 0.5;
+}
+
+.coconpm-blog-content {
+	padding: 25px 0;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.coconpm-blog-card-title {
+	font-size: 22px;
+	font-weight: 700;
+	margin: 0 0 12px 0;
+	line-height: 1.3;
+	color: #333;
+	transition: color 0.3s ease;
+}
+
+.coconpm-blog-card:hover .coconpm-blog-card-title {
+	color: #C64193;
+}
+
+/* Ensure blog card link doesn't affect product cards */
+.coconpm-blog-archive .coconpm-blog-card-link {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.coconpm-blog-excerpt {
+	font-size: 15px;
+	line-height: 1.6;
+	color: #666;
+	margin-bottom: 15px;
+	flex: 1;
+}
+
+.coconpm-blog-read-more {
+	display: inline-block;
+	color: #C64193;
+	font-weight: 600;
+	font-size: 15px;
+	transition: all 0.3s ease;
+}
+
+.coconpm-blog-card:hover .coconpm-blog-read-more {
+	color: #ff00ff;
+}
+
+/* Scoped blog card link styles */
+.coconpm-blog-card .coconpm-blog-card-link {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	text-decoration: none;
+	color: inherit;
+}
+
+/* Pagination */
+.coconpm-blog-pagination {
+	display: flex;
+	justify-content: center;
+	margin-top: 60px;
+}
+
+.coconpm-blog-pagination .nav-links {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.coconpm-blog-pagination a,
+.coconpm-blog-pagination span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 48px;
+	height: 48px;
+	padding: 0 20px;
+	background: transparent;
+	border: 2px solid #C64193;
+	color: #C64193;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.coconpm-blog-pagination a:hover,
+.coconpm-blog-pagination span.current {
+	background: #C64193;
+	color: #fff;
+}
+
+.coconpm-blog-pagination .dots {
+	border: none;
+	pointer-events: none;
+}
+
+/* No Posts */
+.coconpm-no-posts {
+	text-align: center;
+	padding: 80px 20px;
+	color: #666;
+	font-size: 18px;
+}
+
+/* ====================================
+   BLOG SINGLE POST
+   ==================================== */
+
+.coconpm-blog-single {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 60px 20px;
+}
+
+.coconpm-blog-breadcrumb {
+	margin-bottom: 30px;
+}
+
+.coconpm-back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: #666;
+	text-decoration: none;
+	font-size: 16px;
+	transition: all 0.3s ease;
+}
+
+.coconpm-back-link:hover {
+	color: #C64193;
+	gap: 12px;
+}
+
+.coconpm-back-link svg {
+	transition: transform 0.3s ease;
+}
+
+.coconpm-back-link:hover svg {
+	transform: translateX(-4px);
+}
+
+.coconpm-blog-single-categories {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.coconpm-blog-single-title {
+	font-size: 36px;
+	font-weight: 700;
+	color: #000000;
+	margin: 0 0 20px 0;
+	line-height: 1.2;
+}
+
+.coconpm-blog-single-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin-bottom: 40px;
+	padding-bottom: 20px;
+	border-bottom: 2px solid #f0f0f0;
+	font-size: 16px;
+	color: #666;
+}
+
+.coconpm-blog-single-image {
+	margin-bottom: 40px;
+	overflow: hidden;
+}
+
+.coconpm-blog-single-image img {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+.coconpm-blog-single-content {
+	font-size: 18px;
+	line-height: 1.8;
+	color: #333;
+	margin-bottom: 40px;
+}
+
+.coconpm-blog-single-content h1,
+.coconpm-blog-single-content h2,
+.coconpm-blog-single-content h3,
+.coconpm-blog-single-content h4,
+.coconpm-blog-single-content h5,
+.coconpm-blog-single-content h6 {
+	color: #333;
+	font-weight: 700;
+	margin: 40px 0 20px 0;
+	line-height: 1.3;
+}
+
+.coconpm-blog-single-content h2 {
+	font-size: 36px;
+}
+
+.coconpm-blog-single-content h3 {
+	font-size: 28px;
+}
+
+.coconpm-blog-single-content h4 {
+	font-size: 24px;
+}
+
+.coconpm-blog-single-content p {
+	margin: 0 0 20px 0;
+}
+
+.coconpm-blog-single-content a {
+	color: #C64193;
+	text-decoration: underline;
+	transition: color 0.3s ease;
+}
+
+.coconpm-blog-single-content a:hover {
+	color: #ff00ff;
+}
+
+.coconpm-blog-single-content img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 30px 0;
+}
+
+.coconpm-blog-single-content ul,
+.coconpm-blog-single-content ol {
+	margin: 0 0 20px 0;
+	padding-left: 30px;
+}
+
+.coconpm-blog-single-content li {
+	margin-bottom: 10px;
+}
+
+.coconpm-blog-single-content blockquote {
+	margin: 30px 0;
+	padding: 20px 30px;
+	border-left: 4px solid #C64193;
+	background: #f9f9f9;
+	font-style: italic;
+	color: #666;
+}
+
+.coconpm-blog-single-content pre,
+.coconpm-blog-single-content code {
+	background: #f5f5f5;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-family: 'Courier New', monospace;
+	font-size: 16px;
+}
+
+.coconpm-blog-single-content pre {
+	padding: 20px;
+	overflow-x: auto;
+	margin: 20px 0;
+}
+
+.coconpm-page-links {
+	margin: 30px 0;
+	padding: 20px;
+	background: #f9f9f9;
+	border-left: 4px solid #C64193;
+}
+
+.coconpm-page-links .page-links-title {
+	font-weight: 700;
+	margin-right: 10px;
+}
+
+.coconpm-page-links a,
+.coconpm-page-links span {
+	display: inline-block;
+	margin: 5px;
+	padding: 8px 16px;
+	background: #fff;
+	border: 2px solid #C64193;
+	color: #C64193;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.coconpm-page-links a:hover,
+.coconpm-page-links .current {
+	background: #C64193;
+	color: #fff;
+}
+
+/* Tags */
+.coconpm-blog-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: center;
+	margin: 40px 0;
+	padding: 20px 0;
+	border-top: 2px solid #f0f0f0;
+	border-bottom: 2px solid #f0f0f0;
+}
+
+.coconpm-tags-label {
+	font-weight: 700;
+	color: #333;
+}
+
+.coconpm-blog-tag {
+	display: inline-block;
+	padding: 6px 16px;
+	background: #f0f0f0;
+	color: #666;
+	text-decoration: none;
+	font-size: 14px;
+	transition: all 0.3s ease;
+}
+
+.coconpm-blog-tag:hover {
+	background: #C64193;
+	color: #fff;
+}
+
+/* Author Bio */
+.coconpm-author-bio {
+	display: flex;
+	gap: 20px;
+	padding: 30px;
+	background: #f9f9f9;
+	margin: 40px 0;
+}
+
+.coconpm-author-avatar img {
+	border-radius: 50%;
+	width: 80px;
+	height: 80px;
+}
+
+.coconpm-author-info {
+	flex: 1;
+}
+
+.coconpm-author-name {
+	font-size: 20px;
+	font-weight: 700;
+	color: #333;
+	margin: 0 0 10px 0;
+}
+
+.coconpm-author-description {
+	font-size: 16px;
+	line-height: 1.6;
+	color: #666;
+	margin: 0;
+}
+
+/* Post Navigation */
+.coconpm-post-navigation {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	margin: 60px 0 40px 0;
+}
+
+.coconpm-nav-link {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	padding: 25px;
+	border: 2px solid #e0e0e0;
+	text-decoration: none;
+	transition: all 0.3s ease;
+}
+
+.coconpm-nav-link:hover {
+	border-color: #C64193;
+	background: #f9f9f9;
+}
+
+.coconpm-nav-link svg {
+	color: #C64193;
+	flex-shrink: 0;
+}
+
+.coconpm-nav-link span {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.coconpm-nav-label {
+	font-size: 12px;
+	text-transform: uppercase;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	color: #999;
+}
+
+.coconpm-nav-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+}
+
+.coconpm-nav-prev {
+	justify-content: flex-start;
+}
+
+.coconpm-nav-next {
+	justify-content: flex-end;
+	text-align: right;
+}
+
+/* Comments */
+.coconpm-blog-comments {
+	margin-top: 60px;
+	padding-top: 60px;
+	border-top: 2px solid #f0f0f0;
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+
+@media (max-width: 992px) {
+	.coconpm-blog-header {
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+	
+	.coconpm-blog-grid {
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+	
+	.coconpm-blog-title,
+	.coconpm-blog-single-title {
+		font-size: 32px;
+	}
+	
+	.coconpm-tags-filter {
+		padding: 20px;
+	}
+	
+	.coconpm-post-navigation {
+		grid-template-columns: 1fr;
+	}
+	
+	.coconpm-nav-next {
+		justify-content: flex-start;
+		text-align: left;
+	}
+}
+
+@media (max-width: 768px) {
+	.coconpm-blog-archive,
+	.coconpm-blog-single {
+		padding: 40px 20px;
+	}
+	
+	.coconpm-blog-header {
+		gap: 30px;
+		margin-bottom: 40px;
+	}
+	
+	.coconpm-blog-grid {
+		gap: 30px;
+	}
+	
+	.coconpm-blog-title,
+	.coconpm-blog-single-title {
+		font-size: 28px;
+		margin-bottom: 20px;
+	}
+	
+	.coconpm-subscribe-form {
+		flex-direction: column;
+	}
+	
+	.coconpm-subscribe-input,
+	.coconpm-subscribe-btn {
+		width: 100%;
+	}
+	
+	.coconpm-tags-filter {
+		gap: 8px;
+		padding: 15px;
+	}
+	
+	.coconpm-tag-filter-btn {
+		font-size: 13px;
+		padding: 6px 14px;
+	}
+	
+	.coconpm-author-bio {
+		flex-direction: column;
+		text-align: center;
+	}
+	
+	.coconpm-author-avatar {
+		margin: 0 auto;
+	}
+	
+	.coconpm-blog-single-content h2 {
+		font-size: 28px;
+	}
+	
+	.coconpm-blog-single-content h3 {
+		font-size: 24px;
+	}
+}
+
+@media (max-width: 480px) {
+	.coconpm-blog-title,
+	.coconpm-blog-single-title {
+		font-size: 24px;
+	}
+	
+	.coconpm-blog-card-title {
+		font-size: 18px;
+	}
+	
+	.coconpm-blog-content {
+		padding: 20px 0;
+	}
+	
+	.coconpm-nav-link {
+		padding: 15px;
+	}
+	
+	.coconpm-blog-single-content {
+		font-size: 16px;
+	}
+	
+	.coconpm-blog-intro {
+		font-size: 15px;
+	}
+}
+

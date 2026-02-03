@@ -579,3 +579,13 @@ body.woocommerce-cart .button {
 		padding: 20px 16px !important;
 	}
 }
+
+/* ============================================
+   HIDE TRUSTINDEX WIDGET ON CART PAGE
+   ============================================ */
+
+.woocommerce-cart .ti-widget,
+.woocommerce-page.woocommerce-cart .ti-widget,
+body.woocommerce-cart .ti-widget {
+	display: none !important;
+}

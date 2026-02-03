@@ -61,6 +61,9 @@
 	gap: 48px;
 	margin-bottom: 48px;
 	align-items: start;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
 }
 
 .coconpm-product-left {
@@ -487,6 +490,170 @@ select.coconpm-variation-dropdown {
 }
 
 /* ============================================
+   PRODUCT GALLERY - SIMPLIFIED
+   ============================================ */
+
+.cocon-product-gallery {
+	position: relative;
+	width: 100%;
+	max-width: 100%;
+}
+
+/* Simple Layout: Main Image on Top, Thumbnails Below */
+.cocon-product-gallery .wc-row,
+.cocon-product-gallery .g-3,
+.cocon-product-gallery div.wc-row,
+.cocon-product-gallery div.g-3 {
+	display: flex !important;
+	flex-direction: column !important;
+	gap: 16px !important;
+	width: 100% !important;
+}
+
+.cocon-product-gallery .wc-col-auto {
+	width: 100% !important;
+	order: 2 !important;
+}
+
+.cocon-product-gallery .wc-col {
+	width: 100% !important;
+	order: 1 !important;
+}
+
+/* Gallery Thumbnails - Horizontal Row Below Main Image */
+.gallery-thumbnails {
+	display: flex !important;
+	flex-direction: row !important;
+	gap: 8px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding-bottom: 4px;
+}
+
+.gallery-thumbnails::-webkit-scrollbar {
+	height: 6px;
+}
+
+.gallery-thumbnails::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 3px;
+}
+
+.gallery-thumbnails::-webkit-scrollbar-thumb {
+	background: #C64193;
+	border-radius: 3px;
+}
+
+.gallery-thumbnails::-webkit-scrollbar-thumb:hover {
+	background: #A0346D;
+}
+
+.gallery-thumbnail {
+	position: relative;
+	flex: 0 0 80px;
+	width: 80px;
+	height: 80px;
+	min-width: 80px;
+	overflow: hidden;
+	cursor: pointer;
+	border: 2px solid transparent;
+	transition: border-color 0.3s ease;
+}
+
+.gallery-thumbnail:hover,
+.gallery-thumbnail.active {
+	border-color: #C64193;
+}
+
+.gallery-thumbnail img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	display: block;
+	padding: 4px;
+	box-sizing: border-box;
+}
+
+/* Gallery Main Image */
+.gallery-main-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.gallery-main-image {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	background: #f5f5f5;
+}
+
+.gallery-image {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.gallery-image.active {
+	opacity: 1;
+}
+
+.gallery-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	display: block;
+}
+
+/* Gallery Navigation Arrows */
+.gallery-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	border: none;
+	width: 44px;
+	height: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background 0.3s ease;
+	z-index: 2;
+	border-radius: 50%;
+}
+
+.gallery-nav:hover {
+	background: rgba(0, 0, 0, 0.8);
+}
+
+.gallery-nav-prev {
+	left: 16px;
+}
+
+.gallery-nav-next {
+	right: 16px;
+}
+
+.gallery-nav svg {
+	width: 24px;
+	height: 24px;
+}
+
+/* Hide navigation if only one image */
+.gallery-main-image:has(.gallery-image:only-child) .gallery-nav {
+	display: none;
+}
+
+/* ============================================
    PRODUCT TABS
    ============================================ */
 
@@ -592,8 +759,15 @@ select.coconpm-variation-dropdown {
 /* Tablet */
 @media (max-width: 992px) {
 	.coconpm-product-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr !important;
 		gap: 32px;
+		display: grid !important;
+	}
+	
+	.coconpm-product-left,
+	.coconpm-product-right {
+		width: 100% !important;
+		max-width: 100% !important;
 	}
 	
 	.coconpm-product-page {
@@ -606,6 +780,14 @@ select.coconpm-variation-dropdown {
 	
 	.coconpm-product-price {
 		font-size: 24px;
+	}
+	
+	/* Gallery - Same simple layout on tablet, just smaller thumbnails */
+	.gallery-thumbnail {
+		flex: 0 0 70px !important;
+		width: 70px !important;
+		height: 70px !important;
+		min-width: 70px !important;
 	}
 }
 
@@ -621,7 +803,28 @@ select.coconpm-variation-dropdown {
 	}
 	
 	.coconpm-product-grid {
+		grid-template-columns: 1fr !important;
 		gap: 24px;
+		display: grid !important;
+	}
+	
+	.coconpm-product-left,
+	.coconpm-product-right {
+		width: 100% !important;
+		max-width: 100% !important;
+		overflow: visible;
+		position: relative;
+		z-index: auto;
+	}
+	
+	.coconpm-product-left {
+		margin-bottom: 24px;
+	}
+	
+	.coconpm-product-right {
+		position: relative;
+		z-index: 2;
+		clear: both;
 	}
 	
 	.coconpm-product-title {
@@ -639,6 +842,32 @@ select.coconpm-variation-dropdown {
 		font-size: 15px;
 		margin-bottom: 16px;
 		padding-bottom: 16px;
+	}
+	
+	.coconpm-product-meta,
+	.coconpm-add-to-cart,
+	.woocommerce-product-details__short-description,
+	.product_meta {
+		position: relative;
+		z-index: 2;
+		clear: both;
+	}
+	
+	/* Ensure all product sections have proper spacing on mobile */
+	.coconpm-product-wrapper > * {
+		position: relative;
+		z-index: auto;
+	}
+	
+	/* Product tabs and related products should be below everything */
+	.coconpm-product-tabs,
+	.coconpm-related-products,
+	.woocommerce-tabs,
+	.related.products {
+		clear: both;
+		position: relative;
+		z-index: 1;
+		margin-top: 32px !important;
 	}
 	
 	/* Mobile - Variations */
@@ -700,12 +929,39 @@ select.coconpm-variation-dropdown {
 		margin-top: 32px;
 		padding-top: 32px;
 	}
+	
+	/* Mobile Gallery - Smaller thumbnails */
+	.gallery-thumbnail {
+		flex: 0 0 60px !important;
+		width: 60px !important;
+		height: 60px !important;
+		min-width: 60px !important;
+	}
+	
+	/* Navigation arrows - smaller on mobile */
+	.gallery-nav {
+		width: 36px !important;
+		height: 36px !important;
+	}
+	
+	.gallery-nav-prev {
+		left: 8px !important;
+	}
+	
+	.gallery-nav-next {
+		right: 8px !important;
+	}
 }
 
 /* Small Mobile */
 @media (max-width: 480px) {
 	.coconpm-product-page {
 		padding: 16px 12px;
+	}
+	
+	.coconpm-product-grid {
+		grid-template-columns: 1fr !important;
+		gap: 16px;
 	}
 	
 	.coconpm-product-title {
@@ -719,6 +975,20 @@ select.coconpm-variation-dropdown {
 	.coconpm-product-tabs .woocommerce-tabs ul.tabs li a {
 		padding: 10px 16px;
 		font-size: 14px;
+	}
+	
+	/* Smaller thumbnails on very small screens */
+	.gallery-thumbnail {
+		flex: 0 0 50px !important;
+		width: 50px !important;
+		height: 50px !important;
+		min-width: 50px !important;
+	}
+	
+	/* Smaller navigation arrows */
+	.gallery-nav {
+		width: 32px !important;
+		height: 32px !important;
 	}
 }
 

@@ -1,5 +1,6 @@
 <?php
-
+// COCONPM TEST - If you see this comment in page source, functions.php IS loading
+add_action('wp_head', function() { echo "<!-- COCONPM: functions.php timestamp " . time() . " -->\n"; }, 1);
 
 if ( ! isset( $content_width ) ) $content_width = 1080;
 
@@ -1034,6 +1035,85 @@ function et_divi_customize_register( $wp_customize ) {
     et_divi_customizer_theme_settings( $wp_customize );
 }
 add_action( 'customize_register', 'et_divi_customize_register' );
+
+// === SIMPLE TEST: Add visible HTML comment at very start of head ===
+function coconpm_test_if_running() {
+	echo '<!-- COCONPM TEST: functions.php IS RUNNING - timestamp: ' . time() . ' -->' . "\n";
+}
+add_action( 'wp_head', 'coconpm_test_if_running', 1 ); // Priority 1 = very early
+
+/**
+ * FORCE GOLD COLORS - Override all cached CSS
+ * This outputs directly in the head with !important to override everything
+ */
+function coconpm_force_gold_nav_colors() {
+	?>
+	<!-- COCONPM DEBUG: Force Gold Override CSS is LOADING -->
+	<style id="coconpm-force-gold-override" type="text/css">
+		/* FORCE OVERRIDE: Gold for TOP header (secondary nav) */
+		#top-header,
+		#et-secondary-nav li ul,
+		.et_secondary_nav_enabled #page-container #top-header,
+		#page-container #top-header {
+			background-color: #a89664 !important;
+		}
+		
+		/* FORCE OVERRIDE: BLACK for main header (primary nav) */
+		#main-header,
+		#main-header .nav li ul,
+		.et-search-form,
+		#main-header .et_mobile_menu {
+			background-color: #000000 !important;
+		}
+		
+		.nav li ul,
+		.et_mobile_menu {
+			border-color: #a89664 !important;
+		}
+		
+		.mobile_menu_bar:before,
+		.mobile_menu_bar:after,
+		#top-menu li.current-menu-ancestor > a,
+		#top-menu li.current-menu-item > a {
+			color: #a89664 !important;
+		}
+		
+		/* Slide-in menu - GOLD */
+		.et_slide_in_menu_container {
+			background: #a89664 !important;
+		}
+		
+		/* Footer widgets - GOLD */
+		.footer-widget h4,
+		#main-footer .widget_block h1,
+		#main-footer .widget_block h2,
+		#main-footer .widget_block h3,
+		#main-footer .widget_block h4,
+		#main-footer .widget_block h5,
+		#main-footer .widget_block h6 {
+			color: #a89664 !important;
+		}
+		
+		.footer-widget li:before {
+			border-color: #a89664 !important;
+		}
+	</style>
+	<!-- COCONPM DEBUG: Force Gold Override CSS LOADED -->
+	<?php
+}
+add_action( 'wp_head', 'coconpm_force_gold_nav_colors', 9999 );
+
+/**
+ * COCONPM: Set shipping_label from product shipping class slug (for GFWC)
+ */
+add_filter( 'gfwc_product_shipping_data', function( $shipping_data, $product ) {
+	$shipping_class = $product->get_shipping_class();
+	if ( ! $shipping_class ) {
+		return $shipping_data;
+	}
+	$shipping_data['shipping_label'] = $shipping_class;
+	return $shipping_data;
+}, 10, 2 );
 
 if ( ! function_exists( 'et_divi_customizer_theme_settings' ) ) :
 	/**
@@ -5341,6 +5421,162 @@ if ( class_exists( 'WP_Customize_Control' ) ) {
 
 }
 
+function et_divi_mobile_cart_styles() {
+	// Add mobile cart styles
+	?>
+	<style type="text/css">
+		/* Mobile Cart Icon Styles */
+		.et_mobile_cart_container {
+			display: none;
+			position: fixed;
+			top: 70px;
+			right: 2px;
+			z-index: 9999;
+		}
+		
+		/* Show mobile cart only on mobile devices */
+		@media only screen and (max-width: 980px) {
+			.et_mobile_cart_container {
+				display: block !important;
+			}
+		}
+		
+		/* Mobile cart container - 60px size */
+		.et_mobile_cart_container {
+			width: 60px !important;
+			height: 60px !important;
+		}
+		
+		/* Mobile cart button styles (gold circle matching hamburger size) */
+		.et_mobile_cart_button {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 60px;
+			height: 60px;
+			border-radius: 60px;
+			background-color: <?php echo esc_attr( et_builder_accent_color() ); ?>;
+			text-decoration: none;
+			position: relative;
+		}
+		
+		/* Cart count badge - pink bubble inside gold circle */
+		.et_mobile_cart_count {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			background-color: #C64193;
+			color: white;
+			border-radius: 50%;
+			width: 20px;
+			height: 20px;
+			font-size: 12px;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			line-height: 1;
+		}
+		
+		/* Clean mobile cart styling - no debug */
+	</style>
+	<?php
+}
+add_action( 'wp_head', 'et_divi_mobile_cart_styles' );
+
+function et_divi_woocommerce_fix_icons() {
+	// Only run on WooCommerce pages
+	if ( ! is_woocommerce() && ! is_cart() && ! is_checkout() ) {
+		return;
+	}
+	
+	?>
+	<style type="text/css">
+		/* ETmodules font face definition for WooCommerce pages */
+		@font-face {
+			font-family: 'ETmodules';
+			font-display: swap;
+			src: url('<?php echo get_template_directory_uri(); ?>/core/admin/fonts/modules/all/modules.eot');
+			src: url('<?php echo get_template_directory_uri(); ?>/core/admin/fonts/modules/all/modules.eot?#iefix') format('embedded-opentype'),
+			     url('<?php echo get_template_directory_uri(); ?>/core/admin/fonts/modules/all/modules.ttf') format('truetype'),
+			     url('<?php echo get_template_directory_uri(); ?>/core/admin/fonts/modules/all/modules.woff') format('woff'),
+			     url('<?php echo get_template_directory_uri(); ?>/core/admin/fonts/modules/all/modules.svg#ETmodules') format('svg');
+			font-weight: 400;
+			font-style: normal;
+		}
+		
+		/* Fix hamburger menu border-radius on WooCommerce pages */
+		.mobile_menu_bar,
+		.hamburger {
+			border-radius: 60px !important;
+		}
+		
+		/* Fix hamburger menu icon */
+		.mobile_menu_bar:before {
+			font-family: 'ETmodules' !important;
+			content: "\61" !important; /* Hamburger icon */
+			font-size: 32px !important;
+			color: white !important;
+			line-height: 1 !important;
+		}
+		
+		/* Ensure bottom navigation icons use ETmodules */
+		.et_pb_module .et_pb_button:after,
+		.et_pb_button:after,
+		.et_pb_more_button:after,
+		.et_pb_newsletter_button:after,
+		.et_pb_portfolio_filters li a:after,
+		.et_pb_filterable_portfolio .et_pb_portfolio_filters li a:after,
+		.et_pb_gallery .et_pb_gallery_pagination li a:after {
+			font-family: 'ETmodules' !important;
+		}
+		
+		/* Fix any WooCommerce CSS conflicts */
+		.woocommerce .mobile_menu_bar {
+			background: none !important; /* Remove WooCommerce background */
+		}
+		
+		.woocommerce .mobile_menu_bar:before,
+		.woocommerce .mobile_menu_bar:after {
+			background: none !important; /* Remove bar backgrounds if any */
+		}
+	</style>
+	<?php
+}
+add_action( 'wp_head', 'et_divi_woocommerce_fix_icons', 100 );
+
+function et_divi_mobile_cart_javascript() {
+	if ( ! class_exists( 'woocommerce' ) || ! WC()->cart ) {
+		return;
+	}
+	
+	$cart_count = WC()->cart->get_cart_contents_count();
+	$cart_url = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : WC()->cart->get_cart_url();
+	
+	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			// Find the mobile menu bar
+			var $mobileMenuBar = $('.mobile_menu_bar');
+			
+			if ($mobileMenuBar.length > 0 && <?php echo $cart_count; ?> > 0) {
+				// Create the mobile cart HTML - 60px gold circle with pink bubble inside
+				var cartHtml = '<div class="et_mobile_cart_container" style="position: fixed !important; top: 70px !important; right: 2px !important; z-index: 99999 !important; width: 60px !important; height: 60px !important;">' +
+					'<a href="<?php echo esc_js( $cart_url ); ?>" class="et_mobile_cart_button" style="display: flex !important; align-items: center !important; justify-content: center !important; width: 60px !important; height: 60px !important; border-radius: 60px !important; background-color: <?php echo esc_js( et_builder_accent_color() ); ?> !important; text-decoration: none !important; position: relative !important;">' +
+					'<span style="font-family: ETmodules !important; font-size: 32px !important; color: white !important; line-height: 1 !important;">&#xe07a;</span>' +
+					'<span class="et_mobile_cart_count" style="position: absolute !important; top: 5px !important; right: 5px !important; background-color: #C64193 !important; color: white !important; border-radius: 50% !important; width: 20px !important; height: 20px !important; font-size: 12px !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; font-family: Arial, sans-serif !important;"><?php echo $cart_count; ?></span>' +
+					'</a>' +
+					'</div>';
+				
+				// Add it to the body
+				$('body').append(cartHtml);
+			}
+		});
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'et_divi_mobile_cart_javascript' );
+
 function et_divi_add_customizer_css() {
 		if ( wp_doing_ajax() || wp_doing_cron() || ( is_admin() && ! is_customize_preview() ) ) {
 			return;
@@ -5420,10 +5656,22 @@ function et_divi_add_customizer_css() {
 		$body_font_color     = et_get_option( 'font_color', '#666666' );
 		$body_header_color   = et_get_option( 'header_color', '#666666' );
 		$heading_font_weight = absint( et_get_option( 'heading_font_weight', '500' ) );
-		$body_font_weight    = absint( et_get_option( 'body_font_weight', '500' ) );
+	$body_font_weight    = absint( et_get_option( 'body_font_weight', '500' ) );
 
-		$accent_color = et_get_option( 'accent_color', '#2ea3f2' );
-		$link_color = et_get_option( 'link_color', $accent_color );
+	$accent_color = et_get_option( 'accent_color', '#a89664' );
+	
+	// DEBUG: Log the original value from database
+	error_log('🔍 ACCENT COLOR - Original from DB: ' . $accent_color);
+	
+	// FORCE OVERRIDE: Always use gold (#a89664) instead of database blue
+	if ( $accent_color === '#2ea3f2' || $accent_color === '#2EA3F2' ) {
+		error_log('✅ CONVERTING BLUE TO GOLD for accent_color');
+		$accent_color = '#a89664';
+	}
+	
+	error_log('🎨 ACCENT COLOR - Final value used: ' . $accent_color);
+	
+	$link_color = et_get_option( 'link_color', $accent_color );
 
 		$content_width = absint( et_get_option( 'content_width', '1080' ) );
 		$large_content_width = intval ( $content_width * 1.25 );
@@ -5445,19 +5693,35 @@ function et_divi_add_customizer_css() {
 		$header_style = et_get_option( 'header_style', 'left' );
 		$menu_height = absint( et_get_option( 'menu_height', '66' ) );
 		$logo_height = absint( et_get_option( 'logo_height', '54' ) );
-		$menu_margin_top = absint( et_get_option( 'menu_margin_top', '0' ) );
-		$menu_link = et_get_option( 'menu_link', $legacy_primary_nav_color );
-		$menu_link_active = et_get_option( 'menu_link_active', '#2ea3f2' );
-		$vertical_nav = et_get_option( 'vertical_nav', false );
+	$menu_margin_top = absint( et_get_option( 'menu_margin_top', '0' ) );
+	$menu_link = et_get_option( 'menu_link', $legacy_primary_nav_color );
+	$menu_link_active = et_get_option( 'menu_link_active', '#a89664' );
+	// FORCE OVERRIDE: Always use gold (#a89664) instead of database blue
+	if ( $menu_link_active === '#2ea3f2' || $menu_link_active === '#2EA3F2' ) {
+		$menu_link_active = '#a89664';
+	}
+	$vertical_nav = et_get_option( 'vertical_nav', false );
 
 		$hide_primary_logo = et_get_option( 'hide_primary_logo', 'false' );
 		$hide_fixed_logo = et_get_option( 'hide_fixed_logo', 'false' );
 
 		$default_primary_nav_font_size = 14;
-		$primary_nav_font_size = absint( et_get_option( 'primary_nav_font_size', $default_primary_nav_font_size ) );
-		$primary_nav_font_spacing = intval( et_get_option( 'primary_nav_font_spacing', '0' ) );
-		$primary_nav_bg = et_get_option( 'primary_nav_bg', '#ffffff' );
-		$primary_nav_font_style = et_get_option( 'primary_nav_font_style', '', '', true );
+	$primary_nav_font_size = absint( et_get_option( 'primary_nav_font_size', $default_primary_nav_font_size ) );
+	$primary_nav_font_spacing = intval( et_get_option( 'primary_nav_font_spacing', '0' ) );
+	$primary_nav_bg = et_get_option( 'primary_nav_bg', '#a89664' );
+	
+	// DEBUG: Log the original value from database
+	error_log('🔍 PRIMARY NAV BG - Original from DB: ' . $primary_nav_bg);
+	
+	// FORCE OVERRIDE: Always use gold (#a89664) instead of database blue/white
+	if ( $primary_nav_bg === '#2ea3f2' || $primary_nav_bg === '#2EA3F2' || $primary_nav_bg === '#ffffff' ) {
+		error_log('✅ CONVERTING ' . $primary_nav_bg . ' TO GOLD for primary_nav_bg');
+		$primary_nav_bg = '#a89664';
+	}
+	
+	error_log('🎨 PRIMARY NAV BG - Final value used: ' . $primary_nav_bg);
+	
+	$primary_nav_font_style = et_get_option( 'primary_nav_font_style', '', '', true );
 		$primary_nav_dropdown_bg = et_get_option( 'primary_nav_dropdown_bg', $primary_nav_bg );
 		$primary_nav_dropdown_link_color = et_get_option( 'primary_nav_dropdown_link_color', $menu_link );
 		$primary_nav_dropdown_line_color = et_get_option( 'primary_nav_dropdown_line_color', $accent_color );
@@ -5465,12 +5729,24 @@ function et_divi_add_customizer_css() {
 		$mobile_menu_link = et_get_option( 'mobile_menu_link', $menu_link );
 		$mobile_primary_nav_bg = et_get_option( 'mobile_primary_nav_bg', $primary_nav_bg );
 
-		$secondary_nav_font_size = absint( et_get_option( 'secondary_nav_font_size', '12' ) );
-		$secondary_nav_font_spacing = intval( et_get_option( 'secondary_nav_font_spacing', '0' ) );
-		$secondary_nav_font_style = et_get_option( 'secondary_nav_font_style', '', '', true );
-		$secondary_nav_text_color_new = et_get_option( 'secondary_nav_text_color_new', $legacy_secondary_nav_color );
-		$secondary_nav_bg = et_get_option( 'secondary_nav_bg', et_get_option( 'accent_color', '#2ea3f2' ) );
-		$secondary_nav_dropdown_bg = et_get_option( 'secondary_nav_dropdown_bg', $secondary_nav_bg );
+	$secondary_nav_font_size = absint( et_get_option( 'secondary_nav_font_size', '12' ) );
+	$secondary_nav_font_spacing = intval( et_get_option( 'secondary_nav_font_spacing', '0' ) );
+	$secondary_nav_font_style = et_get_option( 'secondary_nav_font_style', '', '', true );
+	$secondary_nav_text_color_new = et_get_option( 'secondary_nav_text_color_new', $legacy_secondary_nav_color );
+	$secondary_nav_bg = et_get_option( 'secondary_nav_bg', '#a89664' );
+	
+	// DEBUG: Log the original value from database
+	error_log('🔍 SECONDARY NAV BG - Original from DB: ' . $secondary_nav_bg);
+	
+	// FORCE OVERRIDE: Always use gold (#a89664) instead of database blue
+	if ( $secondary_nav_bg === '#2ea3f2' || $secondary_nav_bg === '#2EA3F2' ) {
+		error_log('✅ CONVERTING BLUE TO GOLD for secondary_nav_bg');
+		$secondary_nav_bg = '#a89664';
+	}
+	
+	error_log('🎨 SECONDARY NAV BG - Final value used: ' . $secondary_nav_bg);
+	
+	$secondary_nav_dropdown_bg = et_get_option( 'secondary_nav_dropdown_bg', $secondary_nav_bg );
 		$secondary_nav_dropdown_link_color = et_get_option( 'secondary_nav_dropdown_link_color', $secondary_nav_text_color_new );
 
 		$fixed_primary_nav_font_size = absint( et_get_option( 'fixed_primary_nav_font_size', $primary_nav_font_size ) );
@@ -5598,7 +5874,7 @@ function et_divi_add_customizer_css() {
 			}
 			<?php // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped -- Following the existing standards ?>
 		<?php } ?>
-		<?php if ( $accent_color !== '#2ea3f2' ) { ?>
+		<?php if ( $accent_color !== '#a89664' ) { ?>
 			<?php if ( et_is_woocommerce_plugin_active() ) { ?>
 				.woocommerce #respond input#submit,
 				.woocommerce-page #respond input#submit,
@@ -5718,10 +5994,10 @@ function et_divi_add_customizer_css() {
 				max-width: <?php echo esc_html( intval( et_get_option( 'content_width', '1080' ) ) + 160 ); ?>px;
 			}
 		<?php } ?>
-		<?php if ( $link_color !== '#2ea3f2' ) { ?>
+		<?php if ( $link_color !== '#a89664' ) { ?>
 			<?php echo $css( 'a' ); ?> { color: <?php echo esc_html( $link_color ); ?>; }
 		<?php } ?>
-		<?php if ( $primary_nav_bg !== '#ffffff' ) { ?>
+		<?php if ( $primary_nav_bg !== '#a89664' ) { ?>
 			#main-header,
 			#main-header .nav li ul,
 			.et-search-form,
@@ -5732,15 +6008,24 @@ function et_divi_add_customizer_css() {
 		<?php } ?>
 		<?php if ( $primary_nav_dropdown_line_color !== $accent_color ) { ?>
 			<?php echo $css( '.nav li ul' ); ?> { border-color: <?php echo esc_html( $primary_nav_dropdown_line_color ); ?>; }
-		<?php } ?>
-		<?php if ( '#2ea3f2' === $secondary_nav_bg && '#2ea3f2' !== $accent_color ) { ?>
-			#page-container #top-header { background-color: <?php echo esc_html( $accent_color ) . ' !important'; ?>; }
-			#et-secondary-nav li ul { background-color: <?php echo esc_html( $accent_color ); ?>; }
-		<?php } ?>
-		<?php if ( '#2ea3f2' !== $secondary_nav_bg ) { ?>
-			.et_secondary_nav_enabled #page-container #top-header { background-color: <?php echo esc_html( $secondary_nav_bg ) . ' !important'; ?>; }
-			#et-secondary-nav li ul { background-color: <?php echo esc_html( $secondary_nav_bg ); ?>; }
-		<?php } ?>
+	<?php } ?>
+	
+	/* === DEBUG: Color Values === */
+	/* accent_color from DB: <?php echo $accent_color; ?> */
+	/* secondary_nav_bg from DB: <?php echo $secondary_nav_bg; ?> */
+	/* primary_nav_bg from DB: <?php echo $primary_nav_bg; ?> */
+	/* === END DEBUG === */
+	
+	<?php if ( '#a89664' === $secondary_nav_bg && '#a89664' !== $accent_color ) { ?>
+		/* DEBUG: Applying CONDITION 1 - secondary_nav_bg IS gold, accent_color is NOT gold */
+		#page-container #top-header { background-color: <?php echo esc_html( $accent_color ); ?> !important; }
+		#et-secondary-nav li ul { background-color: <?php echo esc_html( $accent_color ); ?>; }
+	<?php } ?>
+	<?php if ( '#a89664' !== $secondary_nav_bg ) { ?>
+		/* DEBUG: Applying CONDITION 2 - secondary_nav_bg is NOT gold, value is: <?php echo $secondary_nav_bg; ?> */
+		.et_secondary_nav_enabled #page-container #top-header { background-color: <?php echo esc_html( $secondary_nav_bg ); ?> !important; }
+		#et-secondary-nav li ul { background-color: <?php echo esc_html( $secondary_nav_bg ); ?>; }
+	<?php } ?>
 		<?php if ( $secondary_nav_dropdown_bg !== $secondary_nav_bg ) { ?>
 			#et-secondary-nav li ul { background-color: <?php echo esc_html( $secondary_nav_dropdown_bg ); ?>; }
 		<?php } ?>
@@ -5828,7 +6113,7 @@ function et_divi_add_customizer_css() {
 			}
 		<?php } ?>
 
-		<?php if ( $menu_link_active !== '#2ea3f2' ) { ?>
+		<?php if ( $menu_link_active !== '#a89664' ) { ?>
 			<?php if ( $color_scheme !== 'none' ) { ?>
 				.et_color_scheme_red #top-menu li.current-menu-ancestor > a,
 				.et_color_scheme_red #top-menu li.current-menu-item > a,
@@ -5858,7 +6143,7 @@ function et_divi_add_customizer_css() {
 		<?php if ( $footer_widget_text_color !== '#fff' && $footer_widget_text_color !== '#ffffff' ) { ?>
 			.footer-widget { color: <?php echo esc_html( $footer_widget_text_color ); ?>; }
 		<?php } ?>
-		<?php if ( $footer_widget_header_color !== '#2ea3f2' ) { ?>
+		<?php if ( $footer_widget_header_color !== '#a89664' ) { ?>
 			#main-footer .footer-widget h4,
 			#main-footer .widget_block h1,
 			#main-footer .widget_block h2,
@@ -5867,7 +6152,7 @@ function et_divi_add_customizer_css() {
 			#main-footer .widget_block h5,
 			#main-footer .widget_block h6 { color: <?php echo esc_html( $footer_widget_header_color ); ?>; }
 		<?php } ?>
-		<?php if ( $footer_widget_bullet_color !== '#2ea3f2' ) { ?>
+		<?php if ( $footer_widget_bullet_color !== '#a89664' ) { ?>
 			.footer-widget li:before { border-color: <?php echo esc_html( $footer_widget_bullet_color ); ?>; }
 		<?php } ?>
 		<?php if ( $body_font_size !== $widget_body_font_size ) { ?>
@@ -6396,7 +6681,7 @@ function et_divi_add_customizer_css() {
 				.et_header_style_split .et-fixed-header .centered-inline-logo-wrap #logo { height: auto; max-height: 100%; }
 
 			<?php } ?>
-			<?php if ( $fixed_secondary_nav_bg !== '#2ea3f2' ) { ?>
+			<?php if ( $fixed_secondary_nav_bg !== '#a89664' ) { ?>
 				.et_fixed_nav #page-container .et-fixed-header#top-header { background-color: <?php echo esc_html( $fixed_secondary_nav_bg ); ?> !important; }
 				.et_fixed_nav #page-container .et-fixed-header#top-header #et-secondary-nav li ul { background-color: <?php echo esc_html( $fixed_secondary_nav_bg ); ?>; }
 			<?php } ?>
@@ -6412,7 +6697,7 @@ function et_divi_add_customizer_css() {
 				.et-fixed-header .et_search_form_container input::-webkit-input-placeholder { color: <?php echo esc_html( $fixed_menu_link ); ?> !important; }
 				.et-fixed-header .et_search_form_container input:-ms-input-placeholder { color: <?php echo esc_html( $fixed_menu_link ); ?> !important; }
 			<?php } ?>
-			<?php if ( $fixed_menu_link_active !== '#2ea3f2' ) { ?>
+			<?php if ( $fixed_menu_link_active !== '#a89664' ) { ?>
 				.et-fixed-header #top-menu li.current-menu-ancestor > a,
 				.et-fixed-header #top-menu li.current-menu-item > a,
 				.et-fixed-header #top-menu li.current_page_item > a { color: <?php echo esc_html( $fixed_menu_link_active ); ?> !important; }
