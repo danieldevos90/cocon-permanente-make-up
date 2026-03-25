@@ -17,6 +17,11 @@ export interface SalonizedDailySyncReport {
     skippedOlderOrEqual: number;
     skippedNoMatch: number;
     skippedAmbiguous: number;
+    skippedUnknownTreatment: number;
+    skippedFollowup: number;
+    skippedTooRecent: number;
+    aftercareSent: number;
+    aftercareErrors: number;
     errors: number;
   };
 }
