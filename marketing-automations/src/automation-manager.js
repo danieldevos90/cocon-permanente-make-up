@@ -27,9 +27,9 @@ export const journeyStages = {
 
 function getJourneyStagesForTreatment(treatmentType) {
   const stagesByTreatment = {
-    wenkbrauwen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months', 'refresh18Months'],
-    eyeliner: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh24Months', 'refresh36Months'],
-    lippen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months', 'refresh24Months'],
+    wenkbrauwen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months'],
+    eyeliner: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh24Months'],
+    lippen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months', 'refresh18Months'],
   };
   const stages = stagesByTreatment[treatmentType] || ['aftercare', 'weekFollowup'];
   return stages.map(stage => [stage, journeyStages[stage]]).filter(([, info]) => info);
