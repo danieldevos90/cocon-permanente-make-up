@@ -26,6 +26,31 @@ export interface SalonizedDailySyncReport {
   };
 }
 
+export interface JourneyEmailsOptions {
+  dryRun?: boolean;
+  mailchimpPageSize?: number;
+}
+
+export interface JourneyEmailsReport {
+  totals: {
+    checked: number;
+    sent: number;
+    skippedOverdue: number;
+    skippedNoTemplate: number;
+    errors: number;
+  };
+  details: {
+    sent: Array<{ stage: string; treatmentType: string; emails: string[]; campaignId?: string }>;
+    skipped: Array<{ stage?: string; treatmentType?: string; emails?: string[]; email?: string; reason: string }>;
+    errors: Array<{ stage: string; treatmentType: string; emails: string[]; error: string }>;
+  };
+  error?: string;
+}
+
 export function runSalonizedDailySync(
   options: SalonizedDailySyncOptions
 ): Promise<SalonizedDailySyncReport>;
+
+export function runJourneyEmails(
+  options?: JourneyEmailsOptions
+): Promise<JourneyEmailsReport>;

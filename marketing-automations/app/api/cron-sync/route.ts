@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
-import { runSalonizedDailySync } from "../../../src/salonized-daily-sync.js";
+import { runSalonizedDailySync, runJourneyEmails } from "../../../src/salonized-daily-sync.js";
 import { listCampaignsSentSince } from "../../../src/mailchimp-client.js";
 import { Redis } from "@upstash/redis";
 
@@ -84,13 +84,17 @@ async function handleCronSync(request: NextRequest) {
       reportPath: "/tmp/salonized-daily-sync-report.json",
     });
 
-    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
     const t = report.totals;
     const dayIso = report.date ?? new Date().toISOString().slice(0, 10);
-    await writeCronToRedis(dayIso, t, elapsed);
     const skipped = (t.skippedOlderOrEqual || 0) + (t.skippedNoMatch || 0) + (t.skippedAmbiguous || 0) + (t.skippedFollowup || 0) + (t.skippedTooRecent || 0);
-    const summary = `[cron-sync] Done in ${elapsed}s — appointments: ${t.todayAppointments}, updated: ${t.updated}, aftercare: ${t.aftercareSent || 0}, skipped: ${skipped} (followup: ${t.skippedFollowup || 0}, tooRecent: ${t.skippedTooRecent || 0}), errors: ${t.errors}`;
-    console.log(summary);
+    log(`Sync done — appointments: ${t.todayAppointments}, updated: ${t.updated}, aftercare: ${t.aftercareSent || 0}, skipped: ${skipped}, errors: ${t.errors}`);
+
+    const journeyReport = await runJourneyEmails({ dryRun: false, mailchimpPageSize: 200 });
+    const j = journeyReport.totals;
+    log(`Journey done — checked: ${j.checked}, sent: ${j.sent}, skippedOverdue: ${j.skippedOverdue}, errors: ${j.errors}`);
+
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    await writeCronToRedis(dayIso, t, elapsed);
 
     const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const campaignsResult = await listCampaignsSentSince(since24h);
@@ -99,13 +103,13 @@ async function handleCronSync(request: NextRequest) {
         (c: { settings?: { subject_line?: string; title?: string }; emails_sent?: number; send_time?: string }) =>
           `  - ${c.settings?.subject_line ?? c.settings?.title ?? "?"} | ${c.emails_sent ?? 0} verzonden | ${c.send_time ?? "-"}`
       );
-      console.log(`[cron-sync] Mailchimp emails (laatste 24u): ${campaignsResult.campaigns.length}`);
+      log(`Mailchimp emails (laatste 24u): ${campaignsResult.campaigns.length}`);
       lines.forEach((line: string) => log(line));
     } else if (!campaignsResult.success) {
       log(`Mailchimp campaigns check failed: ${campaignsResult.error}`);
     }
 
-    return NextResponse.json({ ok: true, elapsed: `${elapsed}s`, report });
+    return NextResponse.json({ ok: true, elapsed: `${elapsed}s`, report, journeyReport });
   } catch (error) {
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
     log(`FAILED after ${elapsed}s — ${(error as Error).message}`);

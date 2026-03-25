@@ -1,0 +1,457 @@
+{
+  "generatedAt": "2026-02-12T20:54:34.156Z",
+  "accountServer": "us1",
+  "audienceId": "fe34f2395c",
+  "audience": {
+    "id": "fe34f2395c",
+    "name": "Cocon Cosmetics",
+    "stats": {
+      "member_count": 5563,
+      "unsubscribe_count": 2098,
+      "cleaned_count": 268,
+      "member_count_since_send": 0,
+      "unsubscribe_count_since_send": 32,
+      "cleaned_count_since_send": 0,
+      "campaign_count": 24,
+      "campaign_last_sent": "2026-01-13T09:43:50+00:00",
+      "merge_field_count": 17,
+      "avg_sub_rate": 59,
+      "avg_unsub_rate": 394,
+      "target_sub_rate": 423,
+      "open_rate": 45.98129170638703,
+      "click_rate": 2.463655862726406,
+      "last_sub_date": "2026-02-12T20:53:59+00:00",
+      "last_unsub_date": "2026-02-12T15:38:29+00:00"
+    },
+    "permissionReminder": "You are receiving this email because you opted in via our website.",
+    "campaignDefaults": {
+      "from_name": "Cocon Cosmetics",
+      "from_email": "info@coconcosmetics.nl",
+      "subject": "",
+      "language": "en"
+    }
+  },
+  "mergeFields": [
+    {
+      "tag": "ADDRESS",
+      "name": "Address",
+      "type": "address",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "BIRTHDAY",
+      "name": "Birthday",
+      "type": "birthday",
+      "required": false,
+      "public": true
+    },
+    {
+      "tag": "CLIENTTYPE",
+      "name": "Client Type",
+      "type": "dropdown",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "COMPANY",
+      "name": "Company",
+      "type": "text",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "FNAME",
+      "name": "First Name",
+      "type": "text",
+      "required": false,
+      "public": true
+    },
+    {
+      "tag": "GENDER",
+      "name": "Gender",
+      "type": "radio",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "LASTTRT",
+      "name": "Last Treatment",
+      "type": "dropdown",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "LASTTRTDT",
+      "name": "Last Treatment Date",
+      "type": "date",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "LNAME",
+      "name": "Last Name",
+      "type": "text",
+      "required": false,
+      "public": true
+    },
+    {
+      "tag": "MMERGE8",
+      "name": "Tags",
+      "type": "text",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "PERFBOOKED",
+      "name": "Perfectie Booked",
+      "type": "dropdown",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "PERFDATE",
+      "name": "Perfectie Date",
+      "type": "date",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "PHONE",
+      "name": "Phone Number",
+      "type": "phone",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "REFRSHDUE",
+      "name": "Refresh Due Date",
+      "type": "date",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "SOURCESYS",
+      "name": "Source System",
+      "type": "dropdown",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "TDATE",
+      "name": "Behandeling Datum",
+      "type": "date",
+      "required": false,
+      "public": false
+    },
+    {
+      "tag": "TREATMENT",
+      "name": "Behandeling Type",
+      "type": "dropdown",
+      "required": false,
+      "public": false
+    }
+  ],
+  "segments": [
+    {
+      "id": 232,
+      "name": "Vlaardingen",
+      "type": "static",
+      "memberCount": 0
+    },
+    {
+      "id": 236,
+      "name": "Basis opleiding",
+      "type": "static",
+      "memberCount": 0
+    },
+    {
+      "id": 237,
+      "name": "Masterclass",
+      "type": "static",
+      "memberCount": 0
+    },
+    {
+      "id": 238,
+      "name": "Injectables",
+      "type": "static",
+      "memberCount": 0
+    },
+    {
+      "id": 239,
+      "name": "PMU verwijderen",
+      "type": "static",
+      "memberCount": 0
+    },
+    {
+      "id": 289,
+      "name": "Allen",
+      "type": "static",
+      "memberCount": 5355
+    },
+    {
+      "id": 290,
+      "name": "TAG: Wenkbrauwen",
+      "type": "static",
+      "memberCount": 1418
+    },
+    {
+      "id": 291,
+      "name": "TAG: Eyeliner",
+      "type": "static",
+      "memberCount": 361
+    },
+    {
+      "id": 292,
+      "name": "SEG: PMU Wenkbrauwen",
+      "type": "saved",
+      "memberCount": 1417
+    },
+    {
+      "id": 293,
+      "name": "SEG: PMU Eyeliner",
+      "type": "saved",
+      "memberCount": 361
+    },
+    {
+      "id": 294,
+      "name": "TAG: PMU Lippen",
+      "type": "static",
+      "memberCount": 72
+    },
+    {
+      "id": 295,
+      "name": "SEG: PMU Lippen",
+      "type": "saved",
+      "memberCount": 72
+    },
+    {
+      "id": 296,
+      "name": "TAG: Laser",
+      "type": "static",
+      "memberCount": 89
+    },
+    {
+      "id": 297,
+      "name": "SEG: PMU Laser",
+      "type": "saved",
+      "memberCount": 89
+    },
+    {
+      "id": 358,
+      "name": "online_aankoop",
+      "type": "static",
+      "memberCount": 157
+    },
+    {
+      "id": 364,
+      "name": "flow-active-treatment",
+      "type": "static",
+      "memberCount": 1
+    },
+    {
+      "id": 365,
+      "name": "flow-active-refresh",
+      "type": "static",
+      "memberCount": 1
+    }
+  ],
+  "connectedApps": [
+    {
+      "id": 249389669066,
+      "name": "Salonized",
+      "description": "Keep track of your agenda, books and customers easily, wherever you are.",
+      "users": [
+        "info@coconcosmetics.nl"
+      ]
+    },
+    {
+      "id": 366074603122,
+      "name": "Mailchimp for WooCommerce",
+      "description": "Connect your store, sell more stuff.",
+      "users": [
+        "info@coconcosmetics.nl"
+      ]
+    }
+  ],
+  "ecommerce": {
+    "storeCount": 1,
+    "stores": [
+      {
+        "id": "698315d7d6e02",
+        "name": "Cocon Permanente Make-up",
+        "platform": "woocommerce",
+        "currencyCode": "EUR",
+        "orderCount": null,
+        "customerCount": null,
+        "sampleOrders": [
+          {
+            "id": "8499",
+            "processedAt": "2025-11-07T16:21:36+00:00",
+            "financialStatus": "paid",
+            "fulfillmentStatus": "fulfilled",
+            "currencyCode": "EUR",
+            "total": 23.84,
+            "email": "rlinden90@gmail.com"
+          },
+          {
+            "id": "8482",
+            "processedAt": "2025-11-04T11:24:01+00:00",
+            "financialStatus": "paid",
+            "fulfillmentStatus": "fulfilled",
+            "currencyCode": "EUR",
+            "total": 13.51,
+            "email": "hashemisinaa@gmail.com"
+          },
+          {
+            "id": "8478",
+            "processedAt": "2025-10-30T16:43:44+00:00",
+            "financialStatus": "paid",
+            "fulfillmentStatus": "fulfilled",
+            "currencyCode": "EUR",
+            "total": 17.05,
+            "email": "mireilleonclin@hotmail.com"
+          }
+        ],
+        "sampleCustomers": [
+          {
+            "id": "cd8458fe26b3b93918ae625199794f32",
+            "email": "salgera77@gmail.com",
+            "ordersCount": 1,
+            "totalSpent": 13.89
+          },
+          {
+            "id": "4c1e7cfab93fd31d7717fc30b547e72b",
+            "email": "redlabel44@hotmail.com",
+            "ordersCount": 1,
+            "totalSpent": 13.89
+          },
+          {
+            "id": "96c28a58b70792518c92d76209b7c73e",
+            "email": "laraschouten12@gmail.com",
+            "ordersCount": 1,
+            "totalSpent": 13.89
+          }
+        ]
+      }
+    ]
+  },
+  "memberSignals": {
+    "scannedMembers": 1000,
+    "totalMembersInAudience": 7930,
+    "sampledOnly": true,
+    "sources": [
+      {
+        "source": "Import",
+        "count": 994,
+        "samples": [
+          {
+            "email": "l.laaraj@hotmail.com",
+            "lastChanged": "2025-07-31T19:25:04+00:00",
+            "tags": [
+              "Allen"
+            ]
+          },
+          {
+            "email": "nhili.laila@gmail.com",
+            "lastChanged": "2025-11-11T16:04:18+00:00",
+            "tags": [
+              "Allen"
+            ]
+          },
+          {
+            "email": "lamiae-khbacha@live.nl",
+            "lastChanged": "2025-07-31T19:25:04+00:00",
+            "tags": [
+              "Allen"
+            ]
+          }
+        ]
+      },
+      {
+        "source": "Cocon Permanente Make-up",
+        "count": 5,
+        "samples": [
+          {
+            "email": "liwill1955@gmail.com",
+            "lastChanged": "2026-02-05T07:50:23+00:00",
+            "tags": [
+              "online_aankoop",
+              "Allen"
+            ]
+          },
+          {
+            "email": "hashemisinaa@gmail.com",
+            "lastChanged": "2026-02-04T11:36:43+00:00",
+            "tags": [
+              "online_aankoop",
+              "Allen"
+            ]
+          },
+          {
+            "email": "amandaschobbe25@gmail.com",
+            "lastChanged": "2026-02-04T11:18:09+00:00",
+            "tags": [
+              "online_aankoop",
+              "TAG: Eyeliner",
+              "Allen"
+            ]
+          }
+        ]
+      },
+      {
+        "source": "Admin Add",
+        "count": 1,
+        "samples": [
+          {
+            "email": "info@coconcosmetics.nl",
+            "lastChanged": "2025-05-06T14:29:06+00:00",
+            "tags": [
+              "Allen"
+            ]
+          }
+        ]
+      }
+    ],
+    "statuses": [
+      {
+        "status": "subscribed",
+        "count": 888
+      },
+      {
+        "status": "unsubscribed",
+        "count": 65
+      },
+      {
+        "status": "cleaned",
+        "count": 47
+      }
+    ],
+    "topTags": [
+      {
+        "name": "Allen",
+        "count": 1000
+      },
+      {
+        "name": "TAG: Wenkbrauwen",
+        "count": 194
+      },
+      {
+        "name": "TAG: Eyeliner",
+        "count": 59
+      },
+      {
+        "name": "TAG: Laser",
+        "count": 11
+      },
+      {
+        "name": "TAG: PMU Lippen",
+        "count": 9
+      },
+      {
+        "name": "online_aankoop",
+        "count": 5
+      }
+    ]
+  }
+}

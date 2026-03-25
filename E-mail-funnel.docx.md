@@ -489,3 +489,194 @@ Vriendelijke groet,
 
 Het team van Cocon Cosmetics
 
+## Magic Pencil
+
+Beste \[Naam\],
+ 
+Wat leuk dat je een Magic Pencil hebt besteld bij Cocon Cosmetics! Het is niet voor niets ons bestverkochte product én de ultieme favoriet van onze PMU-artiesten.
+ 
+✨ Eigenaresse Sina Hashemi over de Magic Pencil:
+ 
+“De 3D Magic Brow Pencil is echt mijn favoriete product! Ik gebruik de kleur Dark Brow om mijn wenkbrauwen subtiel op te warmen. Mijn wenkbrauwen zijn van nature vrij donker, en omdat pigment tegenwoordig vaak iets koeler geneest, zorgt deze pencil voor een mooie, warme tint die mijn wenkbrauwen meer karakter geeft.
+ 
+Met de platte kop kun je heel precies werken. Als je hem verticaal houdt, maak je gemakkelijk zachte hair strokes. En wanneer je hem horizontaal gebruikt, creëer je een prachtige, natuurlijke schaduw in de wenkbrauw.
+ 
+En mijn kleine geheim? Ik gebruik hem ook als eyeliner voor een zachte, subtiele wing. Perfect voor een natuurlijke look!”
+ 
+Ben je benieuwd hoe je het meeste uit de Magic Pencil haalt? Bekijk de video hier:
+[link naar video]
+ 
+Laat je ons jouw resultaat zien? Stuur gerust een foto van je perfecte brows.
+ 
+Vriendelijke groet,
+Het team van Cocon Cosmetics
+
+## Best flow setup (Salonized + WooCommerce + Mailchimp)
+
+This section translates the feedback into one practical automation model you can implement now.
+
+### 1) Strategy in one line
+
+Use **Salonized** as the source for treatment lifecycle, use **WooCommerce** as the source for webshop behavior, and let **Mailchimp** orchestrate segmented journeys based on fields + tags.
+
+### 2) Keep, change, remove (based on feedback)
+
+Keep:
+- Day 0 aftercare email (per treatment)
+- Day 7 week follow-up email (per treatment)
+
+Change:
+- Review request timing -> send after likely completed perfectie treatment window (recommended around day 49-63, not day 21)
+
+Remove from "new treatment journey":
+- "Time for the finishing touch?" at week 6 as standard campaign step (because perfectie is already booked)
+
+Add:
+- Refresh reminder flow at month 6 and month 10/11
+- Cross-sell offer linked to refresh window
+- Lead nurture emails only for non-client/prospect segments
+
+### 3) Required data model in Mailchimp
+
+You already have:
+- `TREATMENT` (dropdown)
+- `TDATE` (date)
+- tags such as `online_aankoop`, `TAG: Wenkbrauwen`, `TAG: Eyeliner`, `TAG: PMU Lippen`
+
+Add these fields:
+- `CLIENTTYPE` (new / returning)
+- `LASTTRT` (last treatment type)
+- `LASTTRTDT` (last treatment date)
+- `PERFBOOKED` (yes/no)
+- `PERFDATE` (date, optional)
+- `REFRESH_DUE` (date; last treatment +10 months)
+- `SOURCE_SYS` (salonized / woocommerce / import / mixed)
+
+Add these operational tags:
+- `flow-active-treatment`
+- `flow-active-refresh`
+- `flow-stop-treatment`
+- `xsell-lips`, `xsell-eyeliner`, `xsell-brows`
+
+### 4) Source of truth per channel
+
+Salonized should update:
+- treatment type
+- treatment date
+- new vs returning
+- perfectie booking status/date
+
+WooCommerce should update:
+- purchase behavior (already visible via ecommerce store + `online_aankoop`)
+- optionally product category tags (`shop-brow`, `shop-aftercare`, etc.)
+
+Mailchimp should do:
+- segmentation
+- timed email journeys
+- reporting
+
+### 5) Core segments to create
+
+Treatment segments:
+- PMU Brows clients
+- PMU Eyeliner clients
+- PMU Lips clients
+- Laser clients
+
+Lifecycle segments:
+- New treatment clients (last 30 days)
+- Returning clients
+- Refresh due in 30-60 days
+- Refresh overdue
+
+Commerce segments:
+- Online purchasers (`online_aankoop`)
+- PMU client + online purchaser
+- PMU client + no webshop purchase
+
+Eligibility filters (global):
+- subscribed only
+- exclude cleaned/unsubscribed
+- suppress if `flow-stop-treatment` is present
+
+### 6) Recommended journey architecture
+
+Journey A: Post-treatment care (Salonized-triggered)
+- Trigger: new treatment event from Salonized
+- Email A1: Day 0 aftercare (per treatment)
+- Email A2: Day 7 follow-up (per treatment)
+- Optional Email A3: Review request at day 49-63 OR after perfectie completed event
+- Exit: add `flow-stop-treatment`Journey B: Refresh lifecycle (date-based)
+- Trigger: `REFRESH_DUE` date
+- Email B1 (month 6): educational reminder (pigment fade + maintenance)
+- Email B2 (month 10): booking CTA for refresh
+- Email B3 (month 11): last reminder + urgency
+- Exit rule: stop if new treatment booked
+
+Journey C: Refresh + cross-sell offer
+- Trigger: in refresh window AND has treatment type X
+- Message logic:
+  - Brows -> promote Lips/Eyeliner combo
+  - Lips -> promote Brows/Eyeliner combo
+  - Eyeliner -> promote Brows/Lips combo
+- Offer format:
+  - unique code or fixed combo upgrade
+  - short expiration (7-14 days)
+
+Journey D: Lead nurture (prospects only)
+- Enter only if no PMU treatment history fields/tags
+- Use education/social proof emails
+- Exclude existing PMU clients
+
+### 7) Decision rules (important)
+
+If client has PMU treatment history:
+- do not send generic PMU persuasion emails
+
+If perfectie already booked:
+- skip perfectie reminder emails
+
+If refresh booked:
+- stop refresh reminder branch
+
+If unsubscribed/cleaned:
+- immediate suppression across all journeys
+
+### 8) Technical implementation order (best path)
+
+Phase 1 (data reliability first):
+1. Add new merge fields in Mailchimp
+2. Map Salonized sync -> those fields/tags
+3. Confirm WooCommerce store/order sync (already active)
+4. Run `npm run audit-mailchimp` and validate segment counts
+
+Phase 2 (journeys):
+5. Build Journey A (post-treatment)
+6. Build Journey B (refresh reminders)
+7. Build Journey C (cross-sell at refresh)
+8. Restrict nurture to prospect segment only
+
+Phase 3 (quality control):
+9. Test all entry/exit conditions with internal seed contacts
+10. Validate no duplicate/conflicting sends between journeys
+11. Add monthly audit: sources, tags, refresh cohort sizes, conversion
+
+### 9) KPI set to track
+
+Primary:
+- refresh booking rate (B2/B3)
+- cross-sell attach rate (combo bookings)
+- review submission rate (post-perfectie)
+
+Secondary:
+- open/click by treatment type
+- unsubscribe by journey/stage
+- revenue contribution from online purchasers + PMU clients
+
+### 10) Final recommendation
+
+The best setup is not "more emails", but **better orchestration**:
+- treatment-specific content,
+- lifecycle timing based on real treatment dates,
+- refresh and cross-sell as the main commercial engine,
+- nurture only for true prospects.

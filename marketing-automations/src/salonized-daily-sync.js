@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { listAudienceMembers, syncSalonizedContact, addTagsToSubscriber, sendAftercareCampaign } from './mailchimp-client.js';
 import { getEmailTemplate } from './templates/index.js';
+import { getNextJourneyEmail, journeyStages } from './automation-manager.js';
 
 const INTERNAL_SUMMARY_KEYWORDS = [
   'pauze',
@@ -500,6 +501,131 @@ export async function runSalonizedDailySync({
   }
 
   writeReport(reportPath, report);
+  return report;
+}
+
+const MAX_OVERDUE_DAYS = 30;
+const VALID_TREATMENTS = ['wenkbrauwen', 'eyeliner', 'lippen'];
+
+/**
+ * Process all subscribers and send journey emails that are due.
+ * Only processes subscribers who already received aftercare (entry gate).
+ * Emails older than MAX_OVERDUE_DAYS are auto-tagged as sent without sending.
+ */
+export async function runJourneyEmails({ dryRun = false, mailchimpPageSize = 200 } = {}) {
+  const memberResult = await listAudienceMembers({
+    count: Math.min(Math.max(Number(mailchimpPageSize) || 200, 50), 500),
+    statuses: ['subscribed'],
+  });
+
+  const report = {
+    totals: { checked: 0, sent: 0, skippedOverdue: 0, skippedNoTemplate: 0, errors: 0 },
+    details: { sent: [], skipped: [], errors: [] },
+  };
+
+  if (!memberResult.success) {
+    report.error = memberResult.error;
+    return report;
+  }
+
+  const sendQueue = {};
+
+  for (const member of memberResult.members) {
+    const treatmentDate = member.merge_fields?.LASTTRTDT || '';
+    const treatmentType = (member.merge_fields?.TREATMENT || member.merge_fields?.LASTTRT || '').toLowerCase();
+
+    if (!treatmentDate || !VALID_TREATMENTS.includes(treatmentType)) continue;
+
+    const sentTags = (member.tags || []).map(t => t.name);
+    if (!sentTags.includes('email-aftercare-sent')) continue;
+
+    report.totals.checked += 1;
+
+    const nextEmail = getNextJourneyEmail(treatmentType, treatmentDate, sentTags);
+    if (!nextEmail || !nextEmail.dueDate) continue;
+
+    const overdueDays = Math.floor((new Date() - nextEmail.dueDate) / (1000 * 60 * 60 * 24));
+    if (overdueDays > MAX_OVERDUE_DAYS) {
+      if (!dryRun) {
+        const stageInfo = journeyStages[nextEmail.stage];
+        if (stageInfo) {
+          await addTagsToSubscriber(member.email_address, [stageInfo.tag]);
+        }
+      }
+      report.totals.skippedOverdue += 1;
+      report.details.skipped.push({
+        email: member.email_address,
+        stage: nextEmail.stage,
+        treatmentType,
+        overdueDays,
+        reason: 'auto-tagged-overdue',
+      });
+      continue;
+    }
+
+    const key = `${nextEmail.stage}-${treatmentType}`;
+    if (!sendQueue[key]) {
+      sendQueue[key] = { stage: nextEmail.stage, treatmentType, emails: [] };
+    }
+    sendQueue[key].emails.push(member.email_address);
+  }
+
+  for (const [, group] of Object.entries(sendQueue)) {
+    const template = getEmailTemplate(group.stage, group.treatmentType);
+    if (!template) {
+      report.totals.skippedNoTemplate += group.emails.length;
+      report.details.skipped.push({
+        stage: group.stage,
+        treatmentType: group.treatmentType,
+        emails: group.emails,
+        reason: 'no-template',
+      });
+      continue;
+    }
+
+    if (dryRun) {
+      report.totals.sent += group.emails.length;
+      report.details.sent.push({
+        stage: group.stage,
+        treatmentType: group.treatmentType,
+        emails: group.emails,
+        action: 'dry-run',
+      });
+      continue;
+    }
+
+    const result = await sendAftercareCampaign({
+      emails: group.emails,
+      subject: template.subject,
+      previewText: template.previewText,
+      htmlContent: template.getContent({}),
+    });
+
+    if (result.success) {
+      report.totals.sent += group.emails.length;
+      report.details.sent.push({
+        stage: group.stage,
+        treatmentType: group.treatmentType,
+        emails: group.emails,
+        campaignId: result.campaignId,
+      });
+      const stageInfo = journeyStages[group.stage];
+      if (stageInfo) {
+        for (const email of group.emails) {
+          await addTagsToSubscriber(email, [stageInfo.tag]);
+        }
+      }
+    } else {
+      report.totals.errors += 1;
+      report.details.errors.push({
+        stage: group.stage,
+        treatmentType: group.treatmentType,
+        emails: group.emails,
+        error: result.error,
+      });
+    }
+  }
+
   return report;
 }
 

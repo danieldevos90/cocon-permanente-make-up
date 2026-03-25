@@ -268,6 +268,8 @@ export async function listAudienceMembers({ count = 200, statuses = ['subscribed
               'members.merge_fields.LNAME',
               'members.merge_fields.TDATE',
               'members.merge_fields.LASTTRTDT',
+              'members.merge_fields.TREATMENT',
+              'members.merge_fields.LASTTRT',
               'members.tags',
               'total_items',
             ],

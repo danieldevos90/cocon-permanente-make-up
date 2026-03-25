@@ -1,0 +1,18 @@
+Behandeling,Email,Wanneer,Onderwerp,Status,Copy van copywriter,Opmerking
+Wenkbrauwen,Nazorg,Dag 0 (na 3 uur),Je behandeling zit erop – zo zorg je goed voor je huid,Automatisch,Ja (Template-text.md),Verstuurd na iCal sync + 3h threshold
+Wenkbrauwen,Week follow-up,Dag 7,Je wenkbrauwen verdienen wat extra liefde deze week,Automatisch,Ja (Template-text.md),Cron checkt LASTTRTDT + tags
+Wenkbrauwen,6 maanden – cross-sell,~6 maanden,Zo blijft je PMU mooi – nu en straks,Automatisch,Ja (Template2-text.md),Cross-sell eyeliner/lippen + 10% korting
+Wenkbrauwen,10 maanden – opfris,~10 maanden,Tijd om je PMU weer op te frissen,Automatisch,Ja (Template2-text.md),Opfrisherinnering
+Wenkbrauwen,18 maanden – no-response,~18 maanden,–,Wacht op copy,Nee,Wordt pas actief als copywriter tekst aanlevert
+Eyeliner,Nazorg,Dag 0 (na 3 uur),Je behandeling zit erop – zo zorg je goed voor je huid,Automatisch,Ja (Template-text.md),Verstuurd na iCal sync + 3h threshold
+Eyeliner,Week follow-up,Dag 7,Je ogen verdienen wat extra liefde deze week,Automatisch,Ja (Template-text.md),Cron checkt LASTTRTDT + tags
+Eyeliner,6 maanden – cross-sell,~6 maanden,Hoe gaat het met je permanente eyeliner?,Automatisch,Ja (Template5-text.md),Cross-sell wenkbrauwen/lippen
+Eyeliner,2 jaar – opfris,~2 jaar,Tijd voor een opfris van je PMU eyeliner?,Automatisch,Ja (Template5-text.md),Timing aangepast van 2.5 naar 2 jaar
+Eyeliner,3 jaar – no-response,~3 jaar,–,Wacht op copy,Nee,Wordt pas actief als copywriter tekst aanlevert
+Lippen,Nazorg,Dag 0 (na 3 uur),Je behandeling zit erop – zo zorg je goed voor je huid,Automatisch,Ja (Template-text.md),Verstuurd na iCal sync + 3h threshold
+Lippen,Week follow-up,Dag 7,Je lippen verdienen wat extra liefde deze week,Automatisch,Ja (Template-text.md),Cron checkt LASTTRTDT + tags
+Lippen,6 maanden – cross-sell,~6 maanden,Hoe gaat het met je permanente lippen?,Automatisch,Ja (Template5-text.md),Cross-sell wenkbrauwen/eyeliner
+Lippen,10 maanden – opfris + korting,~10 maanden,Dit is hét moment voor je lip-opfris (met korting),Automatisch,Ja (Template6-test.md),Prijstabel binnen/na 1 jaar
+Lippen,18 maanden – opfris,~18 maanden,Is het tijd voor een opfris van je lippen?,Automatisch,Ja (Template5-text.md),
+Lippen,2 jaar – no-response,~2 jaar,–,Wacht op copy,Nee,Wordt pas actief als copywriter tekst aanlevert
+Magic Pencil,Bevestiging bestelling,Na bestelling,Je Magic Pencil bestelling – onze ultieme favoriet!,Nog niet automatisch,Ja (Template3-text.md),Trigger via WooCommerce nog activeren
