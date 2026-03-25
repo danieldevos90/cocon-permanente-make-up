@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { listAudienceMembers, syncSalonizedContact, addTagsToSubscriber, sendAftercareCampaign } from './mailchimp-client.js';
+import { listAudienceMembers, syncSalonizedContact, addTagsToSubscriber, setSubscriberTags, sendAftercareCampaign } from './mailchimp-client.js';
 import { getEmailTemplate } from './templates/index.js';
 import { getNextJourneyEmail, journeyStages } from './automation-manager.js';
 
@@ -468,8 +468,15 @@ export async function runSalonizedDailySync({
       date: dayIso,
     });
 
-    const hasAftercareSent = (member.tags || []).some(t => t.name === 'email-aftercare-sent');
-    if (!hasAftercareSent && aftercareQueue[appointment.treatmentType]) {
+    const allJourneyTags = Object.values(journeyStages).map(s => s.tag);
+    const existingJourneyTags = allJourneyTags.filter(tag =>
+      (member.tags || []).some(t => t.name === tag),
+    );
+    if (existingJourneyTags.length > 0) {
+      await setSubscriberTags(member.email_address, { deactivate: existingJourneyTags });
+    }
+
+    if (aftercareQueue[appointment.treatmentType]) {
       aftercareQueue[appointment.treatmentType].push(member.email_address);
     }
   }
