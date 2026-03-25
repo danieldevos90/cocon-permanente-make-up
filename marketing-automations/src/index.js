@@ -13,6 +13,7 @@ export {
   getListInfo,
   addOrUpdateSubscriber,
   addTagsToSubscriber,
+  setSubscriberTags,
   getSubscriber,
   getSubscribersByTag,
   createCampaign,
@@ -21,6 +22,9 @@ export {
   scheduleCampaign,
   sendTestEmail,
   setupMergeFields,
+  ensureMergeFields,
+  setupLifecycleMergeFields,
+  syncSalonizedContact,
 } from './mailchimp-client.js';
 
 export {
@@ -32,6 +36,10 @@ export {
   previewEmail,
   getJourneySummary,
 } from './automation-manager.js';
+
+export {
+  runSalonizedDailySync,
+} from './salonized-daily-sync.js';
 
 export {
   aftercareEmails,

@@ -12,7 +12,7 @@ export const config = {
   
   urls: {
     review: process.env.REVIEW_URL || 'https://cocon-cosmetics.nl/reviews',
-    booking: process.env.BOOKING_URL || 'https://cocon-cosmetics.nl/afspraak',
+    booking: process.env.BOOKING_URL || 'https://www.coconpermanentemakeup.nl/afspraak-maken',
     portfolio: process.env.PORTFOLIO_URL || 'https://cocon-cosmetics.nl/portfolio',
   },
 

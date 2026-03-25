@@ -16,6 +16,16 @@ Geautomatiseerde email marketing voor PMU behandelingen met Mailchimp.
 
 - **3 Behandeltypes**: Wenkbrauwen, Eyeliner, Lippen
 
+## Dashboard
+
+Een beveiligd dashboard op de Vercel-site toont de status per dag:
+
+- **URL**: `https://marketing-automations-kohl.vercel.app/dashboard`
+- **Wachtwoord**: Stel `DASHBOARD_PASSWORD` in Vercel Environment Variables
+- **Cron history**: Voor status per dag, voeg Upstash Redis toe (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`)
+
+Zonder wachtwoord is het dashboard open. Zonder Redis zie je alleen de huidige status (geen historie).
+
 ## Installatie
 
 ```bash
@@ -129,6 +139,91 @@ node src/cli.js subscriber -e "client@email.nl"
 ```bash
 node src/cli.js journey -t wenkbrauwen
 ```
+
+## Dashboard
+
+Next.js dashboard op `/dashboard` met:
+
+- **Mailchimp health** – connectie status
+- **Cron trigger status** – tabel per dag (datum, syncs, appointments, updated, errors, elapsed) uit Upstash Redis
+- **Recent verzonden emails** – laatste 7 dagen
+
+### Password protection
+
+Zet `DASHBOARD_PASSWORD` in je env. Zonder dit veld is het dashboard open. Met wachtwoord: login form op `/login`, httpOnly cookie na succes.
+
+### Cron history (Redis)
+
+Voor de cron-tabel: voeg Upstash Redis toe via Vercel:
+
+1. Ga naar [vercel.com](https://vercel.com) → project **cocon-marketing-automation** → **Integrations**
+2. Zoek **Upstash** en klik **Add Integration**
+3. Maak een nieuwe Redis database (gratis tier) en koppel aan dit project
+4. De env vars `UPSTASH_REDIS_REST_URL` en `UPSTASH_REDIS_REST_TOKEN` worden automatisch toegevoegd
+5. Redeploy de app
+
+Of handmatig via CLI nadat je credentials hebt van [console.upstash.com](https://console.upstash.com):
+
+```bash
+vercel env add UPSTASH_REDIS_REST_URL production --value "https://..." --yes
+vercel env add UPSTASH_REDIS_REST_TOKEN production --value "..." --yes
+vercel --prod
+```
+
+De cron-sync schrijft na elke run naar Redis (`cron:YYYY-MM-DD`).
+
+### Lokaal draaien
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000/dashboard (of /login als DASHBOARD_PASSWORD is gezet).
+
+## Vercel Deployment (API + Health Dashboard)
+
+Deze map is nu Vercel-ready met Next.js, API routes en cron.
+
+### Endpoints
+
+- `GET /api/overview` - JSON overzicht met:
+  - laatste sync report
+  - Mailchimp templates
+  - recente/sent campaigns
+- `GET /health` of `GET /overzicht` - HTML health/overzicht pagina
+- `POST /api/sync` - run sync via API
+- `GET /api/cron-sync` - dagelijkse cron trigger endpoint
+
+### Vereiste Vercel env vars
+
+```env
+API_KEY_MAILCHIMP=...
+MAILCHIMP_LIST_ID=...
+SALONIZED_ICAL_URL=...
+SYNC_API_TOKEN=...
+CRON_SECRET=...
+DASHBOARD_PASSWORD=...          # Optioneel: wachtwoord voor /dashboard
+UPSTASH_REDIS_REST_URL=...     # Optioneel: voor cron history tabel
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+`/api/cron-sync` accepteert nu zowel `CRON_SECRET` als `SYNC_API_TOKEN` als bearer token.
+Aanbevolen: zet beide op dezelfde waarde in Vercel.
+
+### Voorbeeld: API sync trigger
+
+```bash
+curl -X POST "https://<jouw-vercel-url>/api/sync" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <SYNC_API_TOKEN>" \
+  -d '{"dryRun":true}'
+```
+
+### Duplicatie-bescherming
+
+- Zelfde klant meerdere afspraken op dezelfde dag: alleen de meest recente telt.
+- Zelfde sync meerdere keren draaien: update wordt overgeslagen als `LASTTRTDT >= incomingDate`.
+- Ambigue match (meerdere leden met zelfde naam): geen update, alleen report.
 
 ## Email Stages
 

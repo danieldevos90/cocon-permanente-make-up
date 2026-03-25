@@ -1,0 +1,18 @@
+flow,template_id,email_template_bestand,stage,behandeling,template_type,trigger,dagen_na_behandeling,tags_mailchimp_nodig
+Behandelingsreeks,aftercare-wenkbrauwen,aftercare-wenkbrauwen.html,aftercare,wenkbrauwen,reeks,Cron sync + auto-send na 3h threshold,0,"behandeling-wenkbrauwen, active-journey → email-aftercare-sent"
+Behandelingsreeks,aftercare-eyeliner,aftercare-eyeliner.html,aftercare,eyeliner,reeks,Cron sync + auto-send na 3h threshold,0,"behandeling-eyeliner, active-journey → email-aftercare-sent"
+Behandelingsreeks,aftercare-lippen,aftercare-lippen.html,aftercare,lippen,reeks,Cron sync + auto-send na 3h threshold,0,"behandeling-lippen, active-journey → email-aftercare-sent"
+Behandelingsreeks,weekFollowup-wenkbrauwen,weekfollowup-wenkbrauwen.html,weekFollowup,wenkbrauwen,reeks,Verstuur/plan na dag 7,7,email-week-sent
+Behandelingsreeks,weekFollowup-eyeliner,weekfollowup-eyeliner.html,weekFollowup,eyeliner,reeks,Verstuur/plan na dag 7,7,email-week-sent
+Behandelingsreeks,weekFollowup-lippen,weekfollowup-lippen.html,weekFollowup,lippen,reeks,Verstuur/plan na dag 7,7,email-week-sent
+Behandelingsreeks,refresh6Months-wenkbrauwen,refresh6months-wenkbrauwen.html,refresh6Months,wenkbrauwen,reeks,Verstuur/plan na ~6 maanden,180,email-refresh6m-sent
+Behandelingsreeks,refresh10Months-wenkbrauwen,refresh10months-wenkbrauwen.html,refresh10Months,wenkbrauwen,reeks,Verstuur/plan na ~10 maanden,300,email-refresh10m-sent
+Behandelingsreeks,refresh18Months-wenkbrauwen,–,refresh18Months,wenkbrauwen,reeks (copy nog niet aangeleverd),No-response reminder ~18 maanden,547,email-refresh18m-sent
+Behandelingsreeks,refresh6Months-eyeliner,refresh6months-eyeliner.html,refresh6Months,eyeliner,reeks,Verstuur/plan na ~6 maanden,180,email-refresh6m-sent
+Behandelingsreeks,refresh24Months-eyeliner,refresh30months-eyeliner.html,refresh24Months,eyeliner,reeks,Verstuur/plan na ~2 jaar,730,email-refresh24m-sent
+Behandelingsreeks,refresh36Months-eyeliner,–,refresh36Months,eyeliner,reeks (copy nog niet aangeleverd),No-response reminder ~3 jaar,1095,email-refresh36m-sent
+Behandelingsreeks,refresh6Months-lippen,refresh6months-lippen.html,refresh6Months,lippen,reeks,Verstuur/plan na ~6 maanden,180,email-refresh6m-sent
+Behandelingsreeks,refresh10Months-lippen,refresh10months-lippen.html,refresh10Months,lippen,reeks,Verstuur/plan na ~10 maanden (korting binnen 1 jaar),300,email-refresh10m-sent
+Behandelingsreeks,refresh18Months-lippen,refresh18months-lippen.html,refresh18Months,lippen,reeks,Bestaande 18m opfris reminder,547,email-refresh18m-sent
+Behandelingsreeks,refresh24Months-lippen,–,refresh24Months,lippen,reeks (copy nog niet aangeleverd),No-response reminder ~2 jaar,730,email-refresh24m-sent
+Bevestiging,confirmation-magicPencil,confirmation-magicpencil.html,confirmation,magicPencil,bevestiging,Magic Pencil bestelling (Woo data gekoppeld; verzend-trigger nog activeren),,geen

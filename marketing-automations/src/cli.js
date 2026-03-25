@@ -9,8 +9,11 @@ import {
   getListInfo,
   getSubscriber,
   setupMergeFields,
+  setupLifecycleMergeFields,
+  syncSalonizedContact,
   listTemplates,
   upsertTemplate,
+  deleteTemplate,
 } from './mailchimp-client.js';
 import {
   registerTreatment,
@@ -18,6 +21,7 @@ import {
   previewEmail,
   getJourneySummary,
 } from './automation-manager.js';
+import { runSalonizedDailySync } from './salonized-daily-sync.js';
 import { listAllTemplates } from './templates/index.js';
 import fs from 'fs';
 import path from 'path';
@@ -84,7 +88,7 @@ program
  */
 program
   .command('setup')
-  .description('Setup required merge fields in Mailchimp')
+  .description('Setup required merge fields in Mailchimp (base + lifecycle)')
   .action(async () => {
     const validation = validateConfig();
     if (!validation.valid) {
@@ -96,7 +100,11 @@ program
     console.log(chalk.blue('🔧 Setting up merge fields...'));
     
     try {
-      const results = await setupMergeFields();
+      const [baseResults, lifecycleResults] = await Promise.all([
+        setupMergeFields(),
+        setupLifecycleMergeFields(),
+      ]);
+      const results = [...baseResults, ...lifecycleResults];
       
       for (const result of results) {
         if (result.success) {
@@ -107,6 +115,118 @@ program
       }
 
       console.log(chalk.green('\n✅ Setup complete!'));
+    } catch (error) {
+      console.log(chalk.red(`Error: ${error.message}`));
+    }
+  });
+
+/**
+ * Sync Salonized customer/treatment data into Mailchimp
+ */
+program
+  .command('sync-salonized')
+  .description('Sync one Salonized contact into Mailchimp data model')
+  .requiredOption('-e, --email <email>', 'Client email address')
+  .option('-f, --firstname <name>', 'Client first name', '')
+  .option('-l, --lastname <name>', 'Client last name', '')
+  .option('-t, --treatment <type>', 'Treatment type (wenkbrauwen, eyeliner, lippen, laser)', '')
+  .option('-d, --date <date>', 'Last treatment date (YYYY-MM-DD)', '')
+  .option('--client-type <type>', 'Client type (new, returning)', '')
+  .option('--perfectie-booked <value>', 'Perfectie booked (yes/no)', '')
+  .option('--perfectie-date <date>', 'Perfectie date (YYYY-MM-DD)', '')
+  .option('--activate-tags <tags>', 'Comma-separated tags to activate', '')
+  .option('--deactivate-tags <tags>', 'Comma-separated tags to deactivate', '')
+  .action(async (options) => {
+    const validation = validateConfig();
+    if (!validation.valid) {
+      console.log(chalk.red('Configuration errors:'));
+      validation.errors.forEach(e => console.log(chalk.red(`  - ${e}`)));
+      return;
+    }
+
+    const activateTags = options.activateTags
+      ? options.activateTags.split(',').map(tag => tag.trim()).filter(Boolean)
+      : [];
+    const deactivateTags = options.deactivateTags
+      ? options.deactivateTags.split(',').map(tag => tag.trim()).filter(Boolean)
+      : [];
+
+    console.log(chalk.blue(`🔄 Syncing Salonized contact ${options.email}...`));
+
+    try {
+      const result = await syncSalonizedContact({
+        email: options.email,
+        firstName: options.firstname,
+        lastName: options.lastname,
+        treatmentType: options.treatment,
+        lastTreatmentDate: options.date,
+        clientType: options.clientType,
+        perfectionBooked: options.perfectieBooked,
+        perfectionDate: options.perfectieDate,
+        sourceSystem: 'salonized',
+        activateTags,
+        deactivateTags,
+      });
+
+      if (result.success) {
+        console.log(chalk.green('✅ Contact synced successfully'));
+      } else {
+        console.log(chalk.red(`❌ Sync failed: ${result.error}`));
+      }
+    } catch (error) {
+      console.log(chalk.red(`Error: ${error.message}`));
+    }
+  });
+
+/**
+ * Daily Salonized iCal sync based on exact name matches
+ */
+program
+  .command('sync-salonized-daily')
+  .description('Sync today\'s Salonized appointments to Mailchimp using exact first/last name match')
+  .option('--date <date>', 'Date to process (YYYY-MM-DD). Defaults to today in Europe/Amsterdam')
+  .option('--ical-url <url>', 'Override SALONIZED_ICAL_URL')
+  .option('--dry-run', 'Do not write updates, only report')
+  .option('--subscribed-only', 'Match only subscribed contacts for faster sync')
+  .option('--report <path>', 'Write JSON report file', 'reports/salonized-daily-sync-report.json')
+  .action(async (options) => {
+    const validation = validateConfig();
+    if (!validation.valid) {
+      console.log(chalk.red('Configuration errors:'));
+      validation.errors.forEach(e => console.log(chalk.red(`  - ${e}`)));
+      return;
+    }
+
+    const icalUrl = options.icalUrl || process.env.SALONIZED_ICAL_URL || '';
+    if (!icalUrl) {
+      console.log(chalk.red('Missing iCal URL. Set SALONIZED_ICAL_URL in .env or pass --ical-url.'));
+      return;
+    }
+
+    const isDryRun = Boolean(options.dryRun);
+    console.log(chalk.blue(`🗓️  Running Salonized daily sync${isDryRun ? ' (dry run)' : ''}...`));
+
+    try {
+      const report = await runSalonizedDailySync({
+        icalUrl,
+        date: options.date || '',
+        dryRun: isDryRun,
+        includeUnsubscribed: !options.subscribedOnly,
+        reportPath: options.report || '',
+      });
+
+      console.log(chalk.green(`✅ Sync finished for ${report.date}`));
+      console.log(chalk.white(`   Appointments: ${report.totals.todayAppointments}`));
+      console.log(chalk.white(`   Planned updates: ${report.totals.plannedUpdates}`));
+      console.log(chalk.white(`   Updated: ${report.totals.updated}`));
+      console.log(chalk.white(`   Skipped (no match): ${report.totals.skippedNoMatch}`));
+      console.log(chalk.white(`   Skipped (ambiguous): ${report.totals.skippedAmbiguous}`));
+      console.log(chalk.white(`   Skipped (older/equal date): ${report.totals.skippedOlderOrEqual}`));
+      console.log(chalk.white(`   Skipped (unknown treatment): ${report.totals.skippedUnknownTreatment}`));
+      console.log(chalk.white(`   Errors: ${report.totals.errors}`));
+      if (options.report) {
+        console.log(chalk.gray(`   Report: ${options.report}`));
+      }
     } catch (error) {
       console.log(chalk.red(`Error: ${error.message}`));
     }
@@ -172,7 +292,7 @@ program
   .requiredOption('-e, --email <email>', 'Client email address')
   .requiredOption('-f, --firstname <name>', 'Client first name')
   .requiredOption('-t, --treatment <type>', 'Treatment type (wenkbrauwen, eyeliner, lippen)')
-  .requiredOption('-s, --stage <stage>', 'Email stage (aftercare, weekFollowup, reviewRequest, touchupReminder)')
+  .requiredOption('-s, --stage <stage>', 'Email stage (aftercare, weekFollowup, refresh6Months, refresh10Months, refresh18Months, refresh30Months)')
   .option('--test', 'Send as test email instead of real campaign')
   .action(async (options) => {
     const validation = validateConfig();
@@ -279,6 +399,7 @@ program
   .option('--prefix <prefix>', 'Name prefix for templates', 'Cocon - ')
   .option('--folder <folderId>', 'Mailchimp template folder ID to use')
   .option('--dry-run', 'Show actions without updating Mailchimp')
+  .option('--delete-missing', 'Delete Mailchimp templates with this prefix that no longer exist locally')
   .action(async (options) => {
     const validation = validateConfig();
     if (!validation.valid) {
@@ -292,12 +413,16 @@ program
     const prefix = options.prefix || 'Cocon - ';
     const folderId = options.folder || null;
     const dryRun = Boolean(options.dryRun);
+    const deleteMissing = Boolean(options.deleteMissing);
 
     const stageLabels = {
       aftercare: 'Aftercare',
       weekFollowup: 'Week Follow-up',
-      reviewRequest: 'Review Request',
       touchupReminder: 'Touch-up Reminder',
+      refresh6Months: '6-Month Refresh',
+      refresh10Months: '10-Month Refresh',
+      refresh18Months: '18-Month Refresh',
+      refresh30Months: '2-Year Refresh',
       education: 'Education',
       socialProof: 'Social Proof',
     };
@@ -339,6 +464,7 @@ program
     const summary = {
       created: 0,
       updated: 0,
+      deleted: 0,
       skipped: 0,
       failed: 0,
       dryRun: dryRun,
@@ -389,12 +515,51 @@ program
       }
     }
 
+    const shouldDeleteMissing = deleteMissing && !stageFilter && !treatmentFilter;
+    if (deleteMissing && (stageFilter || treatmentFilter)) {
+      console.log(chalk.yellow('⚠️  Skipping delete step because stage/treatment filters are active.'));
+    }
+
+    if (shouldDeleteMissing) {
+      const desiredNames = new Set(
+        templates.map(templateMeta => {
+          const readableStage = stageLabels[templateMeta.stage] || templateMeta.stage;
+          const readableTreatment = templateMeta.treatmentType
+            ? (treatmentLabels[templateMeta.treatmentType] || templateMeta.treatmentType)
+            : null;
+          return `${prefix}${readableStage}${readableTreatment ? ` (${readableTreatment})` : ''}`;
+        }),
+      );
+
+      const toDelete = existingTemplates.filter(template =>
+        template.name?.startsWith(prefix) && !desiredNames.has(template.name),
+      );
+
+      for (const template of toDelete) {
+        if (dryRun) {
+          console.log(chalk.gray(`[dry-run] Would delete template "${template.name}"`));
+          summary.skipped += 1;
+          continue;
+        }
+
+        try {
+          await deleteTemplate(template.id);
+          summary.deleted += 1;
+          console.log(chalk.green(`🗑️  Deleted template: ${template.name}`));
+        } catch (error) {
+          summary.failed += 1;
+          console.log(chalk.red(`❌ Failed to delete ${template.name}: ${error.message}`));
+        }
+      }
+    }
+
     console.log('\n' + chalk.blue('Summary:'));
     if (dryRun) {
       console.log(chalk.white(`  Previewed: ${summary.skipped}`));
     } else {
       console.log(chalk.white(`  Created: ${summary.created}`));
       console.log(chalk.white(`  Updated: ${summary.updated}`));
+      console.log(chalk.white(`  Deleted: ${summary.deleted}`));
       console.log(chalk.white(`  Skipped: ${summary.skipped}`));
       console.log(chalk.white(`  Failed: ${summary.failed}`));
     }

@@ -12,13 +12,13 @@ export const reviewRequestEmails = {
       const content = `
         <h2>Beste ${data.firstName || '*|FNAME|*'},</h2>
         
-        <p>We hopen dat je blij bent met het resultaat van je permanente wenkbrauwen! 🙌</p>
+        <p>We hopen dat je blij bent met het resultaat van je permanente wenkbrauwen.</p>
         
         <p>We waarderen het als je je ervaring met ons deelt. Dit helpt niet alleen ons, maar ook anderen die een behandeling overwegen.</p>
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="${config.urls.review}" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
-            ⭐ Laat je review achter
+            Laat je review achter
           </a>
         </p>
         
@@ -32,7 +32,7 @@ export const reviewRequestEmails = {
         <strong>Het team van Cocon Cosmetics</strong></p>
         
         <p style="font-size: 14px; color: #666; margin-top: 30px;">
-          💬 Vertel het ook gerust aan je familie en vrienden!
+          Vertel het ook gerust aan je familie en vrienden.
         </p>
       `;
       return wrapInBaseTemplate(replacePlaceholders(content, data), { previewText: this.previewText });
@@ -46,13 +46,13 @@ export const reviewRequestEmails = {
       const content = `
         <h2>Beste ${data.firstName || '*|FNAME|*'},</h2>
         
-        <p>We hopen dat je blij bent met het resultaat van je permanente eyeliner! 🙌</p>
+        <p>We hopen dat je blij bent met het resultaat van je permanente eyeliner.</p>
         
         <p>We waarderen het als je je ervaring met ons deelt. Dit helpt niet alleen ons, maar ook anderen die een behandeling overwegen.</p>
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="${config.urls.review}" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
-            ⭐ Laat je review achter
+            Laat je review achter
           </a>
         </p>
         
@@ -66,7 +66,7 @@ export const reviewRequestEmails = {
         <strong>Het team van Cocon Cosmetics</strong></p>
         
         <p style="font-size: 14px; color: #666; margin-top: 30px;">
-          💬 Vertel het ook gerust aan je familie en vrienden!
+          Vertel het ook gerust aan je familie en vrienden.
         </p>
       `;
       return wrapInBaseTemplate(replacePlaceholders(content, data), { previewText: this.previewText });
@@ -80,13 +80,13 @@ export const reviewRequestEmails = {
       const content = `
         <h2>Beste ${data.firstName || '*|FNAME|*'},</h2>
         
-        <p>We hopen dat je blij bent met het resultaat van je permanente make-up lippen! 🙌</p>
+        <p>We hopen dat je blij bent met het resultaat van je permanente make-up lippen.</p>
         
         <p>We waarderen het als je je ervaring met ons deelt. Dit helpt niet alleen ons, maar ook anderen die een behandeling overwegen.</p>
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="${config.urls.review}" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
-            ⭐ Laat je review achter
+            Laat je review achter
           </a>
         </p>
         
@@ -100,7 +100,7 @@ export const reviewRequestEmails = {
         <strong>Het team van Cocon Cosmetics</strong></p>
         
         <p style="font-size: 14px; color: #666; margin-top: 30px;">
-          💬 Vertel het ook gerust aan je familie en vrienden!
+          Vertel het ook gerust aan je familie en vrienden.
         </p>
       `;
       return wrapInBaseTemplate(replacePlaceholders(content, data), { previewText: this.previewText });

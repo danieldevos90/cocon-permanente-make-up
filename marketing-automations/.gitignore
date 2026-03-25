@@ -1,0 +1,7 @@
+.vercel
+.env
+.env.local
+DASHBOARD_PASSWORD.txt
+node_modules/
+.next/
+reports/

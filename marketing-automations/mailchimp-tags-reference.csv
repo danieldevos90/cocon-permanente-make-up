@@ -1,0 +1,13 @@
+tag,gebruikt_door,wanneer_toegepast
+behandeling-wenkbrauwen,Behandelingsreeks + addOrUpdateSubscriber,Bij registratie/sync wanneer behandeling = wenkbrauwen
+behandeling-eyeliner,Behandelingsreeks + addOrUpdateSubscriber,Bij registratie/sync wanneer behandeling = eyeliner
+behandeling-lippen,Behandelingsreeks + addOrUpdateSubscriber,Bij registratie/sync wanneer behandeling = lippen
+active-journey,Behandelingsreeks (registerTreatment),Wanneer een behandeling wordt geregistreerd
+email-aftercare-sent,Automatisering (sendJourneyEmail),Na verzending nazorgmail
+email-week-sent,Automatisering (sendJourneyEmail),Na verzending weekmail
+email-review-sent,Automatisering (sendJourneyEmail),Na verzending reviewverzoek-mail
+email-touchup-sent,Automatisering (sendJourneyEmail),Na verzending touch-up herinnering
+TAG: Wenkbrauwen,Salonized-sync (syncSalonizedContact),Wanneer laatste behandeling = wenkbrauwen
+TAG: Eyeliner,Salonized-sync (syncSalonizedContact),Wanneer laatste behandeling = eyeliner
+TAG: PMU Lippen,Salonized-sync (syncSalonizedContact),Wanneer laatste behandeling = lippen
+TAG: Laser,Salonized-sync (syncSalonizedContact),Wanneer laatste behandeling = laser

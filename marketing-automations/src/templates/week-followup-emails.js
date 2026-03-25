@@ -29,7 +29,7 @@ export const weekFollowupEmails = {
         </ul>
         
         <div class="tips-box" style="background-color: #fdf0f8; border-left: 4px solid #a30077; padding: 20px; margin: 20px 0;">
-          <p style="margin: 0;"><strong>📅 Na 6 tot 9 weken is de perfectiebehandeling.</strong> Die is essentieel om de kleur en vorm bij te werken en het resultaat langdurig mooi te houden.</p>
+          <p style="margin: 0;"><strong>Na 6 tot 9 weken is de perfectiebehandeling.</strong> Die is essentieel om de kleur en vorm bij te werken en het resultaat langdurig mooi te houden.</p>
         </div>
         
         <p>Heb je vragen? Laat het ons weten.</p>
@@ -67,7 +67,7 @@ export const weekFollowupEmails = {
         <p>Gebruik de Bepanthen zalf alleen zoals aangegeven: na het loslaten van de korstjes (meestal na 6 tot 9 dagen) mag je de oogleden enkele nachten dun insmeren. Breng de zalf met een wattenstaafje of een schone vingertop aan en gebruik een klein beetje, een dun laagje is voldoende.</p>
         
         <div class="tips-box" style="background-color: #fdf0f8; border-left: 4px solid #a30077; padding: 20px; margin: 20px 0;">
-          <p style="margin: 0;"><strong>📅 Na ongeveer 6 weken</strong> kom je weer langs voor een perfectiebehandeling. Tijdens deze behandeling brengen we waar nodig nog verfijningen aan, zodat je eyeliner nóg mooier tot zijn recht komt.</p>
+          <p style="margin: 0;"><strong>Na ongeveer 6 weken</strong> kom je weer langs voor een perfectiebehandeling. Tijdens deze behandeling brengen we waar nodig nog verfijningen aan, zodat je eyeliner nóg mooier tot zijn recht komt.</p>
         </div>
         
         <p>Heb je vragen? Neem dan contact met ons op.</p>
@@ -103,7 +103,7 @@ export const weekFollowupEmails = {
         </ul>
         
         <div class="tips-box" style="background-color: #fdf0f8; border-left: 4px solid #a30077; padding: 20px; margin: 20px 0;">
-          <p style="margin: 0;"><strong>📅 Na ongeveer 6 weken</strong> kom je langs voor een perfectiebehandeling. Tijdens deze afspraak brengen we extra pigment aan waar nodig, zodat jouw gewenste kleur volledig tot zijn recht komt.</p>
+          <p style="margin: 0;"><strong>Na ongeveer 6 weken</strong> kom je langs voor een perfectiebehandeling. Tijdens deze afspraak brengen we extra pigment aan waar nodig, zodat jouw gewenste kleur volledig tot zijn recht komt.</p>
         </div>
         
         <p>Vriendelijke groet,<br>

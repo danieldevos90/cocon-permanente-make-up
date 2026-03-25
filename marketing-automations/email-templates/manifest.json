@@ -1,0 +1,117 @@
+{
+  "exported": [
+    {
+      "id": "confirmation-magicPencil",
+      "stage": "confirmation",
+      "treatmentType": "magicPencil",
+      "file": "confirmation-magicpencil.html",
+      "subject": "Je Magic Pencil bestelling - onze ultieme favoriet!",
+      "previewText": "Ontdek hoe je het meeste uit je Magic Pencil haalt"
+    },
+    {
+      "id": "aftercare-wenkbrauwen",
+      "stage": "aftercare",
+      "treatmentType": "wenkbrauwen",
+      "file": "aftercare-wenkbrauwen.html",
+      "subject": "Je behandeling zit erop, zo zorg je goed voor je huid",
+      "previewText": "Belangrijke nazorginstructies voor je permanente wenkbrauwen"
+    },
+    {
+      "id": "weekFollowup-wenkbrauwen",
+      "stage": "weekFollowup",
+      "treatmentType": "wenkbrauwen",
+      "file": "weekfollowup-wenkbrauwen.html",
+      "subject": "Je wenkbrauwen verdienen wat extra liefde deze week",
+      "previewText": "Hoe gaat het met de genezing? Belangrijke tips voor week 1"
+    },
+    {
+      "id": "refresh6Months-wenkbrauwen",
+      "stage": "refresh6Months",
+      "treatmentType": "wenkbrauwen",
+      "file": "refresh6months-wenkbrauwen.html",
+      "subject": "Zo blijft je PMU mooi, nu en straks",
+      "previewText": "Een klein momentje voor jezelf en je uitstraling"
+    },
+    {
+      "id": "refresh10Months-wenkbrauwen",
+      "stage": "refresh10Months",
+      "treatmentType": "wenkbrauwen",
+      "file": "refresh10months-wenkbrauwen.html",
+      "subject": "Tijd om je PMU weer op te frissen",
+      "previewText": "Voor een resultaat dat net zo mooi blijft als toen"
+    },
+    {
+      "id": "aftercare-eyeliner",
+      "stage": "aftercare",
+      "treatmentType": "eyeliner",
+      "file": "aftercare-eyeliner.html",
+      "subject": "Je behandeling zit erop, zo zorg je goed voor je huid",
+      "previewText": "Belangrijke nazorginstructies voor je permanente eyeliner"
+    },
+    {
+      "id": "weekFollowup-eyeliner",
+      "stage": "weekFollowup",
+      "treatmentType": "eyeliner",
+      "file": "weekfollowup-eyeliner.html",
+      "subject": "Je ogen verdienen wat extra liefde deze week",
+      "previewText": "Hoe gaat het met je eyeliner? Tips voor de eerste week"
+    },
+    {
+      "id": "refresh6Months-eyeliner",
+      "stage": "refresh6Months",
+      "treatmentType": "eyeliner",
+      "file": "refresh6months-eyeliner.html",
+      "subject": "Hoe gaat het met je permanente eyeliner?",
+      "previewText": "Een momentje voor jezelf en je uitstraling"
+    },
+    {
+      "id": "refresh24Months-eyeliner",
+      "stage": "refresh24Months",
+      "treatmentType": "eyeliner",
+      "file": "refresh30months-eyeliner.html",
+      "subject": "Tijd voor een opfris van je PMU eyeliner?",
+      "previewText": "Voor een resultaat dat net zo mooi blijft als toen"
+    },
+    {
+      "id": "aftercare-lippen",
+      "stage": "aftercare",
+      "treatmentType": "lippen",
+      "file": "aftercare-lippen.html",
+      "subject": "Je behandeling zit erop, zo zorg je goed voor je huid",
+      "previewText": "Belangrijke nazorginstructies voor je permanente lippen"
+    },
+    {
+      "id": "weekFollowup-lippen",
+      "stage": "weekFollowup",
+      "treatmentType": "lippen",
+      "file": "weekfollowup-lippen.html",
+      "subject": "Je lippen verdienen wat extra liefde deze week",
+      "previewText": "Hoe gaat het met je lippen? Belangrijke tips voor week 1"
+    },
+    {
+      "id": "refresh6Months-lippen",
+      "stage": "refresh6Months",
+      "treatmentType": "lippen",
+      "file": "refresh6months-lippen.html",
+      "subject": "Hoe gaat het met je permanente lippen?",
+      "previewText": "Een momentje voor jezelf en je uitstraling"
+    },
+    {
+      "id": "refresh10Months-lippen",
+      "stage": "refresh10Months",
+      "treatmentType": "lippen",
+      "file": "refresh10months-lippen.html",
+      "subject": "10 maanden geleden: dit is hét moment voor je lip-opfris (met korting)",
+      "previewText": "Profiteer van een lager tarief als je binnen 1 jaar opfrist"
+    },
+    {
+      "id": "refresh18Months-lippen",
+      "stage": "refresh18Months",
+      "treatmentType": "lippen",
+      "file": "refresh18months-lippen.html",
+      "subject": "Is het tijd voor een opfris van je lippen?",
+      "previewText": "Voor een resultaat dat net zo mooi blijft als toen"
+    }
+  ],
+  "skipped": []
+}

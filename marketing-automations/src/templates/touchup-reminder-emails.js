@@ -12,7 +12,7 @@ export const touchupReminderEmails = {
       const content = `
         <h2>Beste ${data.firstName || '*|FNAME|*'},</h2>
         
-        <p>Ben jij al helemaal gewend aan je wenkbrauwen? We horen vaak van klanten dat het zo gezichtsbepalend is dat de complimenten binnenstromen. ✨</p>
+        <p>Ben jij al helemaal gewend aan je wenkbrauwen? We horen vaak van klanten dat het zo gezichtsbepalend is dat de complimenten binnenstromen.</p>
         
         <p>Uiteraard willen wij dat jouw wenkbrauwen er perfect uitzien. Daarom willen we je graag zien voor een <strong>Perfectiebehandeling</strong>.</p>
         
@@ -22,7 +22,7 @@ export const touchupReminderEmails = {
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="${config.urls.booking}" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
-            📅 Plan je afspraak
+            Plan je afspraak
           </a>
         </p>
         
@@ -54,7 +54,7 @@ export const touchupReminderEmails = {
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="${config.urls.booking}" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
-            📅 Plan je afspraak
+            Plan je afspraak
           </a>
         </p>
         
@@ -84,7 +84,7 @@ export const touchupReminderEmails = {
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="${config.urls.booking}" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
-            📅 Plan je afspraak
+            Plan je afspraak
           </a>
         </p>
         

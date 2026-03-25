@@ -6,25 +6,40 @@
 export { wrapInBaseTemplate, replacePlaceholders } from './base-template.js';
 export { aftercareEmails } from './aftercare-emails.js';
 export { weekFollowupEmails } from './week-followup-emails.js';
-export { reviewRequestEmails } from './review-request-emails.js';
 export { touchupReminderEmails } from './touchup-reminder-emails.js';
-export { leadNurtureEmails } from './lead-nurture-emails.js';
+export { confirmationEmails } from './confirmation-emails.js';
+export { refreshReminderEmails } from './refresh-reminder-emails.js';
 
 import { aftercareEmails } from './aftercare-emails.js';
 import { weekFollowupEmails } from './week-followup-emails.js';
-import { reviewRequestEmails } from './review-request-emails.js';
 import { touchupReminderEmails } from './touchup-reminder-emails.js';
-import { leadNurtureEmails } from './lead-nurture-emails.js';
+import { confirmationEmails } from './confirmation-emails.js';
+import { refreshReminderEmails } from './refresh-reminder-emails.js';
 
 /**
  * Get all emails for a treatment type's journey
  */
 export function getJourneyEmails(treatmentType) {
+  const refreshByTreatment = {
+    wenkbrauwen: {
+      refresh6Months: refreshReminderEmails.wenkbrauwen6m,
+      refresh10Months: refreshReminderEmails.wenkbrauwen10m,
+    },
+    eyeliner: {
+      refresh6Months: refreshReminderEmails.eyeliner6m,
+      refresh24Months: refreshReminderEmails.eyeliner30m,
+    },
+    lippen: {
+      refresh6Months: refreshReminderEmails.lippen6m,
+      refresh10Months: refreshReminderEmails.lippen10m,
+      refresh18Months: refreshReminderEmails.lippen18m,
+    },
+  };
+  const refresh = refreshByTreatment[treatmentType] || {};
   return {
     aftercare: aftercareEmails[treatmentType],
     weekFollowup: weekFollowupEmails[treatmentType],
-    reviewRequest: reviewRequestEmails[treatmentType],
-    touchupReminder: touchupReminderEmails[treatmentType],
+    ...refresh,
   };
 }
 
@@ -33,12 +48,20 @@ export function getJourneyEmails(treatmentType) {
  */
 export function getEmailTemplate(stage, treatmentType) {
   const stages = {
+    confirmation: confirmationEmails,
     aftercare: aftercareEmails,
     weekFollowup: weekFollowupEmails,
-    reviewRequest: reviewRequestEmails,
-    touchupReminder: touchupReminderEmails,
-    education: { default: leadNurtureEmails.education },
-    socialProof: { default: leadNurtureEmails.socialProof },
+    refresh6Months: {
+      wenkbrauwen: refreshReminderEmails.wenkbrauwen6m,
+      eyeliner: refreshReminderEmails.eyeliner6m,
+      lippen: refreshReminderEmails.lippen6m,
+    },
+    refresh10Months: {
+      wenkbrauwen: refreshReminderEmails.wenkbrauwen10m,
+      lippen: refreshReminderEmails.lippen10m,
+    },
+    refresh18Months: { lippen: refreshReminderEmails.lippen18m },
+    refresh24Months: { eyeliner: refreshReminderEmails.eyeliner30m },
   };
 
   const stageEmails = stages[stage];
@@ -48,17 +71,27 @@ export function getEmailTemplate(stage, treatmentType) {
 }
 
 /**
- * List all available email templates
+ * List all available email templates (only templates with actual content)
  */
 export function listAllTemplates() {
   const treatmentTypes = ['wenkbrauwen', 'eyeliner', 'lippen'];
-  const journeyStages = ['aftercare', 'weekFollowup', 'reviewRequest', 'touchupReminder'];
+  const journeyStagesByTreatment = {
+    wenkbrauwen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months'],
+    eyeliner: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh24Months'],
+    lippen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months', 'refresh18Months'],
+  };
 
   const templates = [];
 
-  // Treatment journey emails
+  templates.push({
+    id: 'confirmation-magicPencil',
+    stage: 'confirmation',
+    treatmentType: 'magicPencil',
+    type: 'confirmation',
+  });
+
   for (const treatment of treatmentTypes) {
-    for (const stage of journeyStages) {
+    for (const stage of journeyStagesByTreatment[treatment]) {
       templates.push({
         id: `${stage}-${treatment}`,
         stage,
@@ -68,21 +101,15 @@ export function listAllTemplates() {
     }
   }
 
-  // Lead nurture emails
-  templates.push(
-    { id: 'education', stage: 'education', treatmentType: null, type: 'nurture' },
-    { id: 'socialProof', stage: 'socialProof', treatmentType: null, type: 'nurture' }
-  );
-
   return templates;
 }
 
 export default {
+  confirmationEmails,
   aftercareEmails,
   weekFollowupEmails,
-  reviewRequestEmails,
   touchupReminderEmails,
-  leadNurtureEmails,
+  refreshReminderEmails,
   getJourneyEmails,
   getEmailTemplate,
   listAllTemplates,

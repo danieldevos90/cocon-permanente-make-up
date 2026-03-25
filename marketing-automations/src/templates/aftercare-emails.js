@@ -14,7 +14,7 @@ export const aftercareEmails = {
         <p>Vandaag heb je je permanente wenkbrauwen laten zetten. Om een zo mooi mogelijk resultaat te krijgen, is het belangrijk dat je de nazorginstructies goed opvolgt. De komende dagen is het belangrijk om goed voor je huid te zorgen. Zo behaal je het mooiste resultaat.</p>
         
         <div class="tips-box" style="background-color: #faf8f5; border-left: 4px solid #a89664; padding: 20px; margin: 20px 0;">
-          <p style="margin-top: 0;"><strong>⚠️ Let op:</strong> Je wenkbrauwen zullen de eerste dagen donkerder lijken dan de bedoeling is. Ook kan de huid wat rood zijn of gevoelig aanvoelen. Soms gaat de genezing gepaard met jeuk. Dit hoort allemaal bij het herstelproces.</p>
+          <p style="margin-top: 0;"><strong>Let op:</strong> Je wenkbrauwen zullen de eerste dagen donkerder lijken dan de bedoeling is. Ook kan de huid wat rood zijn of gevoelig aanvoelen. Soms gaat de genezing gepaard met jeuk. Dit hoort allemaal bij het herstelproces.</p>
           <p style="margin-bottom: 0;">Na 6 à 14 dagen laten de korstjes vanzelf los. Soms duurt dit iets langer, dat is volkomen normaal. De echte kleur ontwikkelt zich pas in de weken daarna, dit kan ongeveer 4 weken duren.</p>
         </div>
         
@@ -29,7 +29,13 @@ export const aftercareEmails = {
         </ul>
         
         <p><strong>Vragen of onzeker over hoe het eruitziet?</strong> Neem gerust contact op. Paniek is meestal niet nodig. Je huid is gewoon aan het herstellen!</p>
-        
+
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="https://www.coconpermanentemakeup.nl/kennisbank/nazorg-permanente-make-up-wenkbrauwen/" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
+            Bekijk volledige nazorg (wenkbrauwen)
+          </a>
+        </p>
+
         <p>Vriendelijke groet,<br>
         <strong>Het team van Cocon Cosmetics</strong></p>
       `;
@@ -53,7 +59,7 @@ export const aftercareEmails = {
         
         <h3>Nazorgtips:</h3>
         <ul>
-          <li>Koel je ogen de eerste dag intens met het meegegeven coldcompres (in schoon boterhamzakje + tissue). Indien nodig kan je ook de dagen erna koelen. <em>Tip: kijk sterk naar beneden terwijl je koelt, zo koel je de oogleden op de juiste manier</em></li>
+          <li>Koel je ogen de eerste dag met het meegegeven coldcompres (in schoon boterhamzakje + tissue). Indien nodig kan je ook de dagen erna koelen. <em>Tip: kijk sterk naar beneden terwijl je koelt, zo koel je de oogleden op de juiste manier</em></li>
           <li>Houd de huid droog en vermijd condens tijdens het douchen</li>
           <li>Krab en trek niet aan de behandelde huid, de korstjes vallen er vanzelf af</li>
           <li>Breng geen make-up of andere crèmes aan op de behandelde huid</li>
@@ -62,7 +68,13 @@ export const aftercareEmails = {
         <p>Na het loslaten van de korstjes kun je 's avonds een dun laagje Bepanthen aanbrengen. Gebruik hiervoor een wattenstaafje of een schone vingertop.</p>
         
         <p><strong>Vragen of onzeker over hoe het eruitziet?</strong> Neem gerust contact op. Paniek is meestal niet nodig, je huid is gewoon aan het herstellen!</p>
-        
+
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="https://www.coconpermanentemakeup.nl/kennisbank/nazorg-permanente-make-up-eyeliner/" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
+            Bekijk volledige nazorg (eyeliner)
+          </a>
+        </p>
+
         <p>Vriendelijke groet,<br>
         <strong>Het team van Cocon Cosmetics</strong></p>
       `;
@@ -93,7 +105,13 @@ export const aftercareEmails = {
         </ul>
         
         <p><strong>Vragen of onzeker over hoe het eruitziet?</strong> Neem gerust contact op. Paniek is meestal niet nodig, je huid is gewoon aan het herstellen!</p>
-        
+
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="https://www.coconpermanentemakeup.nl/kennisbank/nazorg-permanente-make-up-lippen/" class="button" style="display: inline-block; background-color: #a30077; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 25px; font-weight: 500;">
+            Bekijk volledige nazorg (lippen)
+          </a>
+        </p>
+
         <p>Vriendelijke groet,<br>
         <strong>Het team van Cocon Cosmetics</strong></p>
       `;

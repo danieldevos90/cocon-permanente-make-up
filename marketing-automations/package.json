@@ -5,12 +5,24 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "start:cli": "node src/index.js",
+    "setup": "node src/cli.js setup",
+    "lists": "node src/cli.js lists",
+    "subscriber": "node src/cli.js subscriber",
+    "journey": "node src/cli.js journey",
     "send": "node src/cli.js send",
-    "schedule": "node src/cli.js schedule",
-    "list": "node src/cli.js list",
-    "sync": "node src/cli.js sync",
-    "test-connection": "node src/cli.js test"
+    "register": "node src/cli.js register",
+    "templates": "node src/cli.js templates",
+    "templates-sync": "node src/cli.js templates-sync",
+    "templates-export-all": "node src/export-all-templates.js",
+    "sync-salonized": "node src/cli.js sync-salonized",
+    "sync-salonized-daily": "node src/cli.js sync-salonized-daily",
+    "test-connection": "node src/cli.js test",
+    "health-check": "node src/health-check.js",
+    "audit-mailchimp": "node src/audit-mailchimp.js"
   },
   "keywords": [
     "mailchimp",
@@ -23,9 +35,28 @@
   "license": "MIT",
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.80",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@upstash/redis": "^1.34.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "commander": "^12.1.0",
-    "dotenv": "^16.4.5",
     "date-fns": "^3.6.0",
-    "chalk": "^5.3.0"
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "lucide-react": "^0.468.0",
+    "next": "^14.2.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.7.2"
   }
 }

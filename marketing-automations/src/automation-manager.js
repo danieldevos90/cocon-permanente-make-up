@@ -13,13 +13,27 @@ import { getEmailTemplate, getJourneyEmails } from './templates/index.js';
 
 /**
  * Email Journey Stages with their timing (in days after treatment)
+ * Touch-up wordt automatisch gepland bij behandeling, niet via e-mail.
  */
 export const journeyStages = {
   aftercare: { name: 'Aftercare', daysAfter: 0, tag: 'email-aftercare-sent' },
   weekFollowup: { name: 'Week Follow-up', daysAfter: 7, tag: 'email-week-sent' },
-  reviewRequest: { name: 'Review Request', daysAfter: 21, tag: 'email-review-sent' },
-  touchupReminder: { name: 'Touch-up Reminder', daysAfter: 42, tag: 'email-touchup-sent' },
+  refresh6Months: { name: '6-Month Refresh (cross-sell)', daysAfter: 180, tag: 'email-refresh6m-sent' },
+  refresh10Months: { name: '10-Month Refresh', daysAfter: 300, tag: 'email-refresh10m-sent' },
+  refresh18Months: { name: '18-Month Refresh (no-response)', daysAfter: 547, tag: 'email-refresh18m-sent' },
+  refresh24Months: { name: '2-Year Refresh', daysAfter: 730, tag: 'email-refresh24m-sent' },
+  refresh36Months: { name: '3-Year Refresh (no-response)', daysAfter: 1095, tag: 'email-refresh36m-sent' },
 };
+
+function getJourneyStagesForTreatment(treatmentType) {
+  const stagesByTreatment = {
+    wenkbrauwen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months', 'refresh18Months'],
+    eyeliner: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh24Months', 'refresh36Months'],
+    lippen: ['aftercare', 'weekFollowup', 'refresh6Months', 'refresh10Months', 'refresh24Months'],
+  };
+  const stages = stagesByTreatment[treatmentType] || ['aftercare', 'weekFollowup'];
+  return stages.map(stage => [stage, journeyStages[stage]]).filter(([, info]) => info);
+}
 
 /**
  * Register a new treatment and schedule the email journey
@@ -54,7 +68,7 @@ export async function registerTreatment({
   }
 
   // Calculate scheduled dates for each email
-  const scheduledEmails = Object.entries(journeyStages).map(([stage, info]) => {
+  const scheduledEmails = getJourneyStagesForTreatment(treatmentType).map(([stage, info]) => {
     const sendDate = addDays(treatmentDate, info.daysAfter);
     return {
       stage,
@@ -201,7 +215,7 @@ export async function scheduleJourneyEmail({
 export function getNextJourneyEmail(treatmentType, treatmentDate, sentStages = []) {
   const now = new Date();
   
-  for (const [stage, info] of Object.entries(journeyStages)) {
+  for (const [stage, info] of getJourneyStagesForTreatment(treatmentType)) {
     // Skip if already sent
     if (sentStages.includes(info.tag)) continue;
     
@@ -255,7 +269,7 @@ export function previewEmail(stage, treatmentType, data = {}) {
 export function getJourneySummary(treatmentType) {
   const emails = getJourneyEmails(treatmentType);
   
-  return Object.entries(journeyStages).map(([stage, info]) => {
+  return getJourneyStagesForTreatment(treatmentType).map(([stage, info]) => {
     const template = emails[stage];
     return {
       stage,
