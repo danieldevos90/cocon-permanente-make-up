@@ -1,0 +1,204 @@
+/* CPM Opleidingen Checkout — minimal styling, tuned to fit the Cocon Cosmetics
+   gold/magenta palette already used in coconpm-customizations.php. */
+
+.cpm-opl-form {
+	max-width: 760px;
+	margin: 32px auto;
+	padding: 32px;
+	background: #fff;
+	border: 1px solid #ece6d6;
+	font-family: 'Helvetica Neue', Arial, sans-serif;
+	color: #1a1a1a;
+}
+
+.cpm-opl-header h2 {
+	margin: 0 0 12px;
+	font-size: 26px;
+	color: #C64193;
+}
+
+.cpm-opl-meta {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 8px 24px;
+	margin: 0 0 24px;
+}
+.cpm-opl-meta dt {
+	font-size: 11px;
+	text-transform: uppercase;
+	color: #999;
+	margin-bottom: 2px;
+}
+.cpm-opl-meta dd {
+	margin: 0;
+	font-weight: 600;
+}
+
+.cpm-opl-section {
+	border: none;
+	padding: 0;
+	margin: 0 0 32px;
+}
+.cpm-opl-section legend {
+	font-weight: 700;
+	font-size: 16px;
+	color: #1a1a1a;
+	padding-bottom: 12px;
+	border-bottom: 2px solid #BFA86C;
+	width: 100%;
+	margin-bottom: 16px;
+}
+
+.cpm-opl-note {
+	background: #fff7e6;
+	border-left: 4px solid #BFA86C;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	font-size: 14px;
+}
+
+.cpm-opl-plans {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 12px;
+	margin-bottom: 16px;
+}
+.cpm-opl-plan {
+	cursor: pointer;
+}
+.cpm-opl-plan input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+.cpm-opl-plan-card {
+	display: block;
+	padding: 16px;
+	border: 2px solid #ece6d6;
+	border-radius: 8px;
+	text-align: center;
+	transition: all 0.15s ease;
+}
+.cpm-opl-plan-card strong {
+	display: block;
+	font-size: 18px;
+	color: #1a1a1a;
+}
+.cpm-opl-plan-card small {
+	display: block;
+	margin-top: 4px;
+	font-size: 12px;
+	color: #6b6b6b;
+}
+.cpm-opl-plan input:checked + .cpm-opl-plan-card {
+	border-color: #C64193;
+	background: #fdf3f8;
+}
+
+.cpm-opl-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 8px;
+	font-size: 14px;
+}
+.cpm-opl-table th, .cpm-opl-table td {
+	padding: 10px 8px;
+	border-bottom: 1px solid #f0eddf;
+	text-align: left;
+}
+.cpm-opl-table th {
+	font-weight: 600;
+	background: #fafafa;
+}
+
+.cpm-opl-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px 16px;
+	margin-bottom: 12px;
+}
+.cpm-opl-grid label,
+.cpm-opl-form label.cpm-opl-full {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	color: #1a1a1a;
+}
+.cpm-opl-grid input,
+.cpm-opl-grid select,
+.cpm-opl-form textarea,
+.cpm-opl-form label.cpm-opl-full input {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #d4ccb6;
+	border-radius: 6px;
+	margin-top: 4px;
+	font: inherit;
+	background: #fff;
+}
+.cpm-opl-grid input:focus,
+.cpm-opl-form textarea:focus {
+	outline: none;
+	border-color: #C64193;
+	box-shadow: 0 0 0 3px rgba(198, 65, 147, 0.15);
+}
+.cpm-opl-full {
+	grid-column: 1 / -1;
+}
+.cpm-opl-honeypot {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+.cpm-opl-submit {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	align-items: flex-start;
+}
+.cpm-opl-button {
+	background: #C64193;
+	color: #fff;
+	border: none;
+	padding: 14px 28px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	border-radius: 6px;
+	transition: background 0.15s ease;
+}
+.cpm-opl-button:hover { background: #ad3680; }
+.cpm-opl-button[disabled] { background: #aaa; cursor: not-allowed; }
+.cpm-opl-submit small { color: #6b6b6b; font-size: 12px; }
+
+.cpm-opl-feedback {
+	margin-top: 16px;
+	padding: 0;
+}
+.cpm-opl-feedback.is-error {
+	background: #fde8ec;
+	color: #b3162d;
+	padding: 12px 16px;
+	border-left: 4px solid #b3162d;
+}
+.cpm-opl-feedback.is-success {
+	background: #e6f6ec;
+	color: #1a6e3b;
+	padding: 12px 16px;
+	border-left: 4px solid #1a6e3b;
+}
+
+.cpm-opl-error {
+	padding: 16px;
+	background: #fde8ec;
+	color: #b3162d;
+	border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+	.cpm-opl-form { padding: 20px; }
+	.cpm-opl-grid { grid-template-columns: 1fr; }
+}
