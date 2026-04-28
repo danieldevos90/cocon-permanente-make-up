@@ -1,0 +1,81 @@
+/**
+ * COCONPM: Simple mobile = main header only (no Divi Mobile Menu plugin).
+ * Logo + hamburger menu + cart in #main-header; plugin UI hidden.
+ */
+
+/* --- Hide Divi Mobile Menu plugin on mobile – use only main header --- */
+@media only screen and (max-width: 980px) {
+  #coconpm-root .divi-mobile-menu {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    z-index: -1 !important;
+  }
+}
+
+/* --- Mobile: main header in flow (not floating), simple bar with logo + menu + cart --- */
+@media only screen and (max-width: 767px) {
+  /* Ensure main header and built-in mobile nav are visible (override plugin/theme hiding them) */
+  #coconpm-root #main-header {
+    display: block !important;
+  }
+
+  #coconpm-root #main-header .mobile_menu_bar,
+  #coconpm-root #et_mobile_nav_menu,
+  #coconpm-root body #et_mobile_nav_menu {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  #coconpm-root.et_fixed_nav #page-container {
+    padding-top: 0 !important;
+  }
+
+  #coconpm-root #main-header,
+  #coconpm-root.et_fixed_nav #main-header {
+    position: relative !important;
+    top: auto !important;
+    width: 100%;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  /* Simple hero bar: logo + menu + cart in one row */
+  #coconpm-root #main-header .container.et_menu_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  #coconpm-root #main-header .logo_container {
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+
+  #coconpm-root #main-header #et-top-navigation {
+    display: flex !important;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-right: 0;
+    padding-top: 0;
+    gap: 8px;
+  }
+
+  #coconpm-root #main-header .et_mobile_cart_container,
+  #coconpm-root #main-header .mobile_menu_bar {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+  }
+}
+
+/* Top header in flow on mobile when present */
+@media only screen and (max-width: 767px) {
+  #coconpm-root #top-header {
+    position: relative !important;
+  }
+}

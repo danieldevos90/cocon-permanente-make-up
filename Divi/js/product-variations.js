@@ -59,12 +59,25 @@
 		
 		// Listen for WooCommerce variation events
 		$variationsForm.on('found_variation', function(event, variation) {
+			// Fix: WooCommerce 9.x renders button with disabled attribute by default,
+			// but the minified JS only removes the CSS class "disabled" — not the HTML attribute.
+			// This ensures the button becomes truly clickable when a valid variation is selected.
+			if (variation.is_purchasable && variation.is_in_stock) {
+				$variationsForm.find('.single_add_to_cart_button')
+					.prop('disabled', false)
+					.removeAttr('disabled');
+			}
+
 			if (variation.image && variation.image.src) {
 				updateGalleryWithVariation(variation);
 			}
 		});
 		
 		$variationsForm.on('reset_data', function() {
+			// Re-disable button when variation is cleared
+			$variationsForm.find('.single_add_to_cart_button')
+				.prop('disabled', true)
+				.attr('disabled', 'disabled');
 			resetToOriginalImages();
 		});
 		

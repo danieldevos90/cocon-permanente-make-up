@@ -409,6 +409,20 @@ function et_divi_enqueue_stylesheet() {
 add_action( 'wp_enqueue_scripts', 'et_divi_enqueue_stylesheet' );
 
 /**
+ * COCONPM: Mobile hero layout (header in flow, not floating) + bottom nav black text.
+ */
+function coconpm_enqueue_mobile_hero_css() {
+	$theme_version = et_get_theme_version();
+	wp_enqueue_style(
+		'coconpm-mobile-hero',
+		get_template_directory_uri() . '/css/coconpm-mobile-hero.css',
+		array( 'divi-style' ),
+		$theme_version
+	);
+}
+add_action( 'wp_enqueue_scripts', 'coconpm_enqueue_mobile_hero_css', 20 );
+
+/**
  * Replace the enqueued Divi style.css file with the applicable version.
  * If Dynamic CSS is disabled, we load the -static file. If RTL is enabled, we load the -rtl file.
  * If on a custom post type, we load the -cpt file. This is also necessary for child themes,
@@ -1077,10 +1091,128 @@ function coconpm_force_gold_nav_colors() {
 		#top-menu li.current-menu-item > a {
 			color: #a89664 !important;
 		}
-		
-		/* Slide-in menu - GOLD */
-		.et_slide_in_menu_container {
+
+		/* Mobile: GOLD background + white text (no more black so menu is always visible) */
+		@media only screen and (max-width: 980px) {
+			#coconpm-root #main-header,
+			#coconpm-root #main-header .et_mobile_menu,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu ul,
+			#coconpm-root .et_pb_menu .et_mobile_menu,
+			#coconpm-root .et_pb_menu .et_mobile_menu ul {
+				background-color: #a89664 !important;
+				background: #a89664 !important;
+			}
+			#coconpm-root #main-header .et_mobile_menu li a,
+			#coconpm-root #main-header .et_mobile_menu li a:hover,
+			#coconpm-root .et_mobile_menu li a,
+			#coconpm-root .et_mobile_menu li a:hover,
+			#coconpm-root #et-top-navigation .et-cart-info,
+			#coconpm-root #et-top-navigation .et-cart-info:hover,
+			#coconpm-root #main-header .mobile_menu_bar:before,
+			#coconpm-root #main-header .mobile_menu_bar:after,
+			#coconpm-root .mobile_menu_bar:before,
+			#coconpm-root .mobile_menu_bar:after {
+				color: #ffffff !important;
+			}
+			#coconpm-root .et_pb_fullwidth_menu .mobile_menu_bar:before,
+			#coconpm-root .et_pb_fullwidth_menu .mobile_menu_bar:after,
+			#coconpm-root .et_pb_menu .mobile_menu_bar:before,
+			#coconpm-root .et_pb_menu .mobile_menu_bar:after,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu a,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu li a,
+			#coconpm-root .et_pb_fullwidth_menu .nav li ul.sub-menu a,
+			#coconpm-root .et_pb_menu .et_mobile_menu a,
+			#coconpm-root .et_pb_menu .et_mobile_menu li a,
+			#coconpm-root .et_pb_menu .nav li ul.sub-menu a {
+				color: #ffffff !important;
+			}
+		}
+
+		/* Slide-in menu - GOLD background (body selector beats Divi’s body #page-container) */
+		#coconpm-root #page-container .et_slide_in_menu_container,
+		#coconpm-root .et_slide_in_menu_container {
 			background: #a89664 !important;
+			opacity: 1 !important;
+		}
+		#coconpm-root.et_pb_slide_menu_active .et_slide_in_menu_container {
+			visibility: visible !important;
+			opacity: 1 !important;
+		}
+
+		/* Slide-in menu: all text/links white so never black-on-black */
+		#coconpm-root .et_slide_in_menu_container a,
+		#coconpm-root .et_slide_in_menu_container #mobile_menu_slide li a,
+		#coconpm-root .et_slide_in_menu_container #mobile_menu_slide li a:hover,
+		#coconpm-root .et_slide_in_menu_container #mobile_menu_slide li span.et_mobile_menu_arrow:before,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top a,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top span,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top input,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top #et-info span,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top ul.et-social-icons a {
+			color: #ffffff !important;
+		}
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top .et-search-form input::-webkit-input-placeholder,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top .et-search-form input::-moz-placeholder,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top .et-search-form input:-ms-input-placeholder {
+			color: rgba(255, 255, 255, 0.7) !important;
+		}
+		#coconpm-root .et_slide_in_menu_container #mobile_menu_slide ul.sub-menu li a {
+			color: rgba(255, 255, 255, 0.9) !important;
+		}
+
+		/* Custom mobile menu (.menu-wrap / #dm-menu): ensure links are visible */
+		#coconpm-root .menu-wrap nav a,
+		#coconpm-root .menu-wrap__inner a,
+		#coconpm-root #dm-menu li a,
+		#coconpm-root #dm_nav .sub-menu a,
+		#coconpm-root .menu-text {
+			color: #ffffff !important;
+		}
+
+		/* Slide-out panel only: override .menu-wrap__inner { height: 0 } so panel is visible (do not touch bottom nav) */
+		#coconpm-root #dm_nav.active .menu-wrap__inner,
+		#coconpm-root #dm_nav.open-nav .menu-wrap__inner,
+		#coconpm-root #dm_nav.menu-wrap:not(.menuclosed) .menu-wrap__inner {
+			height: auto !important;
+			min-height: 100vh !important;
+		}
+		/* Divi Mobile Menu plugin: gold bg + white text (exclude bottom-navigation-menu – use black text) */
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu),
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .divi-mobile-menu-inner,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav.menu-wrap,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner .scroll_section {
+			background-color: #a89664 !important;
+			background: #a89664 !important;
+		}
+		/* Slide-out panel only: override so panel can show (do not touch bottom nav) */
+		#coconpm-root #dm_nav.active .menu-wrap__inner,
+		#coconpm-root #dm_nav.open-nav .menu-wrap__inner,
+		#coconpm-root #dm_nav.menu-wrap:not(.menuclosed) .menu-wrap__inner {
+			opacity: 1 !important;
+			visibility: visible !important;
+			display: block !important;
+			pointer-events: auto !important;
+			z-index: 1000000 !important;
+			height: auto !important;
+			min-height: 100vh !important;
+		}
+		#coconpm-root #dm_nav .menu-wrap__inner .scroll_section,
+		#coconpm-root #dm_nav .menu-wrap__inner .menu-side {
+			z-index: 1000001 !important;
+			position: relative !important;
+		}
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm-menu a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm-menu li a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav .sub-menu a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap .menu-side a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-text {
+			color: #ffffff !important;
+		}
+		#coconpm-root .divi-mobile-menu {
+			z-index: 999999999 !important;
 		}
 		
 		/* Footer widgets - GOLD */
@@ -1102,6 +1234,187 @@ function coconpm_force_gold_nav_colors() {
 	<?php
 }
 add_action( 'wp_head', 'coconpm_force_gold_nav_colors', 9999 );
+
+/**
+ * Mobile menu visibility: last-in-document override so it wins over Divi module/cached CSS.
+ */
+function coconpm_mobile_menu_footer_override() {
+	?>
+	<style id="coconpm-mobile-menu-footer-override" type="text/css">
+		@media (max-width: 980px) {
+			#coconpm-root .mobile_menu_bar:before,
+			#coconpm-root .mobile_menu_bar:after,
+			#coconpm-root .et_mobile_menu a,
+			#coconpm-root .et_mobile_menu li a,
+			#coconpm-root .et_pb_fullwidth_menu .mobile_menu_bar:before,
+			#coconpm-root .et_pb_fullwidth_menu .mobile_menu_bar:after,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu a,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu li a,
+			#coconpm-root .et_pb_fullwidth_menu .nav li ul.sub-menu a,
+			#coconpm-root .et_pb_menu .mobile_menu_bar:before,
+			#coconpm-root .et_pb_menu .mobile_menu_bar:after,
+			#coconpm-root .et_pb_menu .et_mobile_menu a,
+			#coconpm-root .et_pb_menu .et_mobile_menu li a,
+			#coconpm-root .et_pb_menu .nav li ul.sub-menu a,
+			#coconpm-root [class*="et_pb_fullwidth_menu"] .mobile_menu_bar:before,
+			#coconpm-root [class*="et_pb_fullwidth_menu"] .et_mobile_menu a,
+			#coconpm-root [class*="et_pb_fullwidth_menu"] .et_mobile_menu li a,
+			#coconpm-root [class*="et_pb_menu"] .mobile_menu_bar:before,
+			#coconpm-root [class*="et_pb_menu"] .et_mobile_menu a,
+			#coconpm-root [class*="et_pb_menu"] .et_mobile_menu li a { color: #fff !important; }
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu,
+			#coconpm-root .et_pb_fullwidth_menu .et_mobile_menu ul,
+			#coconpm-root .et_pb_menu .et_mobile_menu,
+			#coconpm-root .et_pb_menu .et_mobile_menu ul,
+			#coconpm-root [class*="et_pb_fullwidth_menu"] .et_mobile_menu,
+			#coconpm-root [class*="et_pb_fullwidth_menu"] .et_mobile_menu ul,
+			#coconpm-root [class*="et_pb_menu"] .et_mobile_menu,
+			#coconpm-root [class*="et_pb_menu"] .et_mobile_menu ul { background-color: #a89664 !important; }
+		}
+		#coconpm-root .et_slide_in_menu_container,
+		#coconpm-root #page-container .et_slide_in_menu_container { background: #a89664 !important; }
+		#coconpm-root .et_slide_in_menu_container a,
+		#coconpm-root .et_slide_in_menu_container .et_slide_menu_top span,
+		#coconpm-root .et_slide_in_menu_container #mobile_menu_slide li a { color: #fff !important; }
+		/* Divi Mobile Menu plugin (exclude bottom nav – styled in coconpm-mobile-hero.css) */
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu),
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav.menu-wrap,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner { background: #a89664 !important; }
+		#coconpm-root #dm_nav.active .menu-wrap__inner,
+		#coconpm-root #dm_nav.open-nav .menu-wrap__inner,
+		#coconpm-root #dm_nav.menu-wrap:not(.menuclosed) .menu-wrap__inner { opacity: 1 !important; visibility: visible !important; display: block !important; height: auto !important; min-height: 100vh !important; }
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm-menu a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav .sub-menu a,
+		#coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-text { color: #fff !important; }
+	</style>
+	<?php
+}
+add_action( 'wp_footer', 'coconpm_mobile_menu_footer_override', 9999 );
+
+/**
+ * JavaScript fallback: force mobile menu visible and white text (beats all CSS).
+ * Injects styles + inline styles; runs on load, timeouts, click, and when DOM changes.
+ */
+function coconpm_mobile_menu_js_fix() {
+	$script = <<<'JS'
+(function() {
+	var sheet = null;
+	function ensureSheet() {
+		if (sheet) return;
+		var el = document.createElement('style');
+		el.id = 'coconpm-mobile-menu-js-styles';
+		document.head.appendChild(el);
+		sheet = el.sheet;
+		sheet.insertRule('.mobile_menu_bar::before, .mobile_menu_bar::after { color: #ffffff !important; }', 0);
+		sheet.insertRule('@media (max-width:980px){ .et_mobile_menu a, .et_mobile_menu li a, .et_mobile_nav_menu a, .et_mobile_nav_menu li a, .mobile_nav a, .mobile_nav li a { color: #ffffff !important; } .et_mobile_menu, .et_mobile_menu ul, .mobile_nav ul { background-color: #a89664 !important; background: #a89664 !important; } .mobile_nav.opened .et_mobile_menu, .mobile_nav.opened ul { display: block !important; visibility: visible !important; opacity: 1 !important; } }', 0);
+		sheet.insertRule('.et_slide_in_menu_container, .et_slide_in_menu_container a, .et_slide_in_menu_container span, .et_slide_in_menu_container #mobile_menu_slide li a { color: #ffffff !important; } .et_slide_in_menu_container { background: #a89664 !important; z-index: 999999 !important; }', 0);
+		sheet.insertRule('.et_pb_fullwidth_menu .et-menu-nav a, .et_pb_fullwidth_menu .nav a, .et_pb_menu .et-menu-nav a, .et_pb_menu .nav a { color: inherit; }', 0);
+		sheet.insertRule('.divi-mobile-menu:not(.bottom-navigation-menu), .divi-mobile-menu:not(.bottom-navigation-menu) .divi-mobile-menu-inner, #dm_nav.menu-wrap, #dm_nav .menu-wrap__inner { background: #a89664 !important; }', 0);
+		sheet.insertRule('#dm_nav.active .menu-wrap__inner, #dm_nav.open-nav .menu-wrap__inner, #dm_nav.menu-wrap:not(.menuclosed) .menu-wrap__inner { opacity: 1 !important; visibility: visible !important; display: block !important; z-index: 1000000 !important; height: auto !important; min-height: 100vh !important; }', 0);
+		sheet.insertRule('.divi-mobile-menu:not(.bottom-navigation-menu) #dm-menu a, .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav .sub-menu a, .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner a, .divi-mobile-menu:not(.bottom-navigation-menu) .menu-text { color: #ffffff !important; }', 0);
+		sheet.insertRule('.divi-mobile-menu.bottom-navigation-menu #dm-menu a, .divi-mobile-menu.bottom-navigation-menu .menu-text, .bottom-navigation-menu a, .bottom-navigation-menu .menu-text { color: #000 !important; }', 0);
+		if (document.body && !document.getElementById('coconpm-mobile-menu-last')) {
+			var last = document.createElement('style');
+			last.id = 'coconpm-mobile-menu-last';
+			last.textContent = '#coconpm-root #dm_nav.active .menu-wrap__inner, #coconpm-root #dm_nav.open-nav .menu-wrap__inner, #coconpm-root #dm_nav.menu-wrap:not(.menuclosed) .menu-wrap__inner { height: auto !important; min-height: 100vh !important; opacity: 1 !important; visibility: visible !important; display: block !important; }';
+			document.body.appendChild(last);
+		}
+	}
+	function apply() {
+		ensureSheet();
+		var doc = document;
+		var style = function(el, prop, val, imp) {
+			if (el && el.style) el.style.setProperty(prop, val, imp ? 'important' : '');
+		};
+		var isBottomNav = function(el) { return el && el.closest && el.closest('.divi-mobile-menu.bottom-navigation-menu'); };
+		var sel = doc.querySelectorAll.bind(doc);
+		var selectors = [
+			'.et_mobile_menu a', '.et_mobile_menu li a',
+			'.et_mobile_nav_menu a', '.et_mobile_nav_menu li a',
+			'.mobile_nav a', '.mobile_nav li a',
+			'.et_pb_fullwidth_menu .et_mobile_menu a', '.et_pb_fullwidth_menu .nav a',
+			'.et_pb_menu .et_mobile_menu a', '.et_pb_menu .nav a',
+			'.et_slide_in_menu_container a', '.et_slide_in_menu_container #mobile_menu_slide li a',
+			'.et_slide_in_menu_container .et_slide_menu_top span', '.et_slide_in_menu_container .et_slide_menu_top a',
+			'.menu-wrap a', '.menu-wrap__inner a', '#dm-menu a', '.menu-text'
+		];
+		selectors.forEach(function(s) {
+			try {
+				sel(s).forEach(function(a) { if (!isBottomNav(a)) style(a, 'color', '#ffffff', true); });
+			} catch (e) {}
+		});
+		sel('.divi-mobile-menu:not(.bottom-navigation-menu) #dm-menu a, .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav a, #dm_nav .menu-wrap__inner a, .divi-mobile-menu:not(.bottom-navigation-menu) .menu-text').forEach(function(a) { style(a, 'color', '#ffffff', true); });
+		sel('.divi-mobile-menu:not(.bottom-navigation-menu), .divi-mobile-menu:not(.bottom-navigation-menu) .divi-mobile-menu-inner, #dm_nav.menu-wrap, #dm_nav .menu-wrap__inner').forEach(function(el) {
+			style(el, 'background', '#a89664', true);
+			style(el, 'background-color', '#a89664', true);
+		});
+		sel('#dm_nav.active .menu-wrap__inner, #dm_nav.open-nav .menu-wrap__inner, #dm_nav.menu-wrap:not(.menuclosed) .menu-wrap__inner').forEach(function(el) {
+			style(el, 'opacity', '1', true);
+			style(el, 'visibility', 'visible', true);
+			style(el, 'display', 'block', true);
+			style(el, 'height', 'auto', true);
+			style(el, 'min-height', '100vh', true);
+		});
+		sel('.mobile_menu_bar').forEach(function(bar) { style(bar, 'color', '#ffffff', true); });
+		sel('.et_slide_in_menu_container').forEach(function(el) {
+			style(el, 'background', '#a89664', true);
+			style(el, 'z-index', '999999', true);
+		});
+		sel('.et_mobile_menu, .mobile_nav ul').forEach(function(ul) {
+			style(ul, 'background-color', '#a89664', true);
+			style(ul, 'background', '#a89664', true);
+			if (ul.closest && ul.closest('.mobile_nav.opened')) {
+				style(ul, 'display', 'block', true);
+				style(ul, 'visibility', 'visible', true);
+				style(ul, 'opacity', '1', true);
+			}
+		});
+		sel('.et_mobile_menu ul').forEach(function(ul) { style(ul, 'background-color', '#a89664', true); });
+	}
+	function run() {
+		apply();
+		setTimeout(apply, 50);
+		setTimeout(apply, 200);
+		setTimeout(apply, 600);
+		setTimeout(apply, 1200);
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', run);
+	} else {
+		run();
+	}
+	setTimeout(apply, 300);
+	setTimeout(apply, 2500);
+	document.addEventListener('click', function(e) {
+		if (e.target.closest && (e.target.closest('.mobile_menu_bar') || e.target.closest('.mobile_nav') || e.target.closest('#open-button') || e.target.closest('.dm_menu_button') || e.target.closest('.divi-mobile-menu') || e.target.closest('#dm_nav'))) {
+			setTimeout(apply, 0);
+			setTimeout(apply, 50);
+			setTimeout(apply, 150);
+			setTimeout(apply, 350);
+			setTimeout(apply, 600);
+		}
+	}, true);
+	var obs = new MutationObserver(function() { setTimeout(apply, 0); setTimeout(apply, 100); });
+	obs.observe(document.body, { childList: true, subtree: true });
+})();
+JS;
+	echo '<script id="coconpm-mobile-menu-js">' . $script . '</script>';
+}
+add_action( 'wp_footer', 'coconpm_mobile_menu_js_fix', 99999 );
+
+/**
+ * Force Divi menu modules to use white mobile menu text and visible background
+ * so the module's own CSS is correct (no reliance on our overrides winning).
+ */
+function coconpm_force_menu_module_mobile_colors( $props, $attrs, $render_slug, $address, $content ) {
+	if ( ! in_array( $render_slug, array( 'et_pb_fullwidth_menu', 'et_pb_menu' ), true ) ) {
+		return $props;
+	}
+	$props['mobile_menu_text_color'] = '#ffffff';
+	$props['mobile_menu_bg_color']   = '#a89664';
+	return $props;
+}
+add_filter( 'et_pb_module_shortcode_attributes', 'coconpm_force_menu_module_mobile_colors', 10, 5 );
 
 /**
  * COCONPM: Set shipping_label from product shipping class slug (for GFWC)
