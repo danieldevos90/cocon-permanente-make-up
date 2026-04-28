@@ -1,15 +1,24 @@
 # DirectAdmin MCP Setup for Cocon Permanente Make-up
 
-## Current Status: WORKING
+## Current Status: WORKING (REST + Legacy)
 
-The DirectAdmin MCP server is **connected and working** using the Legacy CMD_API.
+The DirectAdmin MCP server is **connected and working** against the hosting server
+`web223.controlepaneel.net:2222` using the Evolution REST API (`/api/*`)
+and the Legacy `CMD_API_*` endpoints.
 
 ```
-Status: healthy
-Legacy API: true
-Domains: coconcosmetics.nl, coconpermanentemakeup.nl
-Tools: 121 (including 23 legacy tools)
+Server   : https://web223.controlepaneel.net:2222
+User     : coconper
+Auth     : HTTP Basic (username + Login Key / API key)
+Domains  : coconcosmetics.nl, coconpermanentemakeup.nl
+Tools    : 127 MCP tools (REST + Legacy)
+Swagger  : https://web223.controlepaneel.net:2222/static/swagger.json
+API Docs : https://web223.controlepaneel.net:2222/evo/api-docs
 ```
+
+> NOTE: The branded URL `https://coconpermanentemakeup.nl:2222` resolves to the
+> same DirectAdmin instance, but TLS/firewall on that hostname can be flaky.
+> Always use `web223.controlepaneel.net:2222` for API calls.
 
 ## Available Legacy Tools
 
@@ -61,9 +70,35 @@ Username: `coconper`
 Edit `.directadmin-mcp/.env` and replace the password with the Login Key:
 
 ```ini
-DA_URL=https://coconpermanentemakeup.nl:2222
+DA_URL=https://web223.controlepaneel.net:2222
 DA_USERNAME=coconper
 DA_LOGIN_KEY=<paste-your-login-key-here>
+SSL_VERIFY=false
+```
+
+### Quick verification (curl)
+
+Test that the API key is accepted via Basic Auth:
+
+```bash
+# REST API – list MySQL databases (works for user-level)
+curl -sk -u "coconper:YVfZFyYMuvrGHjD4v7Qg" \
+  -H "Accept: application/json" \
+  https://web223.controlepaneel.net:2222/api/db-show/databases
+
+# Legacy CMD_API – list domains
+curl -sk -u "coconper:YVfZFyYMuvrGHjD4v7Qg" \
+  https://web223.controlepaneel.net:2222/CMD_API_SHOW_DOMAINS
+```
+
+Expected output (REST):
+```json
+[{"database":"coconper_inlk1","sizeBytes":129875968,"userCount":1,"tableCount":100,"definerIssues":0}]
+```
+
+Expected output (Legacy):
+```
+list[]=coconcosmetics.nl&list[]=coconpermanentemakeup.nl
 ```
 
 ### Step 4: Restart the MCP Server

@@ -23,6 +23,7 @@ import {
 } from './automation-manager.js';
 import { runSalonizedDailySync } from './salonized-daily-sync.js';
 import { listAllTemplates } from './templates/index.js';
+import { runAudit } from './audit-command.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -36,6 +37,22 @@ program
 /**
  * Test Mailchimp connection
  */
+program
+  .command('audit')
+  .description('Volledige audit: Mailchimp, templates, 7d campagnes, sync-rapport, Redis cron-history, optioneel Vercel-logs')
+  .option('--json', 'JSON output')
+  .option('--vercel', 'Steekproef Vercel production logs (vereist ingelogde vercel CLI)')
+  .option('--since <period>', 'Voor --vercel: periode (bv. 3d, 7d)', '3d')
+  .option('--vercel-limit <n>', 'Max logregels voor --vercel', '80')
+  .action(async (options) => {
+    await runAudit({
+      json: options.json,
+      vercel: options.vercel,
+      since: options.since,
+      vercelLimit: options.vercelLimit,
+    });
+  });
+
 program
   .command('test')
   .description('Test Mailchimp API connection')

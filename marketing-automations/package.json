@@ -22,6 +22,10 @@
     "sync-salonized-daily": "node src/cli.js sync-salonized-daily",
     "test-connection": "node src/cli.js test",
     "health-check": "node src/health-check.js",
+    "audit": "node src/cli.js audit",
+    "audit:vercel": "node src/cli.js audit --vercel",
+    "audit:json": "node src/cli.js audit --json",
+    "audit:all": "mkdir -p reports && npm run audit:vercel && node src/audit-mailchimp.js --output reports/mailchimp-audit.json --max-tags 40 && echo \"Mailchimp audit → reports/mailchimp-audit.json\"",
     "audit-mailchimp": "node src/audit-mailchimp.js"
   },
   "keywords": [

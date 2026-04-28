@@ -27,6 +27,15 @@ const FOLLOWUP_KEYWORDS = [
   'extra nabehandeling',
 ];
 
+/** Treatments that reset the refresh/cycle timeline (must update LASTTRTDT like a new round). */
+const RENEW_CYCLE_KEYWORDS = [
+  'opfris',
+  'op fris',
+  'refresh',
+  'touch-up',
+  'touch up',
+];
+
 const MIN_HOURS_AFTER_APPOINTMENT = 3;
 
 function normalizeName(value) {
@@ -74,7 +83,14 @@ function isLikelyInternalEvent(summary = '', description = '') {
   return INTERNAL_SUMMARY_KEYWORDS.some(keyword => haystack.includes(keyword));
 }
 
+function isRenewCycleAppointment(summary = '') {
+  const text = summary.toLowerCase();
+  return RENEW_CYCLE_KEYWORDS.some(keyword => text.includes(keyword));
+}
+
+/** Skip-only voor echte vervolg (perfectie/service/nabehandeling), níet voor opfris: die start de cyclus opnieuw. */
 function isFollowupAppointment(summary = '') {
+  if (isRenewCycleAppointment(summary)) return false;
   const text = summary.toLowerCase();
   return FOLLOWUP_KEYWORDS.some(keyword => text.includes(keyword));
 }
