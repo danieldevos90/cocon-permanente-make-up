@@ -14,3 +14,7 @@ ftp.md
 *.pem
 *.key
 credentials*
+
+# WordPress MCP credentials/JWT renewal helpers
+.wp-mcp/
+.wordpress-mcp.log
