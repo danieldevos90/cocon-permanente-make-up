@@ -72,6 +72,11 @@ class Admin_REST {
 			'permission_callback' => $auth,
 			'callback'            => [ __CLASS__, 'delete_cohort' ],
 		] );
+		register_rest_route( $ns, '/admin/page/(?P<id>\d+)/delete', [
+			'methods'             => 'POST,DELETE',
+			'permission_callback' => $auth,
+			'callback'            => [ __CLASS__, 'delete_page' ],
+		] );
 		register_rest_route( $ns, '/admin/wipe-enrollments', [
 			'methods'             => 'POST,DELETE',
 			'permission_callback' => $auth,
@@ -98,11 +103,33 @@ class Admin_REST {
 			$wpdb->query( $wpdb->prepare( "DELETE FROM {$pay_table} WHERE enrollment_id IN ($placeholders)", $enr_ids ) );
 			$wpdb->query( $wpdb->prepare( "DELETE FROM {$enr_table} WHERE id IN ($placeholders)", $enr_ids ) );
 		}
+		// Cascade: gekoppelde inschrijfpagina ook opruimen
+		$page_id     = (int) get_post_meta( $id, Cohort_Auto_Page::META_PAGE_ID, true );
+		$page_purged = false;
+		if ( $page_id && get_post_type( $page_id ) === 'page' ) {
+			wp_delete_post( $page_id, true );
+			$page_purged = true;
+		}
 		wp_delete_post( $id, true );
 		return [
 			'ok'                 => true,
 			'cohort_id'          => $id,
 			'enrollments_purged' => count( $enr_ids ),
+			'page_purged'        => $page_purged,
+			'page_id'            => $page_id ?: null,
+		];
+	}
+
+	public static function delete_page( \WP_REST_Request $req ) {
+		$id = (int) $req['id'];
+		if ( get_post_type( $id ) !== 'page' ) {
+			return new \WP_Error( 'cpm_not_found', 'Page niet gevonden', [ 'status' => 404 ] );
+		}
+		$res = wp_delete_post( $id, true );
+		return [
+			'ok'        => (bool) $res,
+			'page_id'   => $id,
+			'permanent' => true,
 		];
 	}
 
@@ -154,6 +181,7 @@ class Admin_REST {
 			return $post_id;
 		}
 		self::apply_meta( (int) $post_id, $src );
+		Cohort_Auto_Page::ensure_page( (int) $post_id );
 		return self::cohort_payload( (int) $post_id );
 	}
 
@@ -174,6 +202,7 @@ class Admin_REST {
 			wp_update_post( $update );
 		}
 		self::apply_meta( $id, $src );
+		Cohort_Auto_Page::ensure_page( $id );
 		return self::cohort_payload( $id );
 	}
 
@@ -204,12 +233,21 @@ class Admin_REST {
 	}
 
 	private static function cohort_payload( int $id ): array {
-		$cohort = Cohort_CPT::get( $id );
+		$cohort     = Cohort_CPT::get( $id );
+		$page_id    = (int) get_post_meta( $id, Cohort_Auto_Page::META_PAGE_ID, true );
+		$page_link  = $page_id ? get_permalink( $page_id ) : null;
+		$page_title = $page_id ? get_the_title( $page_id ) : null;
 		return [
-			'ok'         => $cohort !== null,
-			'cohort_id'  => $id,
-			'edit_link'  => get_edit_post_link( $id, 'raw' ),
-			'cohort'     => $cohort,
+			'ok'             => $cohort !== null,
+			'cohort_id'      => $id,
+			'edit_link'      => get_edit_post_link( $id, 'raw' ),
+			'enroll_page_id' => $page_id ?: null,
+			'enroll_page'    => $page_id ? [
+				'id'    => $page_id,
+				'title' => $page_title,
+				'url'   => $page_link,
+			] : null,
+			'cohort'         => $cohort,
 		];
 	}
 

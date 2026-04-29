@@ -31,8 +31,8 @@ $date_label = $cohort['end_date']
 <section class="cpm-opl-page" data-cohort-id="<?php echo esc_attr( $cohort['id'] ); ?>">
 
 	<header class="cpm-opl-hero">
-		<?php if ( $cohort['level'] ) : ?>
-			<span class="cpm-opl-eyebrow"><?php echo esc_html( $cohort['level'] ); ?></span>
+		<?php if ( ! empty( $cohort['eyebrow'] ) ) : ?>
+			<span class="cpm-opl-eyebrow"><?php echo esc_html( $cohort['eyebrow'] ); ?></span>
 		<?php endif; ?>
 		<h2 class="cpm-opl-hero__title"><?php echo esc_html( $cohort['title'] ); ?></h2>
 		<?php if ( $cohort['subtitle'] ) : ?>

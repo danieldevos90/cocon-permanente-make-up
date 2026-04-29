@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cocon Cosmetics — Opleidingen Checkout
  * Description: Inschrijvingen voor PMU-opleidingen met aanbetaling + 1/2/3 termijnen via Mollie. Validatie: laatste termijn moet minimaal 14 dagen vóór startdatum binnen zijn.
- * Version: 0.3.0
+ * Version: 0.4.2
  * Author: Cocon Cosmetics
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -14,14 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CPM_OPL_VERSION', '0.3.0' );
+define( 'CPM_OPL_VERSION', '0.4.2' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );
 define( 'CPM_OPL_DEADLINE_DAYS', 14 );
 
 require_once CPM_OPL_PATH . 'includes/class-db.php';
+require_once CPM_OPL_PATH . 'includes/class-cohort-defaults.php';
 require_once CPM_OPL_PATH . 'includes/class-cohort-cpt.php';
+require_once CPM_OPL_PATH . 'includes/class-cohort-auto-page.php';
 require_once CPM_OPL_PATH . 'includes/class-payment-plan.php';
 require_once CPM_OPL_PATH . 'includes/class-mollie-client.php';
 require_once CPM_OPL_PATH . 'includes/class-emails.php';
@@ -42,6 +44,7 @@ require_once CPM_OPL_PATH . 'includes/class-admin-rest.php';
 add_action( 'plugins_loaded', static function () {
 	CPM_Opleidingen\DB::maybe_migrate();
 	CPM_Opleidingen\Cohort_CPT::register();
+	CPM_Opleidingen\Cohort_Auto_Page::register();
 	CPM_Opleidingen\Webhook::register();
 	CPM_Opleidingen\Checkout_Handler::register();
 	CPM_Opleidingen\Cron::register();

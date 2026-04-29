@@ -51,7 +51,11 @@ class Cohort_CPT {
 			'_cpm_max_students'      => 'integer',
 			'_cpm_location'          => 'string',
 			'_cpm_currency'          => 'string',
-			// rich content velden voor de inschrijfpagina
+			// rich content velden voor de inschrijfpagina (allemaal optioneel —
+			// wanneer leeg, worden defaults uit Cohort_Defaults toegepast op
+			// basis van _cpm_template).
+			'_cpm_template'          => 'string',  // bv. "masterclass-3d-nano-brows"
+			'_cpm_eyebrow'           => 'string',  // kleine label boven titel ("Masterclass")
 			'_cpm_hero_image_url'    => 'string',  // Volledige URL (uit media library of extern)
 			'_cpm_subtitle'          => 'string',  // korte tagline (bv. "2-daagse intensieve masterclass")
 			'_cpm_level'             => 'string',  // bv. "Voor ervaren PMU-specialisten"
@@ -235,6 +239,7 @@ class Cohort_CPT {
 		if ( ! $start || ! $total ) {
 			return null;
 		}
+		$defaults = Cohort_Defaults::for_cohort( $post_id );
 		return [
 			'id'                 => $post_id,
 			'title'              => get_the_title( $post ),
@@ -246,15 +251,42 @@ class Cohort_CPT {
 			'max_students'       => (int) get_post_meta( $post_id, '_cpm_max_students', true ) ?: 5,
 			'location'           => (string) get_post_meta( $post_id, '_cpm_location', true ),
 			'currency'           => (string) get_post_meta( $post_id, '_cpm_currency', true ) ?: 'EUR',
-			// rich content
+			'template'           => (string) get_post_meta( $post_id, '_cpm_template', true ) ?: Cohort_Defaults::DEFAULT_TEMPLATE,
+			// Rich content — leeg veld? → defaults uit template, zodat ELK
+			// event-product automatisch dezelfde stijl + structuur heeft.
 			'hero_image_url'     => self::resolve_hero_image( $post_id ),
-			'subtitle'           => (string) get_post_meta( $post_id, '_cpm_subtitle', true ),
-			'level'              => (string) get_post_meta( $post_id, '_cpm_level', true ),
-			'trainer_name'       => (string) get_post_meta( $post_id, '_cpm_trainer_name', true ),
-			'duration_label'     => (string) get_post_meta( $post_id, '_cpm_duration_label', true ),
-			'what_you_learn'     => self::lines( (string) get_post_meta( $post_id, '_cpm_what_you_learn', true ) ),
-			'includes'           => self::lines( (string) get_post_meta( $post_id, '_cpm_includes', true ) ),
-			'intro_html'         => (string) get_post_meta( $post_id, '_cpm_intro_html', true ),
+			'eyebrow'            => Cohort_Defaults::fallback(
+				(string) get_post_meta( $post_id, '_cpm_eyebrow', true ),
+				(string) ( $defaults['eyebrow'] ?? 'Opleiding' )
+			),
+			'subtitle'           => Cohort_Defaults::fallback(
+				(string) get_post_meta( $post_id, '_cpm_subtitle', true ),
+				(string) ( $defaults['subtitle'] ?? '' )
+			),
+			'level'              => Cohort_Defaults::fallback(
+				(string) get_post_meta( $post_id, '_cpm_level', true ),
+				(string) ( $defaults['level'] ?? '' )
+			),
+			'trainer_name'       => Cohort_Defaults::fallback(
+				(string) get_post_meta( $post_id, '_cpm_trainer_name', true ),
+				(string) ( $defaults['trainer_name'] ?? '' )
+			),
+			'duration_label'     => Cohort_Defaults::fallback(
+				(string) get_post_meta( $post_id, '_cpm_duration_label', true ),
+				(string) ( $defaults['duration_label'] ?? '' )
+			),
+			'what_you_learn'     => Cohort_Defaults::fallback(
+				self::lines( (string) get_post_meta( $post_id, '_cpm_what_you_learn', true ) ),
+				(array) ( $defaults['what_you_learn'] ?? [] )
+			),
+			'includes'           => Cohort_Defaults::fallback(
+				self::lines( (string) get_post_meta( $post_id, '_cpm_includes', true ) ),
+				(array) ( $defaults['includes'] ?? [] )
+			),
+			'intro_html'         => Cohort_Defaults::fallback(
+				(string) get_post_meta( $post_id, '_cpm_intro_html', true ),
+				(string) ( $defaults['intro_html'] ?? '' )
+			),
 		];
 	}
 
