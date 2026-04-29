@@ -13,28 +13,49 @@
 	const scheduleEl  = form.querySelector('[data-cpm-schedule]');
 	const feedbackEl  = form.querySelector('[data-cpm-feedback]');
 	const submitBtn   = form.querySelector('button[type="submit"]');
+	const submitLabel = submitBtn ? submitBtn.querySelector('span') : null;
+	const submitDefaultLabel = submitLabel ? submitLabel.textContent : (submitBtn ? submitBtn.textContent : '');
 
 	let preview = {};
 	try { preview = JSON.parse(previewNode.textContent || '{}'); } catch (e) { preview = {}; }
 
 	const fmtEUR = (cents) =>
-		'€ ' + (Number(cents) / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		'\u20AC\u00A0' + (Number(cents) / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+	const MONTHS_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+	const fmtDateNL = (iso) => {
+		if (!iso) return '';
+		const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+		if (!m) return iso;
+		return parseInt(m[3], 10) + ' ' + MONTHS_NL[parseInt(m[2], 10) - 1] + ' ' + m[1];
+	};
 
 	const renderSchedule = (n) => {
+		if (!scheduleEl) return;
 		const plan = preview[n];
 		if (!plan) return;
 		const rows = plan.map((row) =>
 			`<tr>
 				<td>${row.is_deposit ? 'Aanbetaling' : 'Termijn ' + row.termijn}</td>
-				<td>${row.due_date}</td>
-				<td style="text-align:right">${fmtEUR(row.amount_cents)}</td>
+				<td>${fmtDateNL(row.due_date)}</td>
+				<td>${fmtEUR(row.amount_cents)}</td>
 			</tr>`
 		).join('');
 		scheduleEl.innerHTML =
 			`<table class="cpm-opl-table">
-				<thead><tr><th>Termijn</th><th>Vervaldatum</th><th style="text-align:right">Bedrag</th></tr></thead>
+				<thead><tr><th>Termijn</th><th>Vervalt</th><th>Bedrag</th></tr></thead>
 				<tbody>${rows}</tbody>
 			</table>`;
+	};
+
+	const setSubmit = (label, busy) => {
+		if (!submitBtn) return;
+		if (submitLabel) {
+			submitLabel.textContent = label;
+		} else {
+			submitBtn.textContent = label;
+		}
+		submitBtn.disabled = !!busy;
 	};
 
 	form.addEventListener('change', (e) => {
@@ -54,9 +75,7 @@
 		payload.cohort_id     = Number(form.dataset.cohortId);
 		payload.num_termijnen = Number(payload.num_termijnen || 1);
 
-		submitBtn.disabled = true;
-		const oldText      = submitBtn.textContent;
-		submitBtn.textContent = 'Even geduld…';
+		setSubmit('Even geduld\u2026', true);
 
 		try {
 			const res = await fetch(window.CPM_OPL.rest_root + '/checkout', {
@@ -72,18 +91,16 @@
 				const msg = (data && (data.message || data.detail)) || 'Er ging iets mis. Probeer opnieuw.';
 				feedbackEl.textContent = msg;
 				feedbackEl.classList.add('is-error');
-				submitBtn.disabled = false;
-				submitBtn.textContent = oldText;
+				setSubmit(submitDefaultLabel, false);
 				return;
 			}
-			feedbackEl.textContent = 'Inschrijving aangemaakt — je wordt doorgestuurd naar Mollie…';
+			feedbackEl.textContent = 'Inschrijving aangemaakt \u2014 je wordt doorgestuurd naar Mollie\u2026';
 			feedbackEl.classList.add('is-success');
 			window.location.href = data.redirect_url;
 		} catch (err) {
 			feedbackEl.textContent = 'Netwerkfout: ' + (err && err.message || err);
 			feedbackEl.classList.add('is-error');
-			submitBtn.disabled = false;
-			submitBtn.textContent = oldText;
+			setSubmit(submitDefaultLabel, false);
 		}
 	});
 })();

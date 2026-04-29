@@ -33,7 +33,7 @@ class Admin_REST {
 			'callback'            => [ __CLASS__, 'create_cohort' ],
 		] );
 		register_rest_route( $ns, '/admin/cohort/(?P<id>\d+)', [
-			'methods'             => 'PUT,PATCH',
+			'methods'             => 'POST,PUT,PATCH',
 			'permission_callback' => $auth,
 			'callback'            => [ __CLASS__, 'update_cohort' ],
 		] );
@@ -186,24 +186,16 @@ class Admin_REST {
 	}
 
 	private static function apply_meta( int $id, array $src ): void {
-		$keys = [
-			'_cpm_start_date'        => 'string',
-			'_cpm_end_date'          => 'string',
-			'_cpm_total_price_cents' => 'int',
-			'_cpm_deposit_cents'     => 'int',
-			'_cpm_max_termijnen'     => 'int',
-			'_cpm_max_students'      => 'int',
-			'_cpm_location'          => 'string',
-			'_cpm_currency'          => 'string',
-		];
-		foreach ( $keys as $meta_key => $type ) {
+		foreach ( Cohort_CPT::meta_schema() as $meta_key => $type ) {
 			$param_key = ltrim( $meta_key, '_' );
 			if ( ! array_key_exists( $param_key, $src ) ) {
 				continue;
 			}
 			$v = $src[ $param_key ];
-			if ( $type === 'int' ) {
+			if ( $type === 'integer' ) {
 				$v = (int) $v;
+			} elseif ( $type === 'longtext' ) {
+				$v = wp_kses_post( (string) $v );
 			} else {
 				$v = sanitize_text_field( (string) $v );
 			}

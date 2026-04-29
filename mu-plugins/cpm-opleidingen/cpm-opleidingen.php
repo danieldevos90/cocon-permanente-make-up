@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cocon Cosmetics — Opleidingen Checkout
  * Description: Inschrijvingen voor PMU-opleidingen met aanbetaling + 1/2/3 termijnen via Mollie. Validatie: laatste termijn moet minimaal 14 dagen vóór startdatum binnen zijn.
- * Version: 0.1.0
+ * Version: 0.2.3
  * Author: Cocon Cosmetics
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CPM_OPL_VERSION', '0.1.0' );
+define( 'CPM_OPL_VERSION', '0.2.3' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );

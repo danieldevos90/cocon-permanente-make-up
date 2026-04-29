@@ -37,9 +37,12 @@ class Cohort_CPT {
 	 * Expose all cohort meta keys via REST so the agent + admins can create cohorts
 	 * via POST /wp/v2/cpm_cohort with `meta: { … }`.
 	 */
-	public static function register_meta(): void {
-		$auth = static fn() => current_user_can( 'edit_posts' );
-		$keys = [
+	/**
+	 * Alle cohort meta keys + verwachte type. Gebruikt door zowel
+	 * register_post_meta() als door de admin REST seeder.
+	 */
+	public static function meta_schema(): array {
+		return [
 			'_cpm_start_date'        => 'string',
 			'_cpm_end_date'          => 'string',
 			'_cpm_total_price_cents' => 'integer',
@@ -48,19 +51,37 @@ class Cohort_CPT {
 			'_cpm_max_students'      => 'integer',
 			'_cpm_location'          => 'string',
 			'_cpm_currency'          => 'string',
+			// rich content velden voor de inschrijfpagina
+			'_cpm_hero_image_url'    => 'string',  // Volledige URL (uit media library of extern)
+			'_cpm_subtitle'          => 'string',  // korte tagline (bv. "2-daagse intensieve masterclass")
+			'_cpm_level'             => 'string',  // bv. "Voor ervaren PMU-specialisten"
+			'_cpm_trainer_name'      => 'string',
+			'_cpm_duration_label'    => 'string',  // bv. "2 dagen + optionele 3e dag"
+			'_cpm_what_you_learn'    => 'longtext',// bullet list (één item per regel of \n gescheiden)
+			'_cpm_includes'          => 'longtext',// bullet list (kit, materialen, …)
+			'_cpm_intro_html'        => 'longtext',// rich intro paragraaf
 		];
-		foreach ( $keys as $key => $type ) {
+	}
+
+	public static function register_meta(): void {
+		$auth = static fn() => current_user_can( 'edit_posts' );
+		foreach ( self::meta_schema() as $key => $type ) {
+			$is_int  = $type === 'integer';
+			$is_long = $type === 'longtext';
 			register_post_meta(
 				self::POST_TYPE,
 				$key,
 				[
-					'type'              => $type,
+					'type'              => $is_long ? 'string' : $type,
 					'single'            => true,
 					'show_in_rest'      => true,
 					'auth_callback'     => $auth,
-					'sanitize_callback' => $type === 'integer'
+					'sanitize_callback' => $is_int
 						? static fn( $v ) => (int) $v
-						: 'sanitize_text_field',
+						: ( $is_long
+							? static fn( $v ) => wp_kses_post( (string) $v )
+							: 'sanitize_text_field'
+						),
 				]
 			);
 		}
@@ -225,6 +246,43 @@ class Cohort_CPT {
 			'max_students'       => (int) get_post_meta( $post_id, '_cpm_max_students', true ) ?: 5,
 			'location'           => (string) get_post_meta( $post_id, '_cpm_location', true ),
 			'currency'           => (string) get_post_meta( $post_id, '_cpm_currency', true ) ?: 'EUR',
+			// rich content
+			'hero_image_url'     => self::resolve_hero_image( $post_id ),
+			'subtitle'           => (string) get_post_meta( $post_id, '_cpm_subtitle', true ),
+			'level'              => (string) get_post_meta( $post_id, '_cpm_level', true ),
+			'trainer_name'       => (string) get_post_meta( $post_id, '_cpm_trainer_name', true ),
+			'duration_label'     => (string) get_post_meta( $post_id, '_cpm_duration_label', true ),
+			'what_you_learn'     => self::lines( (string) get_post_meta( $post_id, '_cpm_what_you_learn', true ) ),
+			'includes'           => self::lines( (string) get_post_meta( $post_id, '_cpm_includes', true ) ),
+			'intro_html'         => (string) get_post_meta( $post_id, '_cpm_intro_html', true ),
 		];
+	}
+
+	/**
+	 * Splits een textarea-meta waarin elke regel = 1 bullet, in een
+	 * array met getrimde non-empty regels.
+	 */
+	private static function lines( string $raw ): array {
+		$out = [];
+		foreach ( preg_split( "/\r\n|\n|\r/", $raw ) as $line ) {
+			$line = trim( wp_strip_all_tags( $line ) );
+			if ( $line !== '' ) {
+				$out[] = $line;
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Hero image: voorkeur is _cpm_hero_image_url (rechtstreekse URL),
+	 * fallback naar de WP featured image als die toch is gezet.
+	 */
+	private static function resolve_hero_image( int $post_id ): string {
+		$url = (string) get_post_meta( $post_id, '_cpm_hero_image_url', true );
+		if ( $url ) {
+			return $url;
+		}
+		$thumb = get_the_post_thumbnail_url( $post_id, 'large' );
+		return $thumb ? (string) $thumb : '';
 	}
 }
