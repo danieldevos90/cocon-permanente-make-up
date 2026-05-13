@@ -35,6 +35,10 @@ class CTA {
 
 	public static function register(): void {
 		add_shortcode( self::SHORTCODE, [ __CLASS__, 'shortcode' ] );
+		// Rewrite eerst eventuele hardgecodeerde Divi "Meld je aan" knoppen
+		// in de hero/CTA-blocks naar de juiste inschrijfpagina.
+		add_filter( 'the_content', [ __CLASS__, 'rewrite_landing_buttons' ], 5 );
+		// Daarna onze eigen CTA onderaan injecteren.
 		add_filter( 'the_content', [ __CLASS__, 'auto_inject' ], 20 );
 	}
 
@@ -102,6 +106,75 @@ class CTA {
 	}
 
 	/**
+	 * Vervangt op de gemapte landingspagina's de href van bestaande
+	 * (Divi-)knoppen met de tekst "Meld je aan" of "Schrijf je in" door de
+	 * URL van de eerstvolgende inschrijfpagina. Hierdoor hoeven we de Divi
+	 * pagina zelf niet aan te raken: zolang de tekst klopt, wijst de knop
+	 * automatisch naar het juiste cohort.
+	 */
+	public static function rewrite_landing_buttons( $content ) {
+		if ( ! is_singular( 'page' ) || ! in_the_loop() || ! is_main_query() ) {
+			return $content;
+		}
+		$map  = self::landing_map();
+		$page = (int) get_queried_object_id();
+		if ( ! isset( $map[ $page ] ) ) {
+			return $content;
+		}
+		$url = self::next_cohort_signup_url( (string) $map[ $page ] );
+		if ( ! $url ) {
+			return $content;
+		}
+
+		$labels = [
+			'Meld je aan',
+			'Meld je nu aan',
+			'Schrijf je in',
+			'Inschrijven',
+			'Aanmelden',
+		];
+		// Match <a …>label</a> (label optioneel met witruimte). Hoofdletter-insensitive.
+		$pattern = '#(<a\b)([^>]*)>(\s*(?:' . implode( '|', array_map( 'preg_quote', $labels ) ) . ')\s*)</a>#i';
+
+		return preg_replace_callback(
+			$pattern,
+			static function ( $m ) use ( $url ) {
+				$attrs = $m[2];
+				if ( preg_match( '#\shref="[^"]*"#i', $attrs ) ) {
+					$attrs = preg_replace(
+						'#\shref="[^"]*"#i',
+						' href="' . esc_url( $url ) . '"',
+						$attrs,
+						1
+					);
+				} else {
+					$attrs = ' href="' . esc_url( $url ) . '"' . $attrs;
+				}
+				return $m[1] . $attrs . '>' . $m[3] . '</a>';
+			},
+			(string) $content
+		);
+	}
+
+	/**
+	 * URL naar de inschrijfpagina van de eerstvolgende cohort van een template.
+	 */
+	public static function next_cohort_signup_url( string $template ): string {
+		$cohort_id = self::find_next_cohort_id( $template );
+		if ( ! $cohort_id ) {
+			return '';
+		}
+		$page_id = (int) get_post_meta( $cohort_id, Cohort_Auto_Page::META_PAGE_ID, true );
+		if ( ! $page_id ) {
+			$page_id = Cohort_Auto_Page::ensure_page( $cohort_id );
+		}
+		if ( ! $page_id ) {
+			return '';
+		}
+		return (string) get_permalink( $page_id );
+	}
+
+	/**
 	 * Eerstvolgende publiek-gepubliceerde cohort van een template met
 	 * startdatum vanaf vandaag (oplopend). Fallback: de meest recente
 	 * cohort van die template (zelfs als verlopen) — beter een knop met
@@ -157,7 +230,6 @@ class CTA {
 		}
 		$page_id = (int) get_post_meta( $cohort_id, Cohort_Auto_Page::META_PAGE_ID, true );
 		if ( ! $page_id ) {
-			// Geen gekoppelde inschrijfpagina → maak hem nu aan
 			$page_id = Cohort_Auto_Page::ensure_page( $cohort_id );
 		}
 		if ( ! $page_id ) {
