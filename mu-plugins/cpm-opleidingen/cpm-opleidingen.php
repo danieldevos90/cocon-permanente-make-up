@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CPM_OPL_VERSION', '0.6.2' );
+define( 'CPM_OPL_VERSION', '0.6.3' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );

@@ -37,7 +37,9 @@ class CTA {
 		add_shortcode( self::SHORTCODE, [ __CLASS__, 'shortcode' ] );
 		// Rewrite eerst eventuele hardgecodeerde Divi "Meld je aan" knoppen
 		// in de hero/CTA-blocks naar de juiste inschrijfpagina.
-		add_filter( 'the_content', [ __CLASS__, 'rewrite_landing_buttons' ], 5 );
+		// Priority 15: ná do_shortcode (11) zodat Divi-shortcodes al naar HTML
+		// zijn omgezet en we de daadwerkelijke <a et_pb_button …> kunnen matchen.
+		add_filter( 'the_content', [ __CLASS__, 'rewrite_landing_buttons' ], 15 );
 		// Daarna onze eigen CTA onderaan injecteren.
 		add_filter( 'the_content', [ __CLASS__, 'auto_inject' ], 20 );
 	}
