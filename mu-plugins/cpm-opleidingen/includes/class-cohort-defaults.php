@@ -78,7 +78,7 @@ class Cohort_Defaults {
 			'eyebrow'        => 'Basisopleiding',
 			'subtitle'       => 'Word een gecertificeerd PMU-artiest',
 			'level'          => 'Voor (startende) PMU-specialisten — geen voorkennis vereist',
-			'duration_label' => '6 dagen verdeeld over 6 weken',
+			'duration_label' => '23 september t/m 18 november 2026 (6 trainingsdagen + examen)',
 			'trainer_name'   => 'Els van Rijswijk & Sina Hashemi',
 			'intro_html'     => 'Droom je van een carrière in de beautybranche? Of werk je al in de beauty-industrie, maar wil jij je skills naar een nóg hoger niveau tillen? Start met de exclusieve PMU-wenkbrauwtraining bij Cocon Cosmetics. Onder leiding van Sina Hashemi en Els van Rijswijk — samen goed voor 35 jaar ervaring — leer je niet alleen de techniek, maar ook de finesse en werkwijze die hen tot de meest gevraagde specialisten maken.',
 			'what_you_learn' => [
@@ -96,7 +96,7 @@ class Cohort_Defaults {
 				'Carrièrebegeleiding en praktijkvoering',
 			],
 			'includes'       => [
-				'6 dagen verdeeld over 6 weken',
+				'Lesdagen herfst 2026: 23 & 30 september, 7, 14 & 21 oktober + examen 18 november',
 				'14 hoofdstukken theorie + praktijk',
 				'Max. 5 cursisten per groep',
 				'Oefenen op latex én echte modellen',

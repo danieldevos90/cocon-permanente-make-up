@@ -64,6 +64,10 @@ class Cohort_CPT {
 			'_cpm_what_you_learn'    => 'longtext',// bullet list (één item per regel of \n gescheiden)
 			'_cpm_includes'          => 'longtext',// bullet list (kit, materialen, …)
 			'_cpm_intro_html'        => 'longtext',// rich intro paragraaf
+			// Optionele aanvullende trainingsdag (bv. Combi Brows na masterclass)
+			'_cpm_addon_price_cents' => 'integer', // 0 = geen addon
+			'_cpm_addon_date'       => 'string',  // YYYY-MM-DD (voor tekst bij checkbox)
+			'_cpm_addon_label'      => 'string',  // korte naam (fallback: "Combi Brows-vervolgdag")
 		];
 	}
 
@@ -287,6 +291,9 @@ class Cohort_CPT {
 				(string) get_post_meta( $post_id, '_cpm_intro_html', true ),
 				(string) ( $defaults['intro_html'] ?? '' )
 			),
+			'addon_price_cents'  => max( 0, (int) get_post_meta( $post_id, '_cpm_addon_price_cents', true ) ),
+			'addon_date'         => (string) get_post_meta( $post_id, '_cpm_addon_date', true ),
+			'addon_label'        => trim( (string) get_post_meta( $post_id, '_cpm_addon_label', true ) ),
 		];
 	}
 

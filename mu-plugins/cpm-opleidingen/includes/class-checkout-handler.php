@@ -48,6 +48,7 @@ class Checkout_Handler {
 					'notes'          => [ 'required' => false, 'type' => 'string' ],
 					'website'        => [ 'required' => false, 'type' => 'string' ], // honeypot, must be empty
 					'_wpnonce'       => [ 'required' => false, 'type' => 'string' ],
+					'addon_combi'    => [ 'required' => false, 'type' => 'boolean', 'default' => false ],
 				],
 			]
 		);
@@ -95,11 +96,25 @@ class Checkout_Handler {
 			);
 		}
 
-		// Build payment plan.
+		$addon_price = (int) ( $cohort['addon_price_cents'] ?? 0 );
+		$addon_date  = trim( (string) ( $cohort['addon_date'] ?? '' ) );
+		$addon_ok    = $addon_price > 0 && $addon_date !== '';
+
+		$raw_addon = $request->get_param( 'addon_combi' );
+		$s         = strtolower( trim( is_string( $raw_addon ) ? $raw_addon : '' ) );
+		$want_addon = ( true === $raw_addon || 1 === $raw_addon )
+			|| in_array( $s, [ '1', 'true', 'yes', 'on' ], true );
+		if ( $want_addon && ! $addon_ok ) {
+			return new \WP_Error( 'cpm_invalid_addon', 'Deze combinatie-optie is voor dit cohort niet beschikbaar.', [ 'status' => 400 ] );
+		}
+		$addons_cents  = $want_addon ? $addon_price : 0;
+		$grand_total   = (int) $cohort['total_price_cents'] + $addons_cents;
+
+		// Build payment plan (totaal = cursus + eventueel gekozen addon).
 		try {
 			$plan = Payment_Plan::build(
-				$cohort['total_price_cents'],
-				$cohort['deposit_cents'],
+				$grand_total,
+				(int) $cohort['deposit_cents'],
 				$num_termijnen,
 				$cohort['start_date']
 			);
@@ -134,7 +149,8 @@ class Checkout_Handler {
 				'billing_country'    => strtoupper( sanitize_text_field( (string) ( $request['country'] ?? 'NL' ) ) ),
 				'notes'              => wp_kses_post( (string) ( $request['notes'] ?? '' ) ),
 				'num_termijnen'      => $num_termijnen,
-				'total_amount_cents' => $cohort['total_price_cents'],
+				'total_amount_cents' => $grand_total,
+				'addons_cents'       => $addons_cents,
 				'deposit_cents'      => $cohort['deposit_cents'],
 				'currency'           => $cohort['currency'],
 				'status'             => 'pending',
@@ -153,11 +169,20 @@ class Checkout_Handler {
 		$webhook_url = self::webhook_url();
 		$return_url  = self::checkout_return_url( $enrollment_id );
 
+		$addon_note = $addons_cents > 0
+			? sprintf(
+				' incl. %s (%s)',
+				trim( (string) ( $cohort['addon_label'] ?? 'optionele vervolgdag' ) ),
+				self::format_eur( $addons_cents )
+			)
+			: '';
+
 		$first_link_url = '';
 		foreach ( $plan as $idx => $termijn ) {
 			$desc = sprintf(
-				'%s — termijn %d/%d voor %s %s',
+				'%s%s — termijn %d/%d voor %s %s',
 				$cohort['title'],
+				$addon_note,
 				$termijn['termijn'],
 				count( $plan ),
 				$first,
@@ -222,6 +247,10 @@ class Checkout_Handler {
 			],
 			200
 		);
+	}
+
+	private static function format_eur( int $cents ): string {
+		return '€' . number_format( $cents / 100, 2, ',', '.' );
 	}
 
 	private static function expires_at_for( string $due_date ): string {

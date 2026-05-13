@@ -50,17 +50,43 @@ class Emails {
 		return '<table style="width:100%;border-collapse:collapse;font:14px Arial,sans-serif"><thead><tr style="background:#fafafa"><th style="text-align:left;padding:8px">Termijn</th><th style="text-align:left;padding:8px">Vervaldatum</th><th style="text-align:right;padding:8px">Bedrag</th><th style="padding:8px"></th></tr></thead><tbody>' . $rows . '</tbody></table>';
 	}
 
+	private static function dutch_iso_date_lite( string $iso ): string {
+		$ts = strtotime( $iso );
+		if ( ! $ts ) {
+			return $iso;
+		}
+		$months = [ 1 => 'jan', 2 => 'feb', 3 => 'mrt', 4 => 'apr', 5 => 'mei', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'okt', 11 => 'nov', 12 => 'dec' ];
+		return (int) date( 'j', $ts ) . ' ' . ( $months[ (int) date( 'n', $ts ) ] ?? date( 'M', $ts ) ) . ' ' . date( 'Y', $ts );
+	}
+
 	public static function send_enrollment_confirmation( int $enrollment_id ): void {
 		$enr = DB::get_enrollment( $enrollment_id );
 		if ( ! $enr ) {
 			return;
 		}
-		$cohort   = Cohort_CPT::get( (int) $enr['cohort_id'] );
+		$cohort = Cohort_CPT::get( (int) $enr['cohort_id'] );
+		if ( ! is_array( $cohort ) ) {
+			return;
+		}
 		$payments = DB::get_payments_for_enrollment( $enrollment_id );
+
+		$addons = (int) ( $enr['addons_cents'] ?? 0 );
+		$addon_p = '';
+		if ( $addons > 0 ) {
+			$label = trim( (string) ( $cohort['addon_label'] ?? 'optionele vervolgdag' ) );
+			$d     = self::dutch_iso_date_lite( (string) ( $cohort['addon_date'] ?? '' ) );
+			$addon_p = sprintf(
+				'<p>Je registratie omvat ook <strong>%s</strong> op <strong>%s</strong> (%s excl. btw).</p>',
+				esc_html( $label ),
+				esc_html( $d ),
+				esc_html( self::format_amount( $addons, $enr['currency'] ) )
+			);
+		}
 
 		$html = sprintf(
 			'<h2>Welkom %s,</h2>
 			<p>Bedankt voor je aanmelding voor <strong>%s</strong> (start: %s).</p>
+			%s
 			<p>Hieronder je betalingsschema. Klik op een knop om die termijn nu te betalen — je ontvangt voor toekomstige termijnen een herinnering per mail.</p>
 			%s
 			<p style="margin-top:20px">Totaal: <strong>%s</strong> (%d termijn(en))</p>
@@ -69,6 +95,7 @@ class Emails {
 			esc_html( $enr['student_first_name'] ),
 			esc_html( $cohort['title'] ?? 'Opleiding' ),
 			esc_html( $cohort['start_date'] ?? '' ),
+			$addon_p,
 			self::payments_table( $payments, $enr['currency'] ),
 			self::format_amount( (int) $enr['total_amount_cents'], $enr['currency'] ),
 			(int) $enr['num_termijnen'],

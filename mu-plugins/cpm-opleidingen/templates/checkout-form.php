@@ -3,7 +3,7 @@
  * Variables in scope (set by Shortcode::render):
  *  - $cohort  array
  *  - $options int[]
- *  - $preview array<int, array<int, array{termijn,is_deposit,amount_cents,due_date}>>
+ *  - $preview array{ base: array<int, …>, with_addon?: array<int, …> }
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,6 +27,16 @@ $dutch_date = static function ( string $iso ): string {
 $date_label = $cohort['end_date']
 	? $dutch_date( $cohort['start_date'] ) . ' &amp; ' . $dutch_date( $cohort['end_date'] )
 	: $dutch_date( $cohort['start_date'] );
+
+$preview_base       = isset( $preview['base'] ) && is_array( $preview['base'] ) ? $preview['base'] : $preview;
+$preview_with_addon = isset( $preview['with_addon'] ) && is_array( $preview['with_addon'] ) ? $preview['with_addon'] : null;
+$addon_price        = (int) ( $cohort['addon_price_cents'] ?? 0 );
+$addon_date         = (string) ( $cohort['addon_date'] ?? '' );
+$addon_label        = trim( (string) ( $cohort['addon_label'] ?? '' ) );
+$has_addon          = $addon_price > 0 && $addon_date !== '';
+if ( $addon_label === '' ) {
+	$addon_label = 'Combi Brows-vervolgdag';
+}
 ?>
 <section class="cpm-opl-page" data-cohort-id="<?php echo esc_attr( $cohort['id'] ); ?>">
 
@@ -64,7 +74,15 @@ $date_label = $cohort['end_date']
 			<?php endif; ?>
 			<div>
 				<dt>Investering</dt>
-				<dd><?php echo wp_kses_post( $fmt( (int) $cohort['total_price_cents'] ) ); ?> excl. btw</dd>
+				<dd>
+					<span
+						class="cpm-opl-investment"
+						data-cpm-inv-base="<?php echo esc_attr( (string) (int) $cohort['total_price_cents'] ); ?>"
+						data-cpm-inv-addon="<?php echo esc_attr( (string) $addon_price ); ?>"
+					>
+						<?php echo wp_kses_post( $fmt( (int) $cohort['total_price_cents'] ) ); ?> excl. btw
+					</span>
+				</dd>
 			</div>
 		</dl>
 	</header>
@@ -101,6 +119,21 @@ $date_label = $cohort['end_date']
 	<?php endif; ?>
 
 	<form class="cpm-opl-form" data-cpm-form="1" data-cohort-id="<?php echo esc_attr( $cohort['id'] ); ?>" novalidate>
+		<?php if ( $has_addon && $preview_with_addon ) : ?>
+			<section class="cpm-opl-section cpm-opl-addon">
+				<label class="cpm-opl-addon__choice">
+					<input type="checkbox" name="addon_combi" value="1">
+					<span class="cpm-opl-addon__box">
+						<span class="cpm-opl-addon__title">Optioneel — <?php echo esc_html( $addon_label ); ?></span>
+						<span class="cpm-opl-addon__detail">
+							Datum: <?php echo esc_html( $dutch_date( $addon_date ) ); ?>
+							&nbsp;·&nbsp;+ <?php echo wp_kses_post( $fmt( $addon_price ) ); ?> excl. btw
+						</span>
+					</span>
+				</label>
+			</section>
+		<?php endif; ?>
+
 		<section class="cpm-opl-section">
 			<h3>Kies je betaalplan</h3>
 
@@ -114,12 +147,12 @@ $date_label = $cohort['end_date']
 			<div class="cpm-opl-plans" role="radiogroup" aria-label="Betaalplan">
 				<?php foreach ( $options as $idx => $n ) : ?>
 					<?php
-					$plan       = $preview[ $n ] ?? [];
+					$plan       = $preview_base[ $n ] ?? [];
 					$first_amt  = $plan[0]['amount_cents'] ?? 0;
 					$per_term   = ( $n > 1 && ! empty( $plan ) ) ? end( $plan )['amount_cents'] : 0;
 					$plan_label = $n === 1 ? 'In één keer' : ( $n === 2 ? 'In 2 termijnen' : 'In 3 termijnen' );
 					?>
-					<label class="cpm-opl-plan">
+					<label class="cpm-opl-plan" data-cpm-plan-n="<?php echo (int) $n; ?>">
 						<input type="radio" name="num_termijnen" value="<?php echo (int) $n; ?>" <?php checked( $idx === 0 ); ?> required>
 						<span class="cpm-opl-plan-card">
 							<span class="cpm-opl-plan-card__title"><?php echo esc_html( $plan_label ); ?></span>
@@ -147,7 +180,7 @@ $date_label = $cohort['end_date']
 				<h4>Betalingsschema</h4>
 				<?php
 				$default_n    = $options[0];
-				$default_plan = $preview[ $default_n ] ?? [];
+				$default_plan = $preview_base[ $default_n ] ?? [];
 				?>
 				<div data-cpm-schedule>
 					<table class="cpm-opl-table">

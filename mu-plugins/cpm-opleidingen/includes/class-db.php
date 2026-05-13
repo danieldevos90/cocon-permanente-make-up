@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class DB {
 
-	const SCHEMA_VERSION = '1';
+	const SCHEMA_VERSION = '2';
 
 	public static function table_enrollments(): string {
 		global $wpdb;
@@ -64,6 +64,7 @@ class DB {
 				num_termijnen      TINYINT UNSIGNED NOT NULL DEFAULT 1,
 				total_amount_cents BIGINT UNSIGNED NOT NULL,
 				deposit_cents      BIGINT UNSIGNED NOT NULL DEFAULT 0,
+				addons_cents       BIGINT UNSIGNED NOT NULL DEFAULT 0,
 				currency           VARCHAR(3) NOT NULL DEFAULT 'EUR',
 				status             VARCHAR(32) NOT NULL DEFAULT 'pending',
 				mode               VARCHAR(8) NOT NULL DEFAULT 'live',

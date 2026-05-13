@@ -51,10 +51,10 @@ class Shortcode {
 		}
 
 		$options = Payment_Plan::available_options( $cohort['max_termijnen'], $cohort['start_date'] );
-		$preview = [];
+		$preview = [ 'base' => [] ];
 		foreach ( $options as $n ) {
 			try {
-				$preview[ $n ] = Payment_Plan::build(
+				$preview['base'][ $n ] = Payment_Plan::build(
 					$cohort['total_price_cents'],
 					$cohort['deposit_cents'],
 					$n,
@@ -62,6 +62,24 @@ class Shortcode {
 				);
 			} catch ( \Throwable $e ) {
 				continue;
+			}
+		}
+		$addon_price = (int) ( $cohort['addon_price_cents'] ?? 0 );
+		$addon_date  = trim( (string) ( $cohort['addon_date'] ?? '' ) );
+		if ( $addon_price > 0 && $addon_date !== '' ) {
+			$preview['with_addon'] = [];
+			$grand_total = (int) $cohort['total_price_cents'] + $addon_price;
+			foreach ( $options as $n ) {
+				try {
+					$preview['with_addon'][ $n ] = Payment_Plan::build(
+						$grand_total,
+						$cohort['deposit_cents'],
+						$n,
+						$cohort['start_date']
+					);
+				} catch ( \Throwable $e ) {
+					continue;
+				}
 			}
 		}
 

@@ -119,6 +119,64 @@
 	font-weight: 500;
 }
 
+.cpm-opl-investment__note {
+	display: block;
+	margin-top: 4px;
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--cpm-muted);
+	line-height: 1.4;
+}
+
+/* ---------- Optionele addon (Combi dag) ---------- */
+.cpm-opl-addon {
+	background: var(--cpm-cream);
+	border-style: dashed;
+}
+.cpm-opl-addon__choice {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 0;
+	cursor: pointer;
+	font-weight: 400;
+	line-height: 1.45;
+}
+.cpm-opl-addon__choice input {
+	margin-top: 4px;
+	width: 18px;
+	height: 18px;
+	accent-color: var(--cpm-pink);
+	flex-shrink: 0;
+}
+.cpm-opl-addon__box {
+	flex: 1;
+	border: 1px solid var(--cpm-line);
+	border-radius: 8px;
+	padding: 14px 16px;
+	background: #fff;
+	transition: border-color .15s, box-shadow .15s;
+}
+.cpm-opl-addon__choice:has(input:focus-visible) .cpm-opl-addon__box {
+	outline: 2px solid rgba(198, 65, 147, .25);
+	outline-offset: 2px;
+}
+.cpm-opl-addon__choice:has(input:checked) .cpm-opl-addon__box {
+	border-color: var(--cpm-pink);
+	box-shadow: 0 0 0 2px rgba(198, 65, 147, .12);
+}
+.cpm-opl-addon__title {
+	display: block;
+	font-weight: 600;
+	color: var(--cpm-ink);
+	font-size: 15px;
+	margin-bottom: 4px;
+}
+.cpm-opl-addon__detail {
+	font-size: 14px;
+	color: var(--cpm-muted);
+}
+
 /* ---------- INTRO ---------- */
 .cpm-opl-intro {
 	padding: 0 6px;
