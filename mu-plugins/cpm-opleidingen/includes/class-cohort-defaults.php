@@ -68,6 +68,42 @@ class Cohort_Defaults {
 				'Voor ervaren PMU-artiesten die met apparaat werken',
 			],
 		],
+
+		/**
+		 * 6-daagse basisopleiding wenkbrauwen — content 1-op-1 overgenomen
+		 * van https://www.coconpermanentemakeup.nl/opleidingen/ (landingspagina
+		 * "Permanente make-up opleiding wenkbrauwen").
+		 */
+		'pmu-opleiding-wenkbrauwen' => [
+			'eyebrow'        => 'Basisopleiding',
+			'subtitle'       => 'Word een gecertificeerd PMU-artiest',
+			'level'          => 'Voor (startende) PMU-specialisten — geen voorkennis vereist',
+			'duration_label' => '6 dagen verdeeld over 6 weken',
+			'trainer_name'   => 'Els van Rijswijk & Sina Hashemi',
+			'intro_html'     => 'Droom je van een carrière in de beautybranche? Of werk je al in de beauty-industrie, maar wil jij je skills naar een nóg hoger niveau tillen? Start met de exclusieve PMU-wenkbrauwtraining bij Cocon Cosmetics. Onder leiding van Sina Hashemi en Els van Rijswijk — samen goed voor 35 jaar ervaring — leer je niet alleen de techniek, maar ook de finesse en werkwijze die hen tot de meest gevraagde specialisten maken.',
+			'what_you_learn' => [
+				'Powder, Ombre & Full Shaded Brow',
+				'3D Hairstroke & 3D Nano Brows',
+				'Soft Combi & Full Combi',
+				'Praktijkervaring met levende modellen',
+				'Hygiëne en veiligheid volgens GGD-richtlijnen',
+				'Anatomie van de huid en pigmentopname',
+				'Kleurtheorie en pigmentkeuze',
+				'Wenkbrauwmapping en vormgeving',
+				'Volledige klantbehandeling — consult tot nazorg',
+				'Productkennis: PMU-tools en pigmenten',
+				'Marketing, foto’s, video en social media',
+				'Carrièrebegeleiding en praktijkvoering',
+			],
+			'includes'       => [
+				'6 dagen verdeeld over 6 weken',
+				'14 hoofdstukken theorie + praktijk',
+				'Max. 5 cursisten per groep',
+				'Oefenen op latex én echte modellen',
+				'Persoonlijke begeleiding van Els & Sina',
+				'Certificaat na succesvolle afronding',
+			],
+		],
 	];
 
 	/**
