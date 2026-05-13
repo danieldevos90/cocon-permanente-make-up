@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Cocon Cosmetics — Opleidingen Checkout
  * Description: Inschrijvingen voor PMU-opleidingen met aanbetaling + 1/2/3 termijnen via Mollie. Validatie: laatste termijn moet minimaal 14 dagen vóór startdatum binnen zijn.
- * Version: 0.5.0
+ * Version: 0.6.0
  * Author: Cocon Cosmetics
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CPM_OPL_VERSION', '0.5.0' );
+define( 'CPM_OPL_VERSION', '0.6.0' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );
@@ -31,6 +31,7 @@ require_once CPM_OPL_PATH . 'includes/class-checkout-handler.php';
 require_once CPM_OPL_PATH . 'includes/class-webhook.php';
 require_once CPM_OPL_PATH . 'includes/class-cron.php';
 require_once CPM_OPL_PATH . 'includes/class-shortcode.php';
+require_once CPM_OPL_PATH . 'includes/class-cta.php';
 require_once CPM_OPL_PATH . 'includes/class-admin.php';
 require_once CPM_OPL_PATH . 'includes/class-admin-rest.php';
 
@@ -49,6 +50,7 @@ add_action( 'plugins_loaded', static function () {
 	CPM_Opleidingen\Checkout_Handler::register();
 	CPM_Opleidingen\Cron::register();
 	CPM_Opleidingen\Shortcode::register();
+	CPM_Opleidingen\CTA::register();
 	CPM_Opleidingen\Admin_REST::register();
 	if ( is_admin() ) {
 		CPM_Opleidingen\Admin::register();

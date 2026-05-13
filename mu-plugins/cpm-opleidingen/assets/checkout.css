@@ -433,3 +433,94 @@
 	.cpm-opl-button { width: 100%; }
 	.cpm-opl-trust { text-align: center; }
 }
+
+/* ============================================================
+ * Landing-page CTA  ([cpm_next_cohort_cta])
+ * "Meld je aan" knop onderaan de opleiding-landingspagina's.
+ * ============================================================ */
+.cpm-opl-cta {
+	--cpm-pink: #C64193;
+	--cpm-pink-dark: #a8327c;
+	--cpm-ink: #2b1f12;
+	--cpm-muted: #7d7468;
+	--cpm-beige: #f4f0e8;
+	--cpm-line: #e6dfd1;
+
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 20px;
+	max-width: 880px;
+	margin: 32px auto 24px !important;
+	padding: 24px 28px !important;
+	background: var(--cpm-beige);
+	border: 1px solid var(--cpm-line);
+	border-radius: 10px;
+	font-family: inherit;
+	box-sizing: border-box;
+}
+.cpm-opl-cta * { box-sizing: border-box; }
+.cpm-opl-cta__copy {
+	flex: 1 1 320px;
+	min-width: 0;
+}
+.cpm-opl-cta__date {
+	margin: 0 0 4px !important;
+	padding: 0 !important;
+	font-size: 13px !important;
+	line-height: 1.4 !important;
+	letter-spacing: .04em !important;
+	text-transform: uppercase !important;
+	color: var(--cpm-muted) !important;
+	font-weight: 600 !important;
+}
+.cpm-opl-cta__date strong {
+	color: var(--cpm-ink) !important;
+	font-weight: 700 !important;
+	letter-spacing: 0 !important;
+	text-transform: none !important;
+}
+.cpm-opl-cta__title {
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 18px !important;
+	line-height: 1.35 !important;
+	color: var(--cpm-ink) !important;
+	font-weight: 600 !important;
+}
+.cpm-opl-cta__button {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--cpm-pink) !important;
+	color: #fff !important;
+	border: 0 !important;
+	padding: 14px 28px !important;
+	font-size: 15px !important;
+	font-weight: 600 !important;
+	font-family: inherit !important;
+	border-radius: 6px !important;
+	text-decoration: none !important;
+	letter-spacing: .01em;
+	text-transform: none !important;
+	line-height: 1.2 !important;
+	box-shadow: none !important;
+	transition: background .15s ease;
+	white-space: nowrap;
+}
+.cpm-opl-cta__button:hover,
+.cpm-opl-cta__button:focus {
+	background: var(--cpm-pink-dark) !important;
+	color: #fff !important;
+	text-decoration: none !important;
+}
+
+@media (max-width: 620px) {
+	.cpm-opl-cta {
+		padding: 20px 18px !important;
+		gap: 14px;
+	}
+	.cpm-opl-cta__copy { flex: 1 1 100%; }
+	.cpm-opl-cta__button { width: 100%; }
+}
