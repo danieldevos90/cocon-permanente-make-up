@@ -359,6 +359,7 @@ class Admin_REST {
 			'thankyou_page_url'     => $thankyou ? get_permalink( $thankyou ) : null,
 			'pricing_products'      => array_keys( Pricing::products() ),
 			'pricing_audit'         => Pricing::audit_report(),
+			'wc_legacy_products'    => class_exists( 'WooCommerce' ) ? WooCommerce_Hide::find_deposit_product_ids() : [],
 			'cohort_count'          => (int) wp_count_posts( Cohort_CPT::POST_TYPE )->publish,
 			'enrollment_count'      => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$enr_table}" ),
 		];
