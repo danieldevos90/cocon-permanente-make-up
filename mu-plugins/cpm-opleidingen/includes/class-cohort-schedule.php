@@ -1,11 +1,6 @@
 <?php
 /**
  * Overzicht van geplande cohorts (geen marketing-copy — alleen data uit WP).
- *
- * [cpm_cohort_schedule]                    — alle templates, aankomend eerst
- * [cpm_cohort_schedule template="…"]       — filter op template-key
- *
- * Auto-inject op hub-pagina /pmu-opleidingen-cocon-cosmetics/ (ID 7003).
  */
 
 namespace CPM_Opleidingen;
@@ -36,13 +31,13 @@ class Cohort_Schedule {
 		if ( ! is_singular( 'page' ) || ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
-		if ( ! in_array( (int) get_queried_object_id(), self::hub_page_ids(), true ) ) {
+		// Hub (Divi): alleen footer_inject — voorkomt dubbele tabellen.
+		if ( in_array( (int) get_queried_object_id(), self::hub_page_ids(), true ) ) {
 			return $content;
 		}
 		return $content . self::render( '' );
 	}
 
-	/** Divi-pagebuilder gebruikt vaak geen the_content — injecteer in footer. */
 	public static function footer_inject(): void {
 		if ( ! is_singular( 'page' ) ) {
 			return;
@@ -50,13 +45,7 @@ class Cohort_Schedule {
 		if ( ! in_array( (int) get_queried_object_id(), self::hub_page_ids(), true ) ) {
 			return;
 		}
-		$html = self::render( '' );
-		if ( $html === '' ) {
-			return;
-		}
-		echo '<div class="cpm-opl-schedule-wrap" style="max-width:880px;margin:2rem auto 3rem;padding:0 1rem">';
-		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '</div>';
+		echo self::render( '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public static function shortcode( $atts ): string {
@@ -76,46 +65,81 @@ class Cohort_Schedule {
 			$by_template[ $key ][] = $row;
 		}
 
-		wp_enqueue_style( 'cpm-opl-checkout', CPM_OPL_URL . 'assets/checkout.css', [], CPM_OPL_VERSION );
+		self::enqueue_styles();
 
 		ob_start();
 		?>
-		<section class="cpm-opl-schedule" aria-label="Geplande startdata opleidingen">
-			<?php foreach ( $by_template as $template => $items ) : ?>
-				<?php
-				$label = self::template_label( $template );
-				?>
-				<h4><?php echo esc_html( $label ); ?></h4>
-				<table class="cpm-opl-table">
-					<thead>
-						<tr>
-							<th scope="col">Start</th>
-							<th scope="col">Opleiding</th>
-							<th scope="col"></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ( $items as $item ) : ?>
-							<tr>
-								<td><?php echo esc_html( $item['start_label'] ); ?></td>
-								<td><?php echo esc_html( $item['title'] ); ?></td>
-								<td>
+		<div class="cpm-opl-schedule-wrap">
+			<section class="cpm-opl-schedule" aria-label="Geplande startdata opleidingen">
+				<header class="cpm-opl-schedule__intro">
+					<p class="cpm-opl-schedule__eyebrow">Cocon Academy</p>
+					<h2 class="cpm-opl-schedule__title">Komende startdata</h2>
+					<p class="cpm-opl-schedule__lead">Kies je opleiding en schrijf je direct in. Alle bedragen zijn incl. 21% btw.</p>
+				</header>
+
+				<?php foreach ( $by_template as $template => $items ) : ?>
+					<?php
+					$label = self::template_label( $template );
+					$price = self::template_price_label( $template );
+					?>
+					<div class="cpm-opl-schedule__group">
+						<div class="cpm-opl-schedule__group-head">
+							<h3 class="cpm-opl-schedule__group-title"><?php echo esc_html( $label ); ?></h3>
+							<?php if ( $price ) : ?>
+								<p class="cpm-opl-schedule__group-price"><?php echo esc_html( $price ); ?></p>
+							<?php endif; ?>
+						</div>
+						<ul class="cpm-opl-schedule__list">
+							<?php foreach ( $items as $item ) : ?>
+								<li class="cpm-opl-schedule__card">
+									<div class="cpm-opl-schedule__card-main">
+										<time class="cpm-opl-schedule__date" datetime="<?php echo esc_attr( $item['start_iso'] ); ?>">
+											<?php echo esc_html( $item['start_label'] ); ?>
+										</time>
+										<p class="cpm-opl-schedule__name"><?php echo esc_html( $item['title'] ); ?></p>
+									</div>
 									<?php if ( $item['url'] ) : ?>
-										<a class="cpm-opl-cta__button" style="display:inline-block;padding:8px 16px;font-size:13px" href="<?php echo esc_url( $item['url'] ); ?>">Inschrijven</a>
+										<a class="cpm-opl-schedule__btn" href="<?php echo esc_url( $item['url'] ); ?>">
+											Inschrijven
+										</a>
 									<?php endif; ?>
-								</td>
-							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-			<?php endforeach; ?>
-		</section>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endforeach; ?>
+			</section>
+		</div>
 		<?php
 		return (string) ob_get_clean();
 	}
 
+	private static function enqueue_styles(): void {
+		if ( ! wp_style_is( 'cpm-opl-checkout', 'registered' ) ) {
+			wp_register_style(
+				'cpm-opl-checkout',
+				CPM_OPL_URL . 'assets/checkout.css',
+				[],
+				CPM_OPL_VERSION
+			);
+		}
+		wp_enqueue_style( 'cpm-opl-checkout' );
+	}
+
+	private static function template_price_label( string $template ): string {
+		$def = Pricing::defaults_for_template( $template );
+		if ( ! $def ) {
+			return '';
+		}
+		$total = (int) ( $def['total_price_cents'] ?? 0 );
+		if ( $total <= 0 ) {
+			return '';
+		}
+		return 'Investering ' . Pricing::format_eur( $total ) . ' incl. btw';
+	}
+
 	/**
-	 * @return list<array{template:string,title:string,start_label:string,url:string}>
+	 * @return list<array{template:string,title:string,start_label:string,start_iso:string,url:string}>
 	 */
 	private static function query_cohorts( string $template_filter ): array {
 		$today = gmdate( 'Y-m-d' );
@@ -158,10 +182,12 @@ class Cohort_Schedule {
 			if ( ! $page_id ) {
 				$page_id = Cohort_Auto_Page::ensure_page( (int) $id );
 			}
+			$start = (string) ( $cohort['start_date'] ?? '' );
 			$rows[] = [
 				'template'     => (string) ( $cohort['template'] ?? '' ),
 				'title'        => (string) ( $cohort['title'] ?? get_the_title( $id ) ),
-				'start_label'  => self::dutch_date( (string) ( $cohort['start_date'] ?? '' ) ),
+				'start_label'  => self::dutch_date( $start ),
+				'start_iso'    => $start,
 				'url'          => $page_id ? (string) get_permalink( $page_id ) : '',
 			];
 		}
