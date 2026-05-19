@@ -18,3 +18,6 @@ credentials*
 # WordPress MCP credentials/JWT renewal helpers
 .wp-mcp/
 .wordpress-mcp.log
+
+# CPM opleidingen secrets on server
+mu-plugins/cpm-opleidingen/.env.local

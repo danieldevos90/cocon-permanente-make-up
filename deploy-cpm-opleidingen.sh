@@ -17,7 +17,7 @@ DA_URL="${COCONPM_DA_URL:-https://web223.controlepaneel.net:2222}"
 DA_USER="${COCONPM_DA_USER:-coconper}"
 DA_PASS="${COCONPM_DA_PASS:-YVfZFyYMuvrGHjD4v7Qg}"
 
-LOCAL_DIR="$ROOT/cocon-permanente-make-up/mu-plugins"
+LOCAL_DIR="$ROOT/mu-plugins"
 LOCAL_LOADER="$LOCAL_DIR/cpm-opleidingen-loader.php"
 LOCAL_PLUGIN_DIR="$LOCAL_DIR/cpm-opleidingen"
 
@@ -77,6 +77,29 @@ curl -sk -m 30 -u "$DA_USER:$DA_PASS" \
 	-H "Content-Type: application/json" \
 	-d "$DEL_PAYLOAD" >/dev/null
 rm -f "$LOCAL_ZIP"
+
+# 6. Mailchimp-keys → mu-plugin/.env.local (overschrijft geen server-root .env)
+ENV_SRC="$ROOT/marketing-automations/.env"
+if [ -f "$ENV_SRC" ]; then
+	echo "→ Mailchimp .env.local sync…"
+	TMP_ENV=$(mktemp)
+	{
+		grep -E '^(API_KEY_MAILCHIMP|MAILCHIMP_API_KEY|MAILCHIMP_LIST_ID)=' "$ENV_SRC" || true
+	} > "$TMP_ENV"
+	if [ -s "$TMP_ENV" ]; then
+		curl -sk -m 60 -u "$DA_USER:$DA_PASS" \
+			-X POST "$DA_URL/api/filemanager-actions/upload?dir=$REMOTE_MU/cpm-opleidingen&name=.env.local&overwrite=true" \
+			-F "file=@$TMP_ENV" >/dev/null
+		echo "   ✓ .env.local geüpload"
+	else
+		echo "   ⚠ geen MAILCHIMP-regels in $ENV_SRC"
+	fi
+	rm -f "$TMP_ENV"
+fi
+
+# Trigger WP (prijs-sync draait op eerste request na deploy)
+curl -sk -m 20 "https://www.coconpermanentemakeup.nl/wp-cron.php?doing_wp_cron=1" >/dev/null || true
+curl -sk -m 20 "https://www.coconpermanentemakeup.nl/" >/dev/null || true
 
 echo ""
 echo "✓ Deploy klaar."
