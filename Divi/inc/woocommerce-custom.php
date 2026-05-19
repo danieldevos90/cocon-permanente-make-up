@@ -15,9 +15,86 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Featured Products Shortcode
- * 
- * Usage: [coconpm_featured limit="8" columns="4" title="Featured Products"]
+ *
+ * Usage: [coconpm_featured limit="4" columns="4" view_all="/winkel/" view_all_text="Bekijk meer"]
  */
+if ( ! function_exists( 'coconpm_get_shop_url' ) ) {
+	function coconpm_get_shop_url() {
+		if ( function_exists( 'wc_get_page_permalink' ) ) {
+			$shop_url = wc_get_page_permalink( 'shop' );
+			if ( $shop_url ) {
+				return (string) $shop_url;
+			}
+		}
+
+		return home_url( '/winkel/' );
+	}
+}
+
+if ( ! function_exists( 'coconpm_query_featured_products' ) ) {
+	/**
+	 * Featured products first, then recent products to fill the grid.
+	 *
+	 * @return WP_Query|null
+	 */
+	function coconpm_query_featured_products( $limit, $orderby, $order ) {
+		$limit = max( 1, (int) $limit );
+		$ids   = array();
+
+		$featured_query = new WP_Query(
+			array(
+				'post_type'           => 'product',
+				'post_status'         => 'publish',
+				'ignore_sticky_posts' => 1,
+				'posts_per_page'      => $limit,
+				'orderby'             => $orderby,
+				'order'               => $order,
+				'fields'              => 'ids',
+				'tax_query'           => array(
+					array(
+						'taxonomy' => 'product_visibility',
+						'field'    => 'name',
+						'terms'    => 'featured',
+					),
+				),
+			)
+		);
+
+		$ids = array_map( 'intval', (array) $featured_query->posts );
+
+		if ( count( $ids ) < $limit ) {
+			$fallback_query = new WP_Query(
+				array(
+					'post_type'           => 'product',
+					'post_status'         => 'publish',
+					'ignore_sticky_posts' => 1,
+					'posts_per_page'      => $limit - count( $ids ),
+					'post__not_in'        => $ids,
+					'orderby'             => 'date',
+					'order'               => 'DESC',
+					'fields'              => 'ids',
+				)
+			);
+
+			$ids = array_merge( $ids, array_map( 'intval', (array) $fallback_query->posts ) );
+		}
+
+		if ( ! $ids ) {
+			return null;
+		}
+
+		return new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'post__in'       => $ids,
+				'orderby'        => 'post__in',
+				'posts_per_page' => count( $ids ),
+			)
+		);
+	}
+}
+
 if ( ! function_exists( 'coconpm_featured_products_shortcode' ) ) {
 function coconpm_featured_products_shortcode( $atts ) {
 	// Check if WooCommerce is active
@@ -25,57 +102,54 @@ function coconpm_featured_products_shortcode( $atts ) {
 		return '';
 	}
 
-	$atts = shortcode_atts( array(
-		'limit'         => 8,
-		'columns'       => 4,
-		'orderby'       => 'rand',
-		'order'         => 'desc',
-		'title'         => '', // Optional section title
-		'view_all'      => '', // Optional "View All" link URL (e.g., "/winkel")
-		'view_all_text' => 'Bekijk alle producten', // Customizable link text
-	), $atts, 'featured_products' );
+	$default_limit = is_front_page() ? 4 : 8;
 
-	$query_args = array(
-		'post_type'           => 'product',
-		'post_status'         => 'publish',
-		'ignore_sticky_posts' => 1,
-		'posts_per_page'      => $atts['limit'],
-		'orderby'             => $atts['orderby'],
-		'order'               => $atts['order'],
-		'tax_query'           => array(
-			'relation' => 'AND',
-			array(
-				'taxonomy' => 'product_visibility',
-				'field'    => 'name',
-				'terms'    => 'featured',
-			),
+	$atts = shortcode_atts(
+		array(
+			'limit'         => $default_limit,
+			'columns'       => 4,
+			'orderby'       => 'rand',
+			'order'         => 'desc',
+			'title'         => '',
+			'view_all'      => is_front_page() ? coconpm_get_shop_url() : '',
+			'view_all_text' => 'Bekijk meer',
 		),
+		(array) $atts,
+		'featured_products'
 	);
 
-	$products = new WP_Query( $query_args );
+	$columns = max( 1, min( 6, (int) $atts['columns'] ) );
+	$view_all_url = $atts['view_all'] ? (string) $atts['view_all'] : coconpm_get_shop_url();
+
+	if ( is_front_page() ) {
+		$atts['limit'] = 4;
+		$columns       = 4;
+	}
+
+	$products = coconpm_query_featured_products( $atts['limit'], $atts['orderby'], $atts['order'] );
 
 	ob_start();
 
-	if ( $products->have_posts() ) :
+	if ( $products && $products->have_posts() ) :
 		?>
 		<section class="coconpm-featured-products">
 			<div class="coconpm-featured-container">
-				
+
 				<?php if ( ! empty( $atts['title'] ) ) : ?>
 					<div class="coconpm-featured-header">
 						<h2 class="coconpm-featured-title"><?php echo esc_html( $atts['title'] ); ?></h2>
-						<?php if ( ! empty( $atts['view_all'] ) ) : ?>
-							<a href="<?php echo esc_url( $atts['view_all'] ); ?>" class="coconpm-featured-view-all">
+						<?php if ( $view_all_url ) : ?>
+							<a href="<?php echo esc_url( $view_all_url ); ?>" class="coconpm-featured-view-all">
 								<?php echo esc_html( $atts['view_all_text'] ); ?>
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 									<path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
 							</a>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
-				
-				<div class="coconpm-products-grid coconpm-featured-grid coconpm-columns-<?php echo esc_attr( $atts['columns'] ); ?>">
+
+				<div class="coconpm-products-grid coconpm-featured-grid coconpm-columns-<?php echo esc_attr( $columns ); ?>">
 					<?php
 					while ( $products->have_posts() ) :
 						$products->the_post();
@@ -83,6 +157,14 @@ function coconpm_featured_products_shortcode( $atts ) {
 					endwhile;
 					?>
 				</div>
+
+				<?php if ( $view_all_url ) : ?>
+					<div class="coconpm-featured-footer">
+						<a href="<?php echo esc_url( $view_all_url ); ?>" class="coconpm-btn coconpm-btn-primary">
+							<?php echo esc_html( $atts['view_all_text'] ); ?>
+						</a>
+					</div>
+				<?php endif; ?>
 			</div>
 		</section>
 		<?php

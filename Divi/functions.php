@@ -423,6 +423,61 @@ function coconpm_enqueue_mobile_hero_css() {
 add_action( 'wp_enqueue_scripts', 'coconpm_enqueue_mobile_hero_css', 20 );
 
 /**
+ * Homepage team carousel on mobile.
+ */
+function coconpm_enqueue_home_team_carousel() {
+	if ( ! is_front_page() ) {
+		return;
+	}
+
+	$theme_version = et_get_theme_version();
+
+	wp_enqueue_style(
+		'coconpm-home-team-carousel',
+		get_template_directory_uri() . '/css/coconpm-home-team-carousel.css',
+		array( 'divi-style', 'coconpm-mobile-hero' ),
+		$theme_version
+	);
+
+	wp_enqueue_script(
+		'coconpm-home-team-carousel',
+		get_template_directory_uri() . '/js/coconpm-home-team-carousel.js',
+		array(),
+		$theme_version,
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'coconpm_enqueue_home_team_carousel', 21 );
+
+/**
+ * Sync cookie banner offset with measured bottom nav height on mobile.
+ */
+function coconpm_mobile_bottom_stack_js() {
+	?>
+	<script id="coconpm-mobile-bottom-stack">
+	(function () {
+		function syncBottomStack() {
+			var root = document.documentElement;
+			if (window.innerWidth > 980) {
+				root.style.removeProperty('--coconpm-bottom-nav-height');
+				return;
+			}
+			var nav = document.querySelector('.bottom-navigation-menu');
+			var height = nav ? nav.offsetHeight : 64;
+			root.style.setProperty('--coconpm-bottom-nav-height', height + 'px');
+		}
+
+		syncBottomStack();
+		document.addEventListener('DOMContentLoaded', syncBottomStack);
+		window.addEventListener('load', syncBottomStack);
+		window.addEventListener('resize', syncBottomStack);
+	})();
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'coconpm_mobile_bottom_stack_js', 20 );
+
+/**
  * Replace the enqueued Divi style.css file with the applicable version.
  * If Dynamic CSS is disabled, we load the -static file. If RTL is enabled, we load the -rtl file.
  * If on a custom post type, we load the -cpt file. This is also necessary for child themes,

@@ -80,36 +80,38 @@
 /* Override shop grid styles with higher specificity */
 .coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid {
 	display: grid;
+	width: 100%;
 	gap: 24px;
 	margin: 0;
 	margin-bottom: 0;
 }
 
-/* Column variants - Fixed columns that don't stretch */
-/* Higher specificity to override shop CSS */
+/* Column variants - full-width responsive grid */
 .coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-2 {
-	grid-template-columns: repeat(2, minmax(250px, 350px)) !important;
-	justify-content: start;
+	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
 .coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-3 {
-	grid-template-columns: repeat(3, minmax(240px, 350px)) !important;
-	justify-content: start;
+	grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
 
 .coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4 {
-	grid-template-columns: repeat(4, minmax(240px, 300px)) !important;
-	justify-content: start;
+	grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
 }
 
 .coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5 {
-	grid-template-columns: repeat(5, minmax(200px, 240px)) !important;
-	justify-content: start;
+	grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
 }
 
 .coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
-	grid-template-columns: repeat(6, minmax(180px, 200px)) !important;
-	justify-content: start;
+	grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+.coconpm-featured-footer {
+	display: flex;
+	justify-content: center;
+	margin-top: 32px;
+	padding-top: 4px;
 }
 
 /* Product cards maintain consistent size */
@@ -174,13 +176,15 @@
    RESPONSIVE DESIGN
    ============================================ */
 
-/* Large Desktop - adjust 4+ columns to 3 columns */
+/* Large Desktop - keep 4 columns on homepage featured grid */
 @media (max-width: 1200px) {
-	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
+	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4 {
+		grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+	}
+
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
-		grid-template-columns: repeat(3, minmax(240px, 350px)) !important;
-		justify-content: start;
+		grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 	}
 }
 
@@ -207,8 +211,11 @@
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
-		grid-template-columns: repeat(2, minmax(250px, 400px)) !important;
-		justify-content: start;
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	}
+
+	.coconpm-featured-footer {
+		margin-top: 24px;
 	}
 	
 	.coconpm-featured-grid {
@@ -246,8 +253,11 @@
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
-		grid-template-columns: repeat(2, minmax(160px, 1fr)) !important;
-		justify-content: start;
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	}
+
+	.coconpm-featured-footer {
+		margin-top: 20px;
 	}
 }
 
@@ -274,8 +284,7 @@
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-4,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-5,
 	.coconpm-featured-products .coconpm-products-grid.coconpm-featured-grid.coconpm-columns-6 {
-		grid-template-columns: minmax(280px, 400px) !important;
-		justify-content: center;
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	}
 }
 
