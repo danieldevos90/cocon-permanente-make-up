@@ -14,7 +14,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CPM_OPL_VERSION', '0.6.8' );
+// Hub met dynamisch cohort-rooster: niet via LiteSpeed full-page cache serveren.
+$cpm_opl_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+if ( $cpm_opl_uri !== '' && str_contains( $cpm_opl_uri, 'pmu-opleidingen-cocon-cosmetics' ) ) {
+	if ( ! defined( 'LSCACHE_NO_CACHE' ) ) {
+		define( 'LSCACHE_NO_CACHE', true );
+	}
+	if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+		define( 'DONOTCACHEPAGE', true );
+	}
+}
+
+define( 'CPM_OPL_VERSION', '0.6.19' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );
@@ -112,6 +123,37 @@ function cpm_opl_get_mollie_key( string $mode = 'live' ): string {
  * Returns true when plugin should run in Mollie test mode.
  * Defaults to test on local dev (when WP_HOME contains "localhost").
  */
+/**
+ * Leest een key uit .env / .env.local (zelfde paden als Mailchimp).
+ */
+function cpm_opl_env_value( string $key ): string {
+	$paths = [
+		ABSPATH . '../.env',
+		ABSPATH . '../marketing-automations/.env',
+		CPM_OPL_PATH . '.env.local',
+	];
+	$paths = (array) apply_filters( 'cpm_opl_env_paths', $paths );
+	foreach ( $paths as $env_path ) {
+		if ( ! is_string( $env_path ) || ! file_exists( $env_path ) ) {
+			continue;
+		}
+		$lines = @file( $env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+		foreach ( (array) $lines as $line ) {
+			$line = ltrim( $line );
+			if ( $line === '' || $line[0] === '#' ) {
+				continue;
+			}
+			if ( strpos( $line, $key . '=' ) === 0 ) {
+				$val = trim( substr( $line, strlen( $key ) + 1 ) );
+				if ( $val !== '' ) {
+					return $val;
+				}
+			}
+		}
+	}
+	return '';
+}
+
 function cpm_opl_is_test_mode(): bool {
 	$forced = get_option( 'cpm_opl_test_mode', null );
 	if ( $forced !== null && $forced !== '' ) {

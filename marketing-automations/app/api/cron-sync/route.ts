@@ -93,6 +93,19 @@ async function handleCronSync(request: NextRequest) {
     const j = journeyReport.totals;
     log(`Journey done — checked: ${j.checked}, sent: ${j.sent}, skippedOverdue: ${j.skippedOverdue}, errors: ${j.errors}`);
 
+    let whatsappReport: { checked?: number; sent?: number; skipped?: number; failed?: number } | null = null;
+    try {
+      const waMod = await import("../../../../whatsapp-automations/src/salonized-hook.js");
+      whatsappReport = await waMod.runScheduledSends();
+      log(
+        `WhatsApp scheduled done — checked: ${whatsappReport?.checked ?? 0}, ` +
+        `sent: ${whatsappReport?.sent ?? 0}, skipped: ${whatsappReport?.skipped ?? 0}, ` +
+        `failed: ${whatsappReport?.failed ?? 0}`,
+      );
+    } catch (error) {
+      log(`WhatsApp scheduled skipped (module not available): ${(error as Error).message}`);
+    }
+
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
     await writeCronToRedis(dayIso, t, elapsed);
 
@@ -109,7 +122,7 @@ async function handleCronSync(request: NextRequest) {
       log(`Mailchimp campaigns check failed: ${campaignsResult.error}`);
     }
 
-    return NextResponse.json({ ok: true, elapsed: `${elapsed}s`, report, journeyReport });
+    return NextResponse.json({ ok: true, elapsed: `${elapsed}s`, report, journeyReport, whatsappReport });
   } catch (error) {
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
     log(`FAILED after ${elapsed}s — ${(error as Error).message}`);

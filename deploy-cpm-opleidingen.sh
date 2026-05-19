@@ -84,7 +84,8 @@ if [ -f "$ENV_SRC" ]; then
 	echo "→ Mailchimp .env.local sync…"
 	TMP_ENV=$(mktemp)
 	{
-		grep -E '^(API_KEY_MAILCHIMP|MAILCHIMP_API_KEY|MAILCHIMP_LIST_ID)=' "$ENV_SRC" || true
+		grep -E '^(API_KEY_MAILCHIMP|MAILCHIMP_API_KEY|MAILCHIMP_LIST_ID|CPM_OPL_PURGE_SECRET)=' "$ENV_SRC" || true
+		echo "CPM_OPL_PURGE_SECRET=${CPM_OPL_PURGE_SECRET:-cocon-hub-cache-2026-v1}"
 	} > "$TMP_ENV"
 	if [ -s "$TMP_ENV" ]; then
 		curl -sk -m 60 -u "$DA_USER:$DA_PASS" \
@@ -100,6 +101,15 @@ fi
 # Trigger WP (prijs-sync draait op eerste request na deploy)
 curl -sk -m 20 "https://www.coconpermanentemakeup.nl/wp-cron.php?doing_wp_cron=1" >/dev/null || true
 curl -sk -m 20 "https://www.coconpermanentemakeup.nl/" >/dev/null || true
+# Hub: purge + warm cache (LiteSpeed) na deploy
+curl -sk -m 30 -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+	"https://www.coconpermanentemakeup.nl/pmu-opleidingen-cocon-cosmetics/?cpm_deploy=$(date +%s)" >/dev/null || true
+PURGE_KEY="${CPM_OPL_PURGE_SECRET:-cocon-hub-cache-2026-v1}"
+PURGE_RES=$(curl -sk -m 30 -X POST \
+	"https://www.coconpermanentemakeup.nl/wp-json/cpm/v1/purge-hub?key=${PURGE_KEY}" 2>/dev/null || true)
+echo "→ LiteSpeed hub purge: ${PURGE_RES:-(geen response)}"
+curl -sk -m 30 -H 'Cache-Control: no-cache' \
+	"https://www.coconpermanentemakeup.nl/pmu-opleidingen-cocon-cosmetics/?cpm_deploy=$(date +%s)" >/dev/null || true
 
 echo ""
 echo "✓ Deploy klaar."

@@ -4,6 +4,31 @@ import { listAudienceMembers, syncSalonizedContact, addTagsToSubscriber, setSubs
 import { getEmailTemplate } from './templates/index.js';
 import { getNextJourneyEmail, journeyStages } from './automation-manager.js';
 
+/**
+ * Lazy hook into ../whatsapp-automations.
+ *
+ * Wordt aangeroepen na elke succesvolle Mailchimp-update zodat
+ * - de aftercare WhatsApp (indien opt-in + template approved) verstuurd kan worden
+ * - refresh-stages in de WhatsApp Redis-queue worden gepland
+ *
+ * Het pakket is optioneel: als ../whatsapp-automations niet bestaat of
+ * niet geïnstalleerd is, blijft alleen de e-mail-flow lopen.
+ */
+let whatsappHookPromise;
+async function getWhatsAppHook() {
+  if (whatsappHookPromise === undefined) {
+    whatsappHookPromise = import('../../whatsapp-automations/src/salonized-hook.js')
+      .then(mod => mod.onTreatmentProcessed)
+      .catch(error => {
+        if (process.env.WHATSAPP_HOOK_DEBUG === 'true') {
+          console.log('[salonized-sync] WhatsApp hook niet geladen:', error.message);
+        }
+        return null;
+      });
+  }
+  return whatsappHookPromise;
+}
+
 const INTERNAL_SUMMARY_KEYWORDS = [
   'pauze',
   'blok',
@@ -306,6 +331,8 @@ export async function runSalonizedDailySync({
         skippedTooRecent: 0,
         aftercareSent: 0,
         aftercareErrors: 0,
+        whatsappTriggered: 0,
+        whatsappErrors: 0,
         errors: 0,
       },
       details: {
@@ -319,6 +346,8 @@ export async function runSalonizedDailySync({
         skippedTooRecent: [],
         aftercareSent: [],
         aftercareErrors: [],
+        whatsappTriggered: [],
+        whatsappErrors: [],
         errors: [],
       },
     };
@@ -362,6 +391,8 @@ export async function runSalonizedDailySync({
       skippedTooRecent: 0,
       aftercareSent: 0,
       aftercareErrors: 0,
+      whatsappTriggered: 0,
+      whatsappErrors: 0,
       errors: 0,
     },
     details: {
@@ -375,6 +406,8 @@ export async function runSalonizedDailySync({
       skippedTooRecent: [],
       aftercareSent: [],
       aftercareErrors: [],
+      whatsappTriggered: [],
+      whatsappErrors: [],
       errors: [],
     },
   };
@@ -494,6 +527,27 @@ export async function runSalonizedDailySync({
 
     if (aftercareQueue[appointment.treatmentType]) {
       aftercareQueue[appointment.treatmentType].push(member.email_address);
+    }
+
+    const onTreatmentProcessed = await getWhatsAppHook();
+    if (onTreatmentProcessed) {
+      try {
+        const waSummary = await onTreatmentProcessed({
+          email: member.email_address,
+          firstName: appointment.firstName,
+          lastName: appointment.lastName,
+          treatmentType: appointment.treatmentType,
+          treatmentDate: dayIso,
+        });
+        report.totals.whatsappTriggered += 1;
+        report.details.whatsappTriggered.push(waSummary);
+      } catch (error) {
+        report.totals.whatsappErrors += 1;
+        report.details.whatsappErrors.push({
+          email: member.email_address,
+          error: error.message,
+        });
+      }
     }
   }
 

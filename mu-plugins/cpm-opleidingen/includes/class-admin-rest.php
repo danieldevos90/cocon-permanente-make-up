@@ -52,6 +52,14 @@ class Admin_REST {
 			'permission_callback' => $auth,
 			'callback'            => [ __CLASS__, 'diag' ],
 		] );
+		register_rest_route( $ns, '/purge-hub', [
+			'methods'             => 'POST,GET',
+			'permission_callback' => [ __CLASS__, 'purge_hub_permission' ],
+			'callback'            => [ __CLASS__, 'purge_hub_cache' ],
+			'args'                => [
+				'key' => [ 'type' => 'string', 'required' => false ],
+			],
+		] );
 		register_rest_route( $ns, '/admin/enrollments', [
 			'methods'             => 'GET',
 			'permission_callback' => $auth,
@@ -335,6 +343,38 @@ class Admin_REST {
 		return [
 			'enrollment' => $enr,
 			'payments'   => $payments ?: [],
+		];
+	}
+
+	public static function purge_hub_permission( \WP_REST_Request $req ): bool {
+		$secret = cpm_opl_env_value( 'CPM_OPL_PURGE_SECRET' );
+		if ( $secret === '' ) {
+			return false;
+		}
+		$key = (string) ( $req->get_param( 'key' ) ?: $req->get_header( 'X-CPM-Purge-Key' ) );
+		return $key !== '' && hash_equals( $secret, $key );
+	}
+
+	public static function purge_hub_cache( \WP_REST_Request $req ): array {
+		$purged = [];
+		foreach ( Cohort_Schedule::hub_page_ids() as $post_id ) {
+			do_action( 'litespeed_purge_post', (string) $post_id );
+			$url = get_permalink( $post_id );
+			if ( $url ) {
+				do_action( 'litespeed_purge_url', $url );
+				$purged[] = $url;
+			}
+		}
+		$purge_all = filter_var( $req->get_param( 'all' ), FILTER_VALIDATE_BOOLEAN );
+		if ( $purge_all ) {
+			do_action( 'litespeed_purge_all' );
+		}
+		update_option( 'cpm_opl_hub_cache_v', CPM_OPL_VERSION, false );
+		return [
+			'ok'     => true,
+			'purged' => $purged,
+			'plugin' => CPM_OPL_VERSION,
+			'all'    => $purge_all,
 		];
 	}
 

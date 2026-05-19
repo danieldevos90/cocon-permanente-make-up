@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckCircle2, XCircle, Loader2, LogOut } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, LogOut, MessageCircle } from "lucide-react";
 
 type Overview = {
   generatedAt: string;
@@ -36,18 +36,75 @@ type CronEntry = {
   elapsed: string;
 };
 
+type WhatsAppStatus = {
+  ok: boolean;
+  installed: boolean;
+  reason?: string;
+  config?: {
+    dryRun: boolean;
+    provider: string;
+    apiVersion: string;
+    phoneNumberConfigured: boolean;
+    wabaConfigured: boolean;
+    fallbackToEmail: boolean;
+    redisConfigured: boolean;
+  };
+  templates?: Array<{
+    name: string;
+    stage: string;
+    treatmentType: string;
+    metaStatus: string;
+    category: string;
+    language: string;
+  }>;
+  recent?: {
+    configured: boolean;
+    events: Array<{
+      timestamp: string;
+      to?: string;
+      templateName?: string;
+      stage?: string;
+      treatmentType?: string;
+      email?: string;
+      success: boolean;
+      dryRun?: boolean;
+      error?: string;
+    }>;
+  };
+  inbox?: {
+    configured: boolean;
+    messages: Array<{
+      timestamp: string;
+      from?: string;
+      profileName?: string | null;
+      type?: string;
+      text?: string;
+      waMessageId?: string;
+      signatureVerified?: boolean;
+    }>;
+  };
+  scheduled?: Array<{
+    stage: string;
+    treatmentType: string;
+    email: string;
+    due: string;
+  }>;
+};
+
 export default function DashboardPage() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [cronHistory, setCronHistory] = useState<{ entries: CronEntry[]; configured: boolean } | null>(null);
+  const [whatsapp, setWhatsApp] = useState<WhatsAppStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [overviewRes, cronRes] = await Promise.all([
+        const [overviewRes, cronRes, waRes] = await Promise.all([
           fetch("/api/overview"),
           fetch("/api/cron-history"),
+          fetch("/api/whatsapp-status"),
         ]);
         if (overviewRes.ok) {
           const data = await overviewRes.json();
@@ -56,6 +113,10 @@ export default function DashboardPage() {
         if (cronRes.ok) {
           const data = await cronRes.json();
           setCronHistory(data);
+        }
+        if (waRes.ok) {
+          const data = await waRes.json();
+          setWhatsApp(data);
         }
       } catch (err) {
         console.error(err);
@@ -169,6 +230,221 @@ export default function DashboardPage() {
                 {cronHistory?.configured
                   ? "Geen cron runs gevonden in Redis."
                   : "Configureer UPSTASH_REDIS_REST_URL en UPSTASH_REDIS_REST_TOKEN voor cron history."}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* WhatsApp */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-green-600" />
+              WhatsApp automation
+            </CardTitle>
+            <CardDescription>
+              {whatsapp?.installed
+                ? whatsapp.config?.dryRun
+                  ? "Module geïnstalleerd — DRY RUN (geen live verzending)"
+                  : "Module geïnstalleerd — LIVE"
+                : `Niet geïnstalleerd${whatsapp?.reason ? ` (${whatsapp.reason})` : ""}`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {whatsapp?.installed && whatsapp.config && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Mode:</span>{" "}
+                  <span className={whatsapp.config.dryRun ? "text-yellow-600 font-medium" : "text-green-600 font-medium"}>
+                    {whatsapp.config.dryRun ? "DRY RUN" : "LIVE"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Provider:</span>{" "}
+                  <span className="font-medium">{whatsapp.config.provider}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">API:</span>{" "}
+                  <span className="font-medium">{whatsapp.config.apiVersion}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Phone:</span>{" "}
+                  <span className={whatsapp.config.phoneNumberConfigured ? "text-green-600" : "text-muted-foreground"}>
+                    {whatsapp.config.phoneNumberConfigured ? "configured" : "not set"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">WABA:</span>{" "}
+                  <span className={whatsapp.config.wabaConfigured ? "text-green-600" : "text-muted-foreground"}>
+                    {whatsapp.config.wabaConfigured ? "configured" : "not set"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Fallback email:</span>{" "}
+                  <span className="font-medium">{whatsapp.config.fallbackToEmail ? "aan" : "uit"}</span>
+                </div>
+              </div>
+            )}
+
+            {whatsapp?.templates && whatsapp.templates.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Templates</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Naam</TableHead>
+                      <TableHead>Stage</TableHead>
+                      <TableHead>Treatment</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Meta status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {whatsapp.templates.map((t) => (
+                      <TableRow key={t.name}>
+                        <TableCell className="font-mono text-xs">{t.name}</TableCell>
+                        <TableCell>{t.stage}</TableCell>
+                        <TableCell>{t.treatmentType}</TableCell>
+                        <TableCell>{t.category}</TableCell>
+                        <TableCell>
+                          <span
+                            className={
+                              t.metaStatus === "approved"
+                                ? "text-green-600 font-medium"
+                                : t.metaStatus === "pending"
+                                  ? "text-yellow-600 font-medium"
+                                  : "text-destructive font-medium"
+                            }
+                          >
+                            {t.metaStatus}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {whatsapp?.scheduled && whatsapp.scheduled.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">
+                  Geplande sends ({whatsapp.scheduled.length})
+                </h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Stage</TableHead>
+                      <TableHead>Treatment</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Due</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {whatsapp.scheduled.slice(0, 20).map((s, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{s.stage}</TableCell>
+                        <TableCell>{s.treatmentType}</TableCell>
+                        <TableCell className="font-mono text-xs">{s.email}</TableCell>
+                        <TableCell>{new Date(s.due).toLocaleString("nl-NL")}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {whatsapp?.inbox && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">
+                  Recente klant-replies (observer mode)
+                </h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Binnenkomende berichten worden alleen gelogd — Daniela reageert vanaf de telefoon (coexistence).
+                </p>
+                {whatsapp.inbox.messages.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tijd</TableHead>
+                        <TableHead>Van</TableHead>
+                        <TableHead>Naam</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Bericht</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {whatsapp.inbox.messages.slice(0, 15).map((m, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="text-xs">{new Date(m.timestamp).toLocaleString("nl-NL")}</TableCell>
+                          <TableCell className="font-mono text-xs">{m.from || "-"}</TableCell>
+                          <TableCell>{m.profileName || "-"}</TableCell>
+                          <TableCell className="text-xs">{m.type || "-"}</TableCell>
+                          <TableCell className="text-sm max-w-md truncate" title={m.text || ""}>{m.text || "-"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    {whatsapp.inbox.configured
+                      ? "Geen inkomende berichten in laatste 7 dagen"
+                      : "Redis niet geconfigureerd — geen historie"}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {whatsapp?.recent && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">
+                  Recente events (laatste 7 dagen)
+                </h3>
+                {whatsapp.recent.events.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tijd</TableHead>
+                        <TableHead>Template</TableHead>
+                        <TableHead>To</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {whatsapp.recent.events.slice(0, 15).map((e, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="text-xs">{new Date(e.timestamp).toLocaleString("nl-NL")}</TableCell>
+                          <TableCell className="font-mono text-xs">{e.templateName || "-"}</TableCell>
+                          <TableCell className="font-mono text-xs">{e.to || e.email || "-"}</TableCell>
+                          <TableCell>
+                            {e.success ? (
+                              <span className="text-green-600 font-medium">
+                                {e.dryRun ? "DRY" : "OK"}
+                              </span>
+                            ) : (
+                              <span className="text-destructive font-medium" title={e.error}>
+                                FAIL
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    {whatsapp.recent.configured
+                      ? "Geen events in laatste 7 dagen"
+                      : "Redis niet geconfigureerd — geen historie"}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {!whatsapp?.installed && (
+              <p className="text-muted-foreground text-sm">
+                Installeer de WhatsApp-module: <code className="font-mono">cd whatsapp-automations && npm install</code>.
+                Zie <code className="font-mono">whatsapp-automations/README.md</code> voor de Meta setup.
               </p>
             )}
           </CardContent>
