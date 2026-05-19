@@ -77,7 +77,7 @@ class WooCommerce_Hide {
 	public static function block_add_to_cart( bool $passed, int $product_id ): bool {
 		if ( self::is_deposit_product( $product_id ) ) {
 			wc_add_notice(
-				'Inschrijven voor deze opleiding verloopt via ons inschrijfformulier (incl. btw, termijnbetaling).',
+				'Inschrijven voor deze opleiding verloopt via ons inschrijfformulier (prijzen excl. btw, termijnbetaling).',
 				'notice'
 			);
 			return false;

@@ -54,29 +54,33 @@ function assert_throws( callable $fn, string $needle, string $label ): void {
 
 echo "\n[suite] Payment_Plan::build\n";
 
+// Bedragen in centen incl. 21% btw (zoals Mollie incasseert).
+$basis_total  = 719950;  // €5.950 excl.
+$basis_deposit = 151250; // €1.250 excl.
+
 // 1 termijn = volledig nu
-$plan = Payment_Plan::build( 595000, 0, 1, '2026-12-01', '2026-04-28' );
+$plan = Payment_Plan::build( $basis_total, 0, 1, '2026-12-01', '2026-04-28' );
 assert_equal( 1, count( $plan ),                 '1-termijn: één entry' );
-assert_equal( 595000, $plan[0]['amount_cents'],  '1-termijn: volledig bedrag' );
+assert_equal( $basis_total, $plan[0]['amount_cents'],  '1-termijn: volledig bedrag' );
 assert_equal( '2026-04-28', $plan[0]['due_date'], '1-termijn: due_date = vandaag' );
 
-// 2 termijnen + aanbetaling van 1250 op 5950
-$plan = Payment_Plan::build( 595000, 125000, 2, '2026-12-01', '2026-04-28' );
+// 2 termijnen + aanbetaling
+$plan = Payment_Plan::build( $basis_total, $basis_deposit, 2, '2026-12-01', '2026-04-28' );
 assert_equal( 2, count( $plan ),                 '2-termijn: twee entries' );
-assert_equal( 125000, $plan[0]['amount_cents'], '2-termijn: termijn1 = aanbetaling' );
+assert_equal( $basis_deposit, $plan[0]['amount_cents'], '2-termijn: termijn1 = aanbetaling' );
 assert_equal( true, $plan[0]['is_deposit'],     '2-termijn: termijn1 is_deposit=true' );
-assert_equal( 470000, $plan[1]['amount_cents'], '2-termijn: termijn2 = totaal - aanbetaling' );
+assert_equal( $basis_total - $basis_deposit, $plan[1]['amount_cents'], '2-termijn: termijn2 = totaal - aanbetaling' );
 assert_equal( '2026-11-17', $plan[1]['due_date'], '2-termijn: termijn2 due = startdatum -14 dgn' );
 
 // 3 termijnen + aanbetaling — sum moet exact total zijn
-$plan = Payment_Plan::build( 595000, 125000, 3, '2026-12-01', '2026-04-28' );
+$plan = Payment_Plan::build( $basis_total, $basis_deposit, 3, '2026-12-01', '2026-04-28' );
 assert_equal( 3, count( $plan ),                 '3-termijn: drie entries' );
-assert_equal( 125000, $plan[0]['amount_cents'], '3-termijn: aanbetaling' );
+assert_equal( $basis_deposit, $plan[0]['amount_cents'], '3-termijn: aanbetaling' );
 $sum  = array_sum( array_column( $plan, 'amount_cents' ) );
-assert_equal( 595000, $sum,                     '3-termijn: som = totaal (cent-precisie)' );
+assert_equal( $basis_total, $sum,                     '3-termijn: som = totaal (cent-precisie)' );
 assert_equal( '2026-11-17', $plan[2]['due_date'], '3-termijn: laatste due = startdatum -14 dgn' );
 $rest_termijnen = $plan[1]['amount_cents'] + $plan[2]['amount_cents'];
-assert_equal( 470000, $rest_termijnen,          '3-termijn: 2x rest = totaal - aanbetaling' );
+assert_equal( $basis_total - $basis_deposit, $rest_termijnen,          '3-termijn: 2x rest = totaal - aanbetaling' );
 
 // 3 termijnen ZONDER aanbetaling — N gelijke delen
 $plan = Payment_Plan::build( 600000, 0, 3, '2026-12-01', '2026-04-28' );
@@ -95,18 +99,18 @@ assert_equal( 34, $plan[2]['amount_cents'],     'rounding: laatste termijn vangt
 
 // Deadline al verstreken → 2 termijnen niet meer mogelijk
 assert_throws(
-	static fn() => Payment_Plan::build( 595000, 125000, 2, '2026-05-05', '2026-04-28' ),
+	static fn() => Payment_Plan::build( $basis_total, $basis_deposit, 2, '2026-05-05', '2026-04-28' ),
 	'Te kort dag',
 	'deadline: 2 termijnen geblokkeerd als <14 dgn voor start'
 );
 
 // Deadline al verstreken → 1 termijn nog wel mogelijk
-$plan = Payment_Plan::build( 595000, 0, 1, '2026-05-05', '2026-04-28' );
+$plan = Payment_Plan::build( $basis_total, 0, 1, '2026-05-05', '2026-04-28' );
 assert_equal( 1, count( $plan ),                 'deadline: 1-termijn werkt altijd' );
 
 // Startdatum in verleden → exception
 assert_throws(
-	static fn() => Payment_Plan::build( 595000, 0, 1, '2025-01-01', '2026-04-28' ),
+	static fn() => Payment_Plan::build( $basis_total, 0, 1, '2025-01-01', '2026-04-28' ),
 	'verleden',
 	'verleden: startdatum in verleden geweigerd'
 );

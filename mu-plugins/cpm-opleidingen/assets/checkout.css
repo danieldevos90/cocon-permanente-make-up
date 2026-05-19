@@ -405,6 +405,14 @@
 	color: var(--cpm-gold) !important;
 	white-space: nowrap;
 }
+.cpm-opl-schedule__group-note {
+	margin: 4px 0 0 !important;
+	padding: 0 !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	color: var(--cpm-muted) !important;
+	line-height: 1.4 !important;
+}
 
 .cpm-opl-schedule__list {
 	list-style: none !important;

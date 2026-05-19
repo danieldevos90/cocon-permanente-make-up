@@ -169,7 +169,7 @@ class Cohort_Schedule {
 				<header class="cpm-opl-schedule__intro">
 					<p class="cpm-opl-schedule__eyebrow">Cocon Academy</p>
 					<h2 class="cpm-opl-schedule__title">Komende startdata</h2>
-					<p class="cpm-opl-schedule__lead">Kies je opleiding en schrijf je direct in. Alle bedragen zijn incl. 21% btw.</p>
+					<p class="cpm-opl-schedule__lead">Kies je opleiding en schrijf je direct in. Alle bedragen zijn excl. 21% btw.</p>
 				</header>
 
 				<?php foreach ( $by_template as $template => $items ) : ?>
@@ -182,6 +182,9 @@ class Cohort_Schedule {
 							<h3 class="cpm-opl-schedule__group-title"><?php echo esc_html( $label ); ?></h3>
 							<?php if ( $price ) : ?>
 								<p class="cpm-opl-schedule__group-price"><?php echo esc_html( $price ); ?></p>
+							<?php endif; ?>
+							<?php if ( $template === 'masterclass-3d-nano-brows' ) : ?>
+								<p class="cpm-opl-schedule__group-note">Optionele uitbreidingsdag Combi Brows: <?php echo esc_html( Pricing::format_eur_excl( 60000 ) ); ?></p>
 							<?php endif; ?>
 						</div>
 						<ul class="cpm-opl-schedule__list">
@@ -258,7 +261,7 @@ class Cohort_Schedule {
 		if ( $total <= 0 ) {
 			return '';
 		}
-		return 'Investering ' . Pricing::format_eur( $total ) . ' incl. btw';
+		return Pricing::format_eur_excl( $total );
 	}
 
 	/**
@@ -368,7 +371,7 @@ class Cohort_Schedule {
 	private static function template_label( string $template ): string {
 		$labels = [
 			'pmu-opleiding-wenkbrauwen' => 'Basisopleiding wenkbrauwen',
-			'masterclass-3d-nano-brows' => '3D Nano Brows masterclass',
+			'masterclass-3d-nano-brows' => '3D Nano Brows masterclass (+ optionele uitbreiding Combi Brows)',
 		];
 		return $labels[ $template ] ?? ucfirst( str_replace( '-', ' ', $template ) );
 	}

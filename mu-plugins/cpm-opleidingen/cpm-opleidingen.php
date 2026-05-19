@@ -25,7 +25,7 @@ if ( $cpm_opl_uri !== '' && str_contains( $cpm_opl_uri, 'pmu-opleidingen-cocon-c
 	}
 }
 
-define( 'CPM_OPL_VERSION', '0.6.19' );
+define( 'CPM_OPL_VERSION', '0.6.28' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );

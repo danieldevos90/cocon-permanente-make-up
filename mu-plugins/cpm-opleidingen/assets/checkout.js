@@ -33,8 +33,13 @@
 		return useAddon ? preview.with_addon : preview.base;
 	};
 
+	const BTW = 1.21;
+	const exclFromIncl = (incl) => Math.round(Number(incl) / BTW);
+
 	const fmtEUR = (cents) =>
 		'\u20AC\u00A0' + (Number(cents) / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+	const fmtExclEUR = (inclCents) => `${fmtEUR(exclFromIncl(inclCents))} excl. btw`;
 
 	const MONTHS_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
 	const fmtDateNL = (iso) => {
@@ -54,7 +59,7 @@
 			`<tr>
 				<td>${row.is_deposit ? 'Aanbetaling' : 'Termijn ' + row.termijn}</td>
 				<td>${fmtDateNL(row.due_date)}</td>
-				<td>${fmtEUR(row.amount_cents)}</td>
+				<td>${fmtExclEUR(row.amount_cents)}</td>
 			</tr>`
 		).join('');
 		scheduleEl.innerHTML =
@@ -77,12 +82,12 @@
 			const num = parseInt(n, 10);
 			const amtEl = card.querySelector('.cpm-opl-plan-card__amount');
 			const restEl = card.querySelector('.cpm-opl-plan-card__rest');
-			if (amtEl) amtEl.textContent = fmtEUR(first);
+			if (amtEl) amtEl.textContent = fmtExclEUR(first);
 			if (restEl) {
 				if (num === 1) {
 					restEl.innerHTML = 'Geen vervolg\u00ADtermijnen';
 				} else {
-					restEl.innerHTML = `Daarna ${num - 1}&times; ${fmtEUR(last)}`;
+					restEl.innerHTML = `Daarna ${num - 1}&times; ${fmtExclEUR(last)}`;
 				}
 			}
 		});
@@ -94,16 +99,18 @@
 		const base = Number(wrap.dataset.cpmInvBase || 0);
 		const addon = Number(wrap.dataset.cpmInvAddon || 0);
 		const cb = form.querySelector('input[name="addon_combi"]');
+		const exclLabel = (cents) => `${fmtEUR(cents)} excl. btw`;
+
 		if (!addon || !cb) {
-			wrap.textContent = `${fmtEUR(base)} incl. btw`;
+			wrap.textContent = exclLabel(base);
 			return;
 		}
 		if (cb.checked) {
 			wrap.innerHTML =
-				`${fmtEUR(base + addon)} incl. btw<br>` +
-				`<span class="cpm-opl-investment__note">(${fmtEUR(base)} opleiding + ${fmtEUR(addon)} optionele vervolgdag)</span>`;
+				`${exclLabel(base + addon)}<br>` +
+				`<span class="cpm-opl-investment__note">(${exclLabel(base)} opleiding + ${exclLabel(addon)} optionele vervolgdag)</span>`;
 		} else {
-			wrap.textContent = `${fmtEUR(base)} incl. btw`;
+			wrap.textContent = exclLabel(base);
 		}
 	};
 

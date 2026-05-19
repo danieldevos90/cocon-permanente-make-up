@@ -66,6 +66,10 @@ class Shortcode {
 		}
 		$addon_price = (int) ( $cohort['addon_price_cents'] ?? 0 );
 		$addon_date  = trim( (string) ( $cohort['addon_date'] ?? '' ) );
+		if ( $addon_date === '' && $addon_price > 0 && ( $cohort['template'] ?? '' ) === 'masterclass-3d-nano-brows' ) {
+			$addon_date = Pricing::addon_date_for_masterclass( (string) ( $cohort['start_date'] ?? '' ) );
+			$cohort['addon_date'] = $addon_date;
+		}
 		if ( $addon_price > 0 && $addon_date !== '' ) {
 			$preview['with_addon'] = [];
 			$grand_total = (int) $cohort['total_price_cents'] + $addon_price;

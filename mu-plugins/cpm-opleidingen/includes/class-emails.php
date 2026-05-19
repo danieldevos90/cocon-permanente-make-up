@@ -35,6 +35,10 @@ class Emails {
 		return ( $currency === 'EUR' ? '€ ' : $currency . ' ' ) . number_format( $cents / 100, 2, ',', '.' );
 	}
 
+	private static function format_amount_excl( int $incl_cents, string $currency = 'EUR' ): string {
+		return self::format_amount( Pricing::excl_from_incl_cents( $incl_cents ), $currency ) . ' excl. btw';
+	}
+
 	private static function payments_table( array $payments, string $currency = 'EUR' ): string {
 		$rows = '';
 		foreach ( $payments as $p ) {
@@ -43,7 +47,7 @@ class Emails {
 				'<tr><td style="padding:8px;border-top:1px solid #eee">%s</td><td style="padding:8px;border-top:1px solid #eee">%s</td><td style="padding:8px;border-top:1px solid #eee;text-align:right">%s</td><td style="padding:8px;border-top:1px solid #eee"><a href="%s">Betalen</a></td></tr>',
 				esc_html( $label ),
 				esc_html( $p['due_date'] ),
-				esc_html( self::format_amount( (int) $p['amount_cents'], $currency ) ),
+				esc_html( self::format_amount_excl( (int) $p['amount_cents'], $currency ) ),
 				esc_url( $p['mollie_url'] )
 			);
 		}
@@ -76,10 +80,10 @@ class Emails {
 			$label = trim( (string) ( $cohort['addon_label'] ?? 'optionele vervolgdag' ) );
 			$d     = self::dutch_iso_date_lite( (string) ( $cohort['addon_date'] ?? '' ) );
 			$addon_p = sprintf(
-				'<p>Je registratie omvat ook <strong>%s</strong> op <strong>%s</strong> (%s incl. btw).</p>',
+				'<p>Je registratie omvat ook <strong>%s</strong> op <strong>%s</strong> (%s).</p>',
 				esc_html( $label ),
 				esc_html( $d ),
-				esc_html( self::format_amount( $addons, $enr['currency'] ) )
+				esc_html( self::format_amount_excl( $addons, $enr['currency'] ) )
 			);
 		}
 
@@ -97,7 +101,7 @@ class Emails {
 			esc_html( $cohort['start_date'] ?? '' ),
 			$addon_p,
 			self::payments_table( $payments, $enr['currency'] ),
-			self::format_amount( (int) $enr['total_amount_cents'], $enr['currency'] ),
+			self::format_amount_excl( (int) $enr['total_amount_cents'], $enr['currency'] ),
 			(int) $enr['num_termijnen'],
 			esc_html( $cohort['location'] ?? '' )
 		);
@@ -167,7 +171,7 @@ class Emails {
 			(int) $payment['termijn_index'],
 			esc_html( $cohort['title'] ?? 'Opleiding' ),
 			esc_html( $payment['due_date'] ),
-			esc_html( self::format_amount( (int) $payment['amount_cents'], $payment['currency'] ) ),
+			esc_html( self::format_amount_excl( (int) $payment['amount_cents'], $payment['currency'] ) ),
 			esc_url( $payment['mollie_url'] )
 		);
 		self::send_html( $enr['student_email'], 'Herinnering: betaling termijn ' . (int) $payment['termijn_index'], $html );

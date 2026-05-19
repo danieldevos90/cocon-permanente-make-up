@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $fmt = static fn( int $cents ) => '€&nbsp;' . number_format( $cents / 100, 2, ',', '.' );
+$fmt_excl = static fn( int $excl_cents ) => $fmt( $excl_cents ) . ' excl. btw';
+$fmt_plan = static fn( int $incl_cents ) => $fmt_excl( Pricing::excl_from_incl_cents( $incl_cents ) );
 
 $dutch_date = static function ( string $iso ): string {
 	if ( ! $iso ) {
@@ -30,10 +32,28 @@ $date_label = $cohort['end_date']
 
 $preview_base       = isset( $preview['base'] ) && is_array( $preview['base'] ) ? $preview['base'] : $preview;
 $preview_with_addon = isset( $preview['with_addon'] ) && is_array( $preview['with_addon'] ) ? $preview['with_addon'] : null;
-$addon_price        = (int) ( $cohort['addon_price_cents'] ?? 0 );
+$total_excl = (int) ( $cohort['total_price_excl_cents'] ?? 0 );
+if ( $total_excl <= 0 ) {
+	$total_excl = (int) ( $cohort['total_price_cents'] ?? 0 );
+}
+$addon_price_excl = (int) ( $cohort['addon_price_excl_cents'] ?? 0 );
+if ( $addon_price_excl <= 0 ) {
+	$addon_price_excl = (int) ( $cohort['addon_price_cents'] ?? 0 );
+}
 $addon_date         = (string) ( $cohort['addon_date'] ?? '' );
 $addon_label        = trim( (string) ( $cohort['addon_label'] ?? '' ) );
-$has_addon          = $addon_price > 0 && $addon_date !== '';
+if ( $addon_date === '' && $addon_price_excl > 0 && ( $cohort['template'] ?? '' ) === 'masterclass-3d-nano-brows' ) {
+	$start_iso = (string) ( $cohort['start_date'] ?? '' );
+	if ( $start_iso !== '' ) {
+		$month = (int) substr( $start_iso, 5, 2 );
+		if ( $month <= 9 ) {
+			$addon_date = '2026-11-18';
+		} elseif ( $month === 11 ) {
+			$addon_date = '2026-11-27';
+		}
+	}
+}
+$has_addon          = $addon_price_excl > 0 && $addon_date !== '';
 if ( $addon_label === '' ) {
 	$addon_label = 'Combi Brows-vervolgdag';
 }
@@ -73,14 +93,16 @@ if ( $addon_label === '' ) {
 				</div>
 			<?php endif; ?>
 			<div>
-				<dt>Investering</dt>
+				<dt>Prijs</dt>
 				<dd>
 					<span
 						class="cpm-opl-investment"
-						data-cpm-inv-base="<?php echo esc_attr( (string) (int) $cohort['total_price_cents'] ); ?>"
-						data-cpm-inv-addon="<?php echo esc_attr( (string) $addon_price ); ?>"
+						data-cpm-inv-base="<?php echo esc_attr( (string) $total_excl ); ?>"
+						data-cpm-inv-addon="<?php echo esc_attr( (string) $addon_price_excl ); ?>"
+						data-cpm-inv-base-incl="<?php echo esc_attr( (string) (int) ( $cohort['total_price_cents'] ?? 0 ) ); ?>"
+						data-cpm-inv-addon-incl="<?php echo esc_attr( (string) (int) round( $addon_price_excl * 1.21 ) ); ?>"
 					>
-						<?php echo wp_kses_post( $fmt( (int) $cohort['total_price_cents'] ) ); ?> incl. btw
+						<?php echo wp_kses_post( $fmt_excl( $total_excl ) ); ?>
 					</span>
 				</dd>
 			</div>
@@ -127,7 +149,7 @@ if ( $addon_label === '' ) {
 						<span class="cpm-opl-addon__title">Optioneel — <?php echo esc_html( $addon_label ); ?></span>
 						<span class="cpm-opl-addon__detail">
 							Datum: <?php echo esc_html( $dutch_date( $addon_date ) ); ?>
-							&nbsp;·&nbsp;+ <?php echo wp_kses_post( $fmt( $addon_price ) ); ?> incl. btw
+							&nbsp;·&nbsp;+ <?php echo wp_kses_post( $fmt_excl( $addon_price_excl ) ); ?>
 						</span>
 					</span>
 				</label>
@@ -156,7 +178,7 @@ if ( $addon_label === '' ) {
 						<input type="radio" name="num_termijnen" value="<?php echo (int) $n; ?>" <?php checked( $idx === 0 ); ?> required>
 						<span class="cpm-opl-plan-card">
 							<span class="cpm-opl-plan-card__title"><?php echo esc_html( $plan_label ); ?></span>
-							<span class="cpm-opl-plan-card__amount"><?php echo wp_kses_post( $fmt( (int) $first_amt ) ); ?></span>
+							<span class="cpm-opl-plan-card__amount"><?php echo wp_kses_post( $fmt_plan( (int) $first_amt ) ); ?></span>
 							<span class="cpm-opl-plan-card__sub">
 								<?php if ( $n === 1 ) : ?>
 									totaal, vandaag
@@ -168,7 +190,7 @@ if ( $addon_label === '' ) {
 								<?php if ( $n === 1 ) : ?>
 									Geen vervolg&shy;termijnen
 								<?php else : ?>
-									Daarna <?php echo (int) ( $n - 1 ); ?>× <?php echo wp_kses_post( $fmt( (int) $per_term ) ); ?>
+									Daarna <?php echo (int) ( $n - 1 ); ?>× <?php echo wp_kses_post( $fmt_plan( (int) $per_term ) ); ?>
 								<?php endif; ?>
 							</span>
 						</span>
@@ -178,6 +200,7 @@ if ( $addon_label === '' ) {
 
 			<div class="cpm-opl-schedule">
 				<h4>Betalingsschema</h4>
+				<p class="cpm-opl-note">Alle bedragen zijn excl. 21% btw.</p>
 				<?php
 				$default_n    = $options[0];
 				$default_plan = $preview_base[ $default_n ] ?? [];
@@ -190,7 +213,7 @@ if ( $addon_label === '' ) {
 							<tr>
 								<td><?php echo $row['is_deposit'] ? 'Aanbetaling' : 'Termijn ' . (int) $row['termijn']; ?></td>
 								<td><?php echo esc_html( $dutch_date( (string) $row['due_date'] ) ); ?></td>
-								<td><?php echo wp_kses_post( $fmt( (int) $row['amount_cents'] ) ); ?></td>
+								<td><?php echo wp_kses_post( $fmt_plan( (int) $row['amount_cents'] ) ); ?></td>
 							</tr>
 						<?php endforeach; ?>
 						</tbody>

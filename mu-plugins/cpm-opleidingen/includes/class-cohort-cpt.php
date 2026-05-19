@@ -157,7 +157,7 @@ class Cohort_CPT {
 				<input type="date" name="cpm_end_date" value="<?php echo esc_attr( $end ); ?>">
 			</div>
 			<div>
-				<label>Totale prijs (in centen, incl. btw)</label>
+				<label>Totale prijs (in centen, excl. btw)</label>
 				<input type="number" min="0" step="1" name="cpm_total_price_cents" value="<?php echo esc_attr( $price ); ?>" required>
 				<div class="cpm-money-hint">Voorbeeld: <code>595000</code> = € 5.950,00</div>
 			</div>
@@ -239,9 +239,16 @@ class Cohort_CPT {
 			return null;
 		}
 		$start = (string) get_post_meta( $post_id, '_cpm_start_date', true );
-		$total = (int) get_post_meta( $post_id, '_cpm_total_price_cents', true );
-		if ( ! $start || ! $total ) {
+		$total_excl = (int) get_post_meta( $post_id, '_cpm_total_price_cents', true );
+		if ( ! $start || ! $total_excl ) {
 			return null;
+		}
+		$deposit_excl = (int) get_post_meta( $post_id, '_cpm_deposit_cents', true );
+		$addon_excl   = max( 0, (int) get_post_meta( $post_id, '_cpm_addon_price_cents', true ) );
+		$template     = (string) get_post_meta( $post_id, '_cpm_template', true ) ?: Cohort_Defaults::DEFAULT_TEMPLATE;
+		$addon_date   = (string) get_post_meta( $post_id, '_cpm_addon_date', true );
+		if ( $addon_date === '' && $addon_excl > 0 && $template === 'masterclass-3d-nano-brows' ) {
+			$addon_date = Pricing::addon_date_for_masterclass( $start );
 		}
 		$defaults = Cohort_Defaults::for_cohort( $post_id );
 		return [
@@ -249,13 +256,16 @@ class Cohort_CPT {
 			'title'              => get_the_title( $post ),
 			'start_date'         => $start,
 			'end_date'           => (string) get_post_meta( $post_id, '_cpm_end_date', true ),
-			'total_price_cents'  => $total,
-			'deposit_cents'      => (int) get_post_meta( $post_id, '_cpm_deposit_cents', true ),
+			'total_price_excl_cents' => $total_excl,
+			'deposit_excl_cents'     => $deposit_excl,
+			'addon_price_excl_cents' => $addon_excl,
+			'total_price_cents'  => Pricing::incl_cents( $total_excl ),
+			'deposit_cents'      => Pricing::incl_cents( $deposit_excl ),
 			'max_termijnen'      => max( 1, min( 3, (int) get_post_meta( $post_id, '_cpm_max_termijnen', true ) ?: 3 ) ),
 			'max_students'       => (int) get_post_meta( $post_id, '_cpm_max_students', true ) ?: 5,
 			'location'           => (string) get_post_meta( $post_id, '_cpm_location', true ),
 			'currency'           => (string) get_post_meta( $post_id, '_cpm_currency', true ) ?: 'EUR',
-			'template'           => (string) get_post_meta( $post_id, '_cpm_template', true ) ?: Cohort_Defaults::DEFAULT_TEMPLATE,
+			'template'           => $template,
 			// Rich content — leeg veld? → defaults uit template, zodat ELK
 			// event-product automatisch dezelfde stijl + structuur heeft.
 			'hero_image_url'     => self::resolve_hero_image( $post_id ),
@@ -291,8 +301,8 @@ class Cohort_CPT {
 				(string) get_post_meta( $post_id, '_cpm_intro_html', true ),
 				(string) ( $defaults['intro_html'] ?? '' )
 			),
-			'addon_price_cents'  => max( 0, (int) get_post_meta( $post_id, '_cpm_addon_price_cents', true ) ),
-			'addon_date'         => (string) get_post_meta( $post_id, '_cpm_addon_date', true ),
+			'addon_price_cents'  => $addon_excl > 0 ? Pricing::incl_cents( $addon_excl ) : 0,
+			'addon_date'         => $addon_date,
 			'addon_label'        => trim( (string) get_post_meta( $post_id, '_cpm_addon_label', true ) ),
 		];
 	}

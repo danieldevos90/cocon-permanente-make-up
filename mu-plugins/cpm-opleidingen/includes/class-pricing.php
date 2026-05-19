@@ -1,7 +1,7 @@
 <?php
 /**
- * Canonieke prijzen incl. btw (centen) per opleiding-template.
- * Gelijk aan Salonized Cocon Academy + website-inschrijfbedragen.
+ * Canonieke prijzen excl. btw (centen) per opleiding-template.
+ * Website toont excl.; Mollie rekent incl. 21% btw af.
  */
 
 namespace CPM_Opleidingen;
@@ -15,7 +15,9 @@ class Pricing {
 	const LOCATION = 'Korte Hoogstraat 29A, Vlaardingen';
 
 	const SYNC_OPTION = 'cpm_opl_pricing_sync_version';
-	const SYNC_VERSION = '2';
+	const SYNC_VERSION = '4';
+
+	const BTW_RATE = 1.21;
 
 	/**
 	 * @return array<string,array<string,mixed>>
@@ -32,20 +34,34 @@ class Pricing {
 				'addon_price_cents' => 0,
 				'addon_date'        => '',
 				'addon_label'       => '',
+				'canonical_start'   => '2026-09-23',
 			],
 			'masterclass-3d-nano-brows' => [
-				// Salonized: aanbetaling €500 + restant €2.404 = €2.904 incl. btw
-				'total_price_cents' => 290400,
-				'deposit_cents'     => 50000,
+				'total_price_cents' => 240000,
+				'deposit_cents'     => 41322,
 				'max_termijnen'     => 3,
 				'max_students'      => 5,
 				'location'          => self::LOCATION,
 				'currency'          => 'EUR',
-				'addon_price_cents' => 72600,
-				'addon_label'       => 'Combi Brows-vervolgdag',
+				'addon_price_cents' => 60000,
+				'addon_label'       => 'Combi Brows-vervolgdag (optionele uitbreidingsdag)',
 			],
 		];
 		return (array) apply_filters( 'cpm_opl_pricing_products', $products );
+	}
+
+	public static function incl_cents( int $excl_cents ): int {
+		if ( $excl_cents <= 0 ) {
+			return 0;
+		}
+		return (int) round( $excl_cents * self::BTW_RATE );
+	}
+
+	public static function excl_from_incl_cents( int $incl_cents ): int {
+		if ( $incl_cents <= 0 ) {
+			return 0;
+		}
+		return (int) round( $incl_cents / self::BTW_RATE );
 	}
 
 	/**
@@ -65,9 +81,6 @@ class Pricing {
 		return $map[ $template ] ?? '';
 	}
 
-	/**
-	 * Eenmalig: cohort-meta alignen met canonieke incl.-prijzen (live + nieuwe cohorts).
-	 */
 	public static function maybe_sync_cohorts(): void {
 		if ( get_option( self::SYNC_OPTION ) === self::SYNC_VERSION ) {
 			return;
@@ -129,7 +142,65 @@ class Pricing {
 			update_post_meta( $cohort_id, '_cpm_template', $template );
 			$changed = true;
 		}
+
+		$changed = self::sync_cohort_content( $cohort_id, $template ) || $changed;
+
 		return $changed;
+	}
+
+	private static function sync_cohort_content( int $cohort_id, string $template ): bool {
+		$changed  = false;
+		$defaults = Cohort_Defaults::for_cohort( $cohort_id );
+
+		if ( ! empty( $defaults['trainer_name'] ) ) {
+			$trainer = (string) $defaults['trainer_name'];
+			if ( (string) get_post_meta( $cohort_id, '_cpm_trainer_name', true ) !== $trainer ) {
+				update_post_meta( $cohort_id, '_cpm_trainer_name', $trainer );
+				$changed = true;
+			}
+		}
+
+		$product = self::defaults_for_template( $template );
+		if ( ! $product ) {
+			return $changed;
+		}
+
+		if ( $template === 'pmu-opleiding-wenkbrauwen' && ! empty( $product['canonical_start'] ) ) {
+			$start = (string) $product['canonical_start'];
+			if ( (string) get_post_meta( $cohort_id, '_cpm_start_date', true ) !== $start ) {
+				update_post_meta( $cohort_id, '_cpm_start_date', $start );
+				$changed = true;
+			}
+		}
+
+		if ( $template === 'masterclass-3d-nano-brows' && (int) ( $product['addon_price_cents'] ?? 0 ) > 0 ) {
+			$start = (string) get_post_meta( $cohort_id, '_cpm_start_date', true );
+			$addon = self::masterclass_addon_date_for_start( $start );
+			if ( $addon && (string) get_post_meta( $cohort_id, '_cpm_addon_date', true ) !== $addon ) {
+				update_post_meta( $cohort_id, '_cpm_addon_date', $addon );
+				$changed = true;
+			}
+		}
+
+		return $changed;
+	}
+
+	private static function masterclass_addon_date_for_start( string $start_iso ): string {
+		return self::addon_date_for_masterclass( $start_iso );
+	}
+
+	public static function addon_date_for_masterclass( string $start_iso ): string {
+		if ( $start_iso === '' ) {
+			return '';
+		}
+		$month = (int) substr( $start_iso, 5, 2 );
+		if ( $month <= 9 ) {
+			return '2026-11-18';
+		}
+		if ( $month === 11 ) {
+			return '2026-11-27';
+		}
+		return '';
 	}
 
 	/**
@@ -139,16 +210,18 @@ class Pricing {
 	 */
 	public static function audit_report(): array {
 		$report = [
-			'vat_note' => 'Alle bedragen in CPM zijn incl. 21% btw (consumentenprijs).',
+			'vat_note' => 'Opgeslagen bedragen zijn excl. 21% btw; Mollie incasseert incl. btw.',
 			'products' => [],
 			'cohorts'  => [],
 		];
 		foreach ( self::products() as $tpl => $def ) {
+			$excl = (int) $def['total_price_cents'];
 			$report['products'][ $tpl ] = [
-				'total'   => self::format_eur( (int) $def['total_price_cents'] ),
-				'deposit' => self::format_eur( (int) $def['deposit_cents'] ),
-				'addon'   => (int) $def['addon_price_cents'] > 0
-					? self::format_eur( (int) $def['addon_price_cents'] )
+				'total_excl'   => self::format_eur_excl( $excl ),
+				'total_incl'   => self::format_eur_incl( $excl ),
+				'deposit_excl' => self::format_eur_excl( (int) $def['deposit_cents'] ),
+				'addon'        => (int) $def['addon_price_cents'] > 0
+					? self::format_eur_excl( (int) $def['addon_price_cents'] )
 					: null,
 			];
 		}
@@ -165,23 +238,23 @@ class Pricing {
 			if ( ! $c ) {
 				continue;
 			}
-			$tpl     = (string) ( $c['template'] ?? '' );
-			$canon   = self::defaults_for_template( $tpl );
-			$total   = (int) $c['total_price_cents'];
-			$deposit = (int) $c['deposit_cents'];
-			$addon   = (int) ( $c['addon_price_cents'] ?? 0 );
-			$ok      = $canon
-				&& $total === (int) $canon['total_price_cents']
-				&& $deposit === (int) $canon['deposit_cents']
-				&& $addon === (int) ( $canon['addon_price_cents'] ?? 0 );
+			$tpl       = (string) ( $c['template'] ?? '' );
+			$canon     = self::defaults_for_template( $tpl );
+			$total_ex  = (int) ( $c['total_price_excl_cents'] ?? 0 );
+			$dep_ex    = (int) ( $c['deposit_excl_cents'] ?? 0 );
+			$addon_ex  = (int) ( $c['addon_price_excl_cents'] ?? 0 );
+			$ok        = $canon
+				&& $total_ex === (int) $canon['total_price_cents']
+				&& $dep_ex === (int) $canon['deposit_cents']
+				&& $addon_ex === (int) ( $canon['addon_price_cents'] ?? 0 );
 			$report['cohorts'][] = [
-				'id'      => (int) $id,
-				'title'   => (string) $c['title'],
-				'template'=> $tpl,
-				'total'   => self::format_eur( $total ),
-				'deposit' => self::format_eur( $deposit ),
-				'addon'   => $addon > 0 ? self::format_eur( $addon ) : null,
-				'ok'      => $ok,
+				'id'       => (int) $id,
+				'title'    => (string) $c['title'],
+				'template' => $tpl,
+				'total'    => self::format_eur_excl( $total_ex ),
+				'deposit'  => self::format_eur_excl( $dep_ex ),
+				'addon'    => $addon_ex > 0 ? self::format_eur_excl( $addon_ex ) : null,
+				'ok'       => $ok,
 			];
 		}
 		return $report;
@@ -189,5 +262,13 @@ class Pricing {
 
 	public static function format_eur( int $cents ): string {
 		return '€ ' . number_format( $cents / 100, 2, ',', '.' );
+	}
+
+	public static function format_eur_excl( int $excl_cents ): string {
+		return self::format_eur( $excl_cents ) . ' excl. btw';
+	}
+
+	public static function format_eur_incl( int $excl_cents ): string {
+		return self::format_eur( self::incl_cents( $excl_cents ) ) . ' incl. btw';
 	}
 }
