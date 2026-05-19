@@ -1,0 +1,139 @@
+/**
+ * Homepage team section: horizontal carousel on mobile.
+ */
+
+@media only screen and (max-width: 980px) {
+  .coconpm-team-carousel {
+    position: relative;
+    width: 100%;
+    margin: 8px 0 0;
+    padding: 0 0 8px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .coconpm-team-carousel__track {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 0 12px;
+    scrollbar-width: none;
+    width: 100%;
+  }
+
+  .coconpm-team-carousel__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .coconpm-team-carousel__slide {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    box-sizing: border-box;
+    padding: 0 var(--coconpm-mobile-gutter, 16px);
+  }
+
+  .coconpm-team-carousel__slide .et_pb_team_member {
+    display: block !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .coconpm-team-carousel__slide .et_pb_team_member_image {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 12px !important;
+    text-align: center !important;
+  }
+
+  .coconpm-team-carousel__slide .et_pb_team_member_image img {
+    width: 100%;
+    height: auto;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .coconpm-team-carousel__slide .et_pb_team_member_description {
+    display: block !important;
+    text-align: center;
+  }
+
+  .coconpm-team-carousel__slide .et_pb_module_header {
+    font-size: 18px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .coconpm-team-carousel__slide .et_pb_member_position {
+    font-size: 14px !important;
+  }
+
+  .coconpm-team-carousel__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 4px var(--coconpm-mobile-gutter, 16px) 0;
+  }
+
+  .coconpm-team-carousel__btn {
+    appearance: none;
+    border: 1px solid #d8ccb0;
+    background: #fff;
+    color: #9b8858;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .coconpm-team-carousel__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .coconpm-team-carousel__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .coconpm-team-carousel__dot {
+    appearance: none;
+    border: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d8ccb0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .coconpm-team-carousel__dot.is-active {
+    background: #9b8858;
+    transform: scale(1.15);
+  }
+
+  .coconpm-team-carousel__source-row {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 981px) {
+  .coconpm-team-carousel {
+    display: none !important;
+  }
+}

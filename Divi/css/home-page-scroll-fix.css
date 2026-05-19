@@ -1,0 +1,116 @@
+/**
+ * Home Page Scroll Performance Fix
+ * Disables Divi scroll effects that cause Chrome lag on homepage only
+ */
+
+/* Apply ONLY to home page */
+.home body,
+body.home {
+	/* Force simple scrolling */
+	overflow-x: hidden;
+}
+
+/* Disable ALL Divi scroll effects on home page */
+.home .et_pb_section,
+body.home .et_pb_section {
+	/* Remove scroll effects */
+	animation: none !important;
+	transform: none !important;
+	transition: none !important;
+	will-change: auto !important;
+}
+
+/* Disable parallax on home page */
+.home .et_parallax_bg,
+body.home .et_parallax_bg {
+	background-attachment: scroll !important;
+	transform: none !important;
+	will-change: auto !important;
+}
+
+/* Disable Divi animations on scroll (home page only) */
+.home .et_pb_animation,
+body.home .et_pb_animation {
+	animation: none !important;
+	transform: none !important;
+	opacity: 1 !important;
+	will-change: auto !important;
+}
+
+/* Disable waypoint animations on home page */
+.home .et-waypoint,
+body.home .et-waypoint {
+	animation: none !important;
+	transform: none !important;
+	will-change: auto !important;
+}
+
+/* Remove scroll effects from all modules on home page */
+.home .et_pb_module,
+body.home .et_pb_module {
+	animation: none !important;
+	transition: none !important;
+	will-change: auto !important;
+}
+
+/* Simplify rows on home page */
+.home .et_pb_row,
+body.home .et_pb_row {
+	animation: none !important;
+	transition: none !important;
+	will-change: auto !important;
+}
+
+/* Disable hover animations on home page */
+.home .et_pb_module:hover,
+body.home .et_pb_module:hover {
+	transform: none !important;
+	transition: none !important;
+}
+
+/* Remove complex transforms from images on home page */
+.home .et_pb_image,
+body.home .et_pb_image,
+.home .et_pb_image img,
+body.home .et_pb_image img {
+	transform: none !important;
+	transition: none !important;
+	will-change: auto !important;
+}
+
+/* Disable Instagram feed animations if present */
+.home .et_pb_social_media_follow,
+body.home .et_pb_social_media_follow {
+	animation: none !important;
+	transition: none !important;
+}
+
+/* Force GPU acceleration ONLY on fixed header (not sections) */
+.home #main-header,
+body.home #main-header {
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+}
+
+/* Remove excessive containment from home page sections */
+.home .et_pb_section,
+body.home .et_pb_section {
+	contain: none !important;
+}
+
+/* Optimize team member cards if present */
+.home .et_pb_team_member,
+body.home .et_pb_team_member {
+	transform: none !important;
+	transition: none !important;
+	animation: none !important;
+}
+
+/* Disable any scroll-triggered effects */
+.home [class*="et_pb_scroll"],
+body.home [class*="et_pb_scroll"] {
+	animation: none !important;
+	transform: none !important;
+	transition: none !important;
+}
+

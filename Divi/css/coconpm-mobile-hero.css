@@ -1,0 +1,318 @@
+/**
+ * COCONPM: Mobile header in flow + fixed bottom tab bar.
+ * Hide Divi Mobile Menu slide-out only; keep bottom-navigation-menu visible.
+ */
+
+/* --- Mobile layout: equal section width, no horizontal overflow --- */
+@media only screen and (max-width: 980px) {
+  :root {
+    --coconpm-mobile-gutter: 16px;
+  }
+
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  #page-container,
+  #page-container #main-content,
+  #et-main-area,
+  #main-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  #main-header,
+  #top-header,
+  #main-header .container,
+  #top-header .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #main-content .et_pb_section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #main-content .et_pb_row,
+  #main-content .et_pb_row_inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: var(--coconpm-mobile-gutter) !important;
+    padding-right: var(--coconpm-mobile-gutter) !important;
+    box-sizing: border-box !important;
+  }
+
+  #main-content .et_pb_module,
+  #main-content .et_pb_code_inner,
+  #main-content .et_pb_text_inner,
+  #main-content .et_pb_image,
+  #main-content .et_pb_image img,
+  #main-content .et_pb_slider,
+  #main-content .et_pb_slide {
+    max-width: 100% !important;
+  }
+
+  #main-content .et_pb_module {
+    overflow-x: hidden;
+  }
+}
+
+@media only screen and (max-width: 980px) {
+  body .divi-mobile-menu:not(.bottom-navigation-menu),
+  body .divi-mobile-menu:not(.bottom-navigation-menu) .divi-mobile-menu-inner,
+  body .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav,
+  body .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap,
+  body .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner,
+  body #open-button.hamburger.dm_menu_button,
+  #coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu),
+  #coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .divi-mobile-menu-inner,
+  #coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) #dm_nav,
+  #coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap,
+  #coconpm-root .divi-mobile-menu:not(.bottom-navigation-menu) .menu-wrap__inner,
+  #coconpm-root #open-button.hamburger.dm_menu_button {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    z-index: -1 !important;
+  }
+}
+
+/* --- Bottom tab bar: fit 5 items on narrow screens --- */
+@media only screen and (max-width: 980px) {
+  .divi-mobile-menu.bottom-navigation-menu {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    padding-bottom: env(safe-area-inset-bottom, 0) !important;
+  }
+
+  .divi-mobile-menu.bottom-navigation-menu .bottom-navigation,
+  .divi-mobile-menu.bottom-navigation-menu nav {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .bottom-navigation-menu ul#dm-menu.nav,
+  .bottom-navigation-menu ul.nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .bottom-navigation-menu #dm-menu a {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 8px 2px 10px !important;
+    min-height: 58px !important;
+    font-size: clamp(8px, 2.2vw, 10px) !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: center !important;
+  }
+
+  .bottom-navigation-menu #dm-menu a::after,
+  .bottom-navigation-menu ul a::after {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    display: block !important;
+    order: -1 !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 22px !important;
+    margin: 0 !important;
+    font-family: ETmodules, "ETmodules" !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+    color: #9b8858 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bottom-navigation-menu ul li {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .bottom-navigation-menu #dm-menu a,
+  .bottom-navigation-menu .menu-text {
+    color: #000 !important;
+  }
+}
+
+@media only screen and (max-width: 380px) {
+  .bottom-navigation-menu #dm-menu a {
+    padding: 6px 1px 8px !important;
+    font-size: 8px !important;
+    letter-spacing: -0.02em !important;
+    min-height: 54px !important;
+  }
+
+  .bottom-navigation-menu #dm-menu a::after,
+  .bottom-navigation-menu ul a::after {
+    font-size: 20px !important;
+    min-height: 20px !important;
+  }
+}
+
+/* --- Cookie Notice: stack above bottom tab bar on mobile --- */
+@media only screen and (max-width: 980px) {
+  :root {
+    --coconpm-bottom-nav-height: 64px;
+  }
+
+  #cookie-notice.cn-position-bottom {
+    bottom: calc(var(--coconpm-bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px)) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    z-index: 1000000000 !important;
+    box-shadow: 0 -2px 14px rgba(0, 0, 0, 0.14) !important;
+  }
+
+  #cookie-notice .cookie-notice-container {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+    text-align: left !important;
+    width: 100% !important;
+  }
+
+  #cookie-notice #cn-notice-text,
+  #cookie-notice .cn-text-container {
+    display: block !important;
+    width: 100% !important;
+    padding-right: 30px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+  }
+
+  #cookie-notice #cn-notice-buttons,
+  #cookie-notice .cn-buttons-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  #cookie-notice .cn-button.cn-set-cookie {
+    margin: 0 !important;
+    padding: 8px 18px !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    border-radius: 999px !important;
+  }
+
+  #cookie-notice .cn-close-icon {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    margin: 0 !important;
+  }
+}
+
+/* --- Mobile: main header in flow (not floating), simple bar with logo + menu + cart --- */
+@media only screen and (max-width: 767px) {
+  /* Ensure main header and built-in mobile nav are visible (override plugin/theme hiding them) */
+  #coconpm-root #main-header {
+    display: block !important;
+  }
+
+  #coconpm-root #main-header .mobile_menu_bar,
+  #coconpm-root #et_mobile_nav_menu,
+  #coconpm-root body #et_mobile_nav_menu {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  #coconpm-root.et_fixed_nav #page-container {
+    padding-top: 0 !important;
+  }
+
+  #coconpm-root #main-header,
+  #coconpm-root.et_fixed_nav #main-header {
+    position: relative !important;
+    top: auto !important;
+    width: 100%;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  /* Simple hero bar: logo + menu + cart in one row */
+  #coconpm-root #main-header .container.et_menu_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  #coconpm-root #main-header .logo_container {
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+
+  #coconpm-root #main-header #et-top-navigation {
+    display: flex !important;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-right: 0;
+    padding-top: 0;
+    gap: 8px;
+  }
+
+  #coconpm-root #main-header .et_mobile_cart_container,
+  #coconpm-root #main-header .mobile_menu_bar {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+  }
+}
+
+/* Top header in flow on mobile when present */
+@media only screen and (max-width: 767px) {
+  #coconpm-root #top-header {
+    position: relative !important;
+  }
+}

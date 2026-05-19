@@ -6,8 +6,25 @@
 # Cursor settings (may contain tokens)
 .cursor/
 
+# WordPress
+wp-content/uploads/
+wp-content/cache/
+wp-content/backup/
+wp-content/upgrade/
+
+# Database
+*.sql
+*.sql.gz
+
 # OS files
 .DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Sensitive files
 ftp.md

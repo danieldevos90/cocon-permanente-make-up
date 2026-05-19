@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Featured Products Component Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px 20px;
+        }
+        
+        .preview-note {
+            max-width: 1400px;
+            margin: 0 auto 30px;
+            background: #fff;
+            padding: 20px;
+            border-left: 4px solid #d946a6;
+        }
+        
+        .preview-note h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-note p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Featured Products Component Styles */
+        .cocon-featured-products {
+            padding: 60px 0;
+            background: #fff;
+        }
+
+        .cocon-featured-products-container {
+            width: 80%;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .cocon-featured-products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            gap: 20px;
+        }
+        
+        .cocon-featured-products-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 30px;
+            font-weight: 500;
+            color: #000;
+            margin: 0;
+            text-align: left;
+            line-height: 1.2;
+            letter-spacing: -0.02px;
+        }
+        
+        .cocon-featured-products-view-all {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 2px;
+        }
+        
+        .cocon-featured-products-view-all:hover {
+            color: #d946a6;
+            border-bottom-color: #d946a6;
+        }
+        
+        .cocon-featured-products-view-all svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+        
+        .cocon-featured-products-view-all:hover svg {
+            transform: translateX(4px);
+        }
+
+        .cocon-featured-products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .cocon-featured-product-card {
+            background: #fff;
+            border: none;
+            border-radius: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cocon-featured-product-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .cocon-featured-product-card-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .cocon-featured-product-image {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .cocon-featured-product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+
+        .cocon-featured-product-card:hover .cocon-featured-product-image img {
+            transform: scale(1.08);
+        }
+
+        .cocon-sale-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #b8986d;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: capitalize;
+            letter-spacing: 0.3px;
+            z-index: 10;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cocon-sale-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .cocon-featured-product-details {
+            padding: 25px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .cocon-featured-product-title-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 0 15px 0;
+            gap: 15px;
+        }
+
+        .cocon-featured-product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #000;
+            margin: 0;
+            line-height: 1.3;
+            flex: 1;
+        }
+
+        .cocon-featured-product-title a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+
+        .cocon-featured-product-title a:hover {
+            color: #666;
+        }
+
+        .cocon-featured-product-price {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin: 0;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .cocon-featured-product-price del {
+            color: #999;
+            font-weight: 400;
+            font-size: 18px;
+            margin-right: 10px;
+            opacity: 0.7;
+        }
+
+        .cocon-featured-product-price ins {
+            text-decoration: none;
+            color: #000;
+        }
+
+        .cocon-featured-product-excerpt {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #000;
+            margin: 0 0 25px 0;
+            flex-grow: 1;
+        }
+
+        .cocon-featured-product-actions {
+            margin-top: auto;
+        }
+
+        .cocon-featured-product-actions button {
+            width: 100%;
+            background: transparent;
+            color: #000;
+            border: 2px solid #d946a6;
+            padding: 12px 16px;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: clamp(10px, 2vw, 11px);
+            font-weight: 400;
+            line-height: 150%;
+            letter-spacing: -0.02em;
+            text-align: center;
+            text-transform: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+            display: block;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 980px) {
+            .cocon-featured-product-actions button {
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cocon-featured-product-actions button {
+                padding: 10px 14px;
+            }
+        }
+
+        .cocon-featured-product-actions button:hover {
+            background: #d946a6;
+            color: #fff;
+            border-color: #d946a6;
+        }
+
+        @media (max-width: 1200px) {
+            .cocon-featured-products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .cocon-featured-products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cocon-featured-products-title {
+                font-size: 26px;
+            }
+            
+            .cocon-featured-products-header {
+                margin-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cocon-featured-products-container {
+                padding: 0 20px;
+            }
+            
+            .cocon-featured-products-header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 35px;
+                gap: 15px;
+            }
+            
+            .cocon-featured-products-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cocon-featured-products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cocon-featured-products {
+                padding: 40px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-note">
+        <h1>🎨 Featured Products Component Preview</h1>
+        <p>This is a static HTML preview of the Featured Products component. The actual component will pull real products from WooCommerce. Use shortcode: <code>[cocon_featured_products]</code></p>
+    </div>
+
+    <section class="cocon-featured-products">
+        <div class="cocon-featured-products-container">
+            <div class="cocon-featured-products-header">
+                <h2 class="cocon-featured-products-title">Uitgelichte producten</h2>
+                <a href="#" class="cocon-featured-products-view-all">
+                    Bekijk alle producten
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="cocon-featured-products-grid">
+                <!-- Product 1 -->
+                <div class="cocon-featured-product-card">
+                    <div class="cocon-featured-product-card-inner">
+                        <div class="cocon-featured-product-image">
+                            <img src="https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Product+Image" alt="Product">
+                            <span class="cocon-sale-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 6h.008v.008H6V6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sale
+                            </span>
+                        </div>
+                        <div class="cocon-featured-product-details">
+                            <div class="cocon-featured-product-title-price-row">
+                                <h3 class="cocon-featured-product-title">
+                                    <a href="#">Supkley Dark Glasses</a>
+                                </h3>
+                                <div class="cocon-featured-product-price">
+                                    <del>€700</del>
+                                    <ins>€450</ins>
+                                </div>
+                            </div>
+                            <div class="cocon-featured-product-excerpt">
+                                Lorem ipsum dolor sit amet consectetur sociis maecenas sit porttitor.
+                            </div>
+                            <div class="cocon-featured-product-actions">
+                                <button>Toevoegen aan winkelwagen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="cocon-featured-product-card">
+                    <div class="cocon-featured-product-card-inner">
+                        <div class="cocon-featured-product-image">
+                            <img src="https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Product+Image" alt="Product">
+                            <span class="cocon-sale-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 6h.008v.008H6V6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sale
+                            </span>
+                        </div>
+                        <div class="cocon-featured-product-details">
+                            <div class="cocon-featured-product-title-price-row">
+                                <h3 class="cocon-featured-product-title">
+                                    <a href="#">Supkley Dark Glasses</a>
+                                </h3>
+                                <div class="cocon-featured-product-price">
+                                    <del>€700</del>
+                                    <ins>€450</ins>
+                                </div>
+                            </div>
+                            <div class="cocon-featured-product-excerpt">
+                                Lorem ipsum dolor sit amet consectetur sociis maecenas sit porttitor.
+                            </div>
+                            <div class="cocon-featured-product-actions">
+                                <button>Toevoegen aan winkelwagen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="cocon-featured-product-card">
+                    <div class="cocon-featured-product-card-inner">
+                        <div class="cocon-featured-product-image">
+                            <img src="https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Product+Image" alt="Product">
+                            <span class="cocon-sale-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 6h.008v.008H6V6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sale
+                            </span>
+                        </div>
+                        <div class="cocon-featured-product-details">
+                            <div class="cocon-featured-product-title-price-row">
+                                <h3 class="cocon-featured-product-title">
+                                    <a href="#">Supkley Dark Glasses</a>
+                                </h3>
+                                <div class="cocon-featured-product-price">
+                                    <del>€700</del>
+                                    <ins>€450</ins>
+                                </div>
+                            </div>
+                            <div class="cocon-featured-product-excerpt">
+                                Lorem ipsum dolor sit amet consectetur sociis maecenas sit porttitor.
+                            </div>
+                            <div class="cocon-featured-product-actions">
+                                <button>Toevoegen aan winkelwagen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="cocon-featured-product-card">
+                    <div class="cocon-featured-product-card-inner">
+                        <div class="cocon-featured-product-image">
+                            <img src="https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Product+Image" alt="Product">
+                            <span class="cocon-sale-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 6h.008v.008H6V6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Sale
+                            </span>
+                        </div>
+                        <div class="cocon-featured-product-details">
+                            <div class="cocon-featured-product-title-price-row">
+                                <h3 class="cocon-featured-product-title">
+                                    <a href="#">Supkley Dark Glasses</a>
+                                </h3>
+                                <div class="cocon-featured-product-price">
+                                    <del>€700</del>
+                                    <ins>€450</ins>
+                                </div>
+                            </div>
+                            <div class="cocon-featured-product-excerpt">
+                                Lorem ipsum dolor sit amet consectetur sociis maecenas sit porttitor.
+                            </div>
+                            <div class="cocon-featured-product-actions">
+                                <button>Toevoegen aan winkelwagen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Gallery Layout Preview - Cocon Permanente Make-up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --wc-brand-color: #C64193;
+            --wc-fuchsia: #ff00ff;
+            --wc-text-color: #000000;
+        }
+        
+        body {
+            background: #f8f9fa;
+            padding: 40px 0;
+        }
+        
+        .preview-container {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Gallery Styles */
+        .cocon-product-gallery {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .gallery-thumbnails {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 8px;
+        }
+        
+        .gallery-thumbnail {
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            background: #f0f0f0;
+        }
+        
+        .gallery-thumbnail:hover {
+            border-color: var(--wc-brand-color);
+        }
+        
+        .gallery-thumbnail.active {
+            border-color: var(--wc-brand-color);
+        }
+        
+        .gallery-thumbnail.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(198, 65, 147, 0.1);
+            pointer-events: none;
+        }
+        
+        .gallery-main-wrapper {
+            width: 100%;
+            position: relative;
+        }
+        
+        .gallery-main-image {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        .gallery-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            background: #000000;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+        
+        .gallery-nav:hover {
+            background: #333333;
+        }
+        
+        .gallery-nav-prev {
+            left: 20px;
+        }
+        
+        .gallery-nav-next {
+            right: 20px;
+        }
+        
+        /* Product Info Styles */
+        .product-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--wc-fuchsia) !important;
+            margin-bottom: 1.5rem;
+        }
+        
+        .product-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        /* Quantity and Button */
+        .quantity input[type="number"] {
+            border: 2px solid #000000 !important;
+            padding: 0 !important;
+            width: 48px !important;
+            height: 48px !important;
+            text-align: center;
+            color: var(--wc-text-color);
+            background: transparent !important;
+            font-weight: 500;
+            border-radius: 0 !important;
+            font-size: 16px;
+        }
+        
+        .single_add_to_cart_button {
+            background-color: transparent !important;
+            border: 2px solid var(--wc-brand-color) !important;
+            color: var(--wc-brand-color) !important;
+            font-weight: 500 !important;
+            padding: 0.75rem 1.5rem !important;
+            height: 48px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 0 !important;
+            flex-grow: 1;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .single_add_to_cart_button:hover {
+            background-color: var(--wc-brand-color) !important;
+            color: white !important;
+        }
+        
+        .info-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--wc-brand-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="preview-container">
+            <div class="info-badge">
+                <strong>Preview:</strong> Custom Product Gallery Layout with Vertical Thumbnails & Navigation Arrows
+            </div>
+            
+            <h1 class="text-center mb-4">Product Gallery Layout</h1>
+            
+            <div class="row g-5">
+                <!-- Gallery Column -->
+                <div class="col-lg-6">
+                    <div class="cocon-product-gallery">
+                        <div class="row g-3">
+                            <!-- Vertical Thumbnails -->
+                            <div class="col-auto">
+                                <div class="gallery-thumbnails">
+                                    <div class="gallery-thumbnail active">
+                                        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px;">Thumb 1</span>
+                                    </div>
+                                    <div class="gallery-thumbnail">
+                                        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px;">Thumb 2</span>
+                                    </div>
+                                    <div class="gallery-thumbnail">
+                                        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px;">Thumb 3</span>
+                                    </div>
+                                    <div class="gallery-thumbnail">
+                                        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px;">Thumb 4</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Main Image with Navigation Arrows -->
+                            <div class="col">
+                                <div class="gallery-main-wrapper">
+                                    <div class="gallery-main-image">
+                                        <div class="gallery-image">
+                                            Main Product Image<br>
+                                            <small>(1:1 Aspect Ratio)</small>
+                                        </div>
+                                        
+                                        <!-- Navigation Arrows -->
+                                        <button class="gallery-nav gallery-nav-prev" aria-label="Previous image">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        <button class="gallery-nav gallery-nav-next" aria-label="Next image">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9 18L15 12L9 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Info Column -->
+                <div class="col-lg-6">
+                    <h1 class="product-title">Wenkbrauw Microblading</h1>
+                    
+                    <div class="product-price">€350,00</div>
+                    
+                    <div class="product-description">
+                        <p>Perfecte wenkbrauwen met haartje-voor-haartje techniek. Natuurlijk resultaat dat 12-18 maanden meegaat.</p>
+                    </div>
+                    
+                    <!-- Add to Cart Form -->
+                    <form class="cart">
+                        <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+                            <div class="quantity">
+                                <input type="number" class="qty" value="1" min="1">
+                            </div>
+                            <button type="button" class="single_add_to_cart_button">
+                                Add to cart
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="border-top pt-4 mt-4">
+                        <p class="text-muted mb-2"><strong>Category:</strong> Uncategorized</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3 class="mb-4">Gallery Features Implemented</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="feature-list">
+                                <li><strong>Vertical Thumbnails</strong> (80x80px squares on left)</li>
+                                <li><strong>Active State</strong> with pink border highlight</li>
+                                <li><strong>Main Image</strong> with 1:1 aspect ratio</li>
+                                <li><strong>Black Navigation Arrows</strong> in bottom corners</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="feature-list">
+                                <li><strong>Fuchsia Price</strong> (#ff00ff) for emphasis</li>
+                                <li><strong>Bootstrap Buttons</strong> with consistent styling</li>
+                                <li><strong>Quantity Input</strong> 48x48px square</li>
+                                <li><strong>Responsive Design</strong> for all devices</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Arrow Details -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-dark" role="alert">
+                        <h5 class="alert-heading">Navigation Arrow Details</h5>
+                        <ul class="mb-0">
+                            <li><strong>Size:</strong> 50x50px black squares</li>
+                            <li><strong>Position:</strong> Bottom-left (previous) and bottom-right (next)</li>
+                            <li><strong>Icon:</strong> White chevron arrows</li>
+                            <li><strong>Hover Effect:</strong> Darkens to #333333</li>
+                            <li><strong>Responsive:</strong> Scales down to 40px on tablets, 36px on mobile</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
