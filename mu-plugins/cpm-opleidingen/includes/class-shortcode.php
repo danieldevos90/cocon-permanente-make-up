@@ -87,6 +87,17 @@ class Shortcode {
 			}
 		}
 
+		// Alleen termijn-opties tonen waarvoor het plan daadwerkelijk berekend is.
+		$options = array_values(
+			array_filter(
+				$options,
+				static fn( int $n ): bool => ! empty( $preview['base'][ $n ] )
+			)
+		);
+		if ( $options === [] ) {
+			return '<div class="cpm-opl-error">Geen betaalplan beschikbaar voor deze startdatum. Neem contact op via info@coconcosmetics.nl.</div>';
+		}
+
 		ob_start();
 		$template = CPM_OPL_PATH . 'templates/checkout-form.php';
 		include $template;

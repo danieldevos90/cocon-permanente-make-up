@@ -83,6 +83,7 @@ class Cohort_Auto_Page {
 				$update_args['post_content'] = $shortcode;
 			}
 			wp_update_post( $update_args );
+			Enroll_Page_Layout::apply_page_meta( $page_id );
 			return $page_id;
 		}
 
@@ -97,6 +98,7 @@ class Cohort_Auto_Page {
 			return 0;
 		}
 		update_post_meta( $cohort_id, self::META_PAGE_ID, (int) $new_id );
+		Enroll_Page_Layout::apply_page_meta( (int) $new_id );
 		return (int) $new_id;
 	}
 

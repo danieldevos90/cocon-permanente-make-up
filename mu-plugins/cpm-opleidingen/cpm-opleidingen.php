@@ -25,7 +25,7 @@ if ( $cpm_opl_uri !== '' && str_contains( $cpm_opl_uri, 'pmu-opleidingen-cocon-c
 	}
 }
 
-define( 'CPM_OPL_VERSION', '0.6.28' );
+define( 'CPM_OPL_VERSION', '0.6.32' );
 define( 'CPM_OPL_FILE', __FILE__ );
 define( 'CPM_OPL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CPM_OPL_URL', plugin_dir_url( __FILE__ ) );
@@ -35,6 +35,7 @@ require_once CPM_OPL_PATH . 'includes/class-db.php';
 require_once CPM_OPL_PATH . 'includes/class-cohort-defaults.php';
 require_once CPM_OPL_PATH . 'includes/class-cohort-cpt.php';
 require_once CPM_OPL_PATH . 'includes/class-cohort-auto-page.php';
+require_once CPM_OPL_PATH . 'includes/class-enroll-page-layout.php';
 require_once CPM_OPL_PATH . 'includes/class-payment-plan.php';
 require_once CPM_OPL_PATH . 'includes/class-mollie-client.php';
 require_once CPM_OPL_PATH . 'includes/class-emails.php';
@@ -70,6 +71,7 @@ add_action( 'plugins_loaded', static function () {
 	CPM_Opleidingen\Pricing::maybe_sync_cohorts();
 	CPM_Opleidingen\Cohort_CPT::register();
 	CPM_Opleidingen\Cohort_Auto_Page::register();
+	CPM_Opleidingen\Enroll_Page_Layout::register();
 	CPM_Opleidingen\Webhook::register();
 	CPM_Opleidingen\Checkout_Handler::register();
 	CPM_Opleidingen\Cron::register();

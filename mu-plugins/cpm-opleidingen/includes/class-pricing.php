@@ -268,6 +268,11 @@ class Pricing {
 		return self::format_eur( $excl_cents ) . ' excl. btw';
 	}
 
+	/** Bedrag in Mollie/incl.-centen tonen als excl. btw-label (inschrijfpagina). */
+	public static function format_eur_excl_from_incl( int $incl_cents ): string {
+		return self::format_eur_excl( self::excl_from_incl_cents( $incl_cents ) );
+	}
+
 	public static function format_eur_incl( int $excl_cents ): string {
 		return self::format_eur( self::incl_cents( $excl_cents ) ) . ' incl. btw';
 	}

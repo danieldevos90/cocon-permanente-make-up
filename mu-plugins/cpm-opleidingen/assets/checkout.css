@@ -20,7 +20,7 @@
 	--cpm-line: #e6dfd1;
 	--cpm-radius: 10px;
 
-	max-width: 880px;
+	max-width: 1080px;
 	margin: 0 auto;
 	color: var(--cpm-text);
 	font-family: inherit;
@@ -872,4 +872,98 @@
 	}
 	.cpm-opl-cta__copy { flex: 1 1 100%; }
 	.cpm-opl-cta__button { width: 100%; }
+}
+
+/* ============================================================
+ * Inschrijfpagina — volle breedte (zelfde shell als Divi-landingspagina's)
+ * body.cpm-opl-enroll-page wordt gezet door Enroll_Page_Layout
+ * ============================================================ */
+body.cpm-opl-enroll-page #top-header,
+body.cpm-opl-enroll-page #main-header {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+body.cpm-opl-enroll-page #top-header .container,
+body.cpm-opl-enroll-page #main-header .container {
+	width: 100% !important;
+	max-width: 1080px !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	padding-left: 24px !important;
+	padding-right: 24px !important;
+	box-sizing: border-box !important;
+}
+
+body.cpm-opl-enroll-page #cocon-mobile-header {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+body.cpm-opl-enroll-page:not(.et_pb_pagebuilder_layout) #main-content .container {
+	width: 100% !important;
+	max-width: 100% !important;
+	padding-top: 0 !important;
+}
+
+body.cpm-opl-enroll-page:not(.et_pb_pagebuilder_layout) #content-area,
+body.cpm-opl-enroll-page:not(.et_pb_pagebuilder_layout) #left-area {
+	width: 100% !important;
+	float: none !important;
+	padding-right: 0 !important;
+}
+
+body.cpm-opl-enroll-page #sidebar {
+	display: none !important;
+}
+
+body.cpm-opl-enroll-page #main-content .container:before {
+	display: none !important;
+}
+
+body.cpm-opl-enroll-page h1.entry-title.main_title {
+	display: none !important;
+}
+
+body.cpm-opl-enroll-page .entry-content {
+	width: 100% !important;
+	max-width: 100% !important;
+	padding: 24px 0 48px !important;
+	box-sizing: border-box !important;
+}
+
+body.cpm-opl-enroll-page .cpm-opl-page {
+	width: 100% !important;
+	max-width: 1080px !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	padding-left: 24px !important;
+	padding-right: 24px !important;
+	box-sizing: border-box !important;
+}
+
+@media (min-width: 981px) {
+	body.cpm-opl-enroll-page .entry-content {
+		padding-left: 10% !important;
+		padding-right: 10% !important;
+	}
+
+	body.cpm-opl-enroll-page .cpm-opl-page {
+		width: 80% !important;
+		max-width: 1080px !important;
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+	}
+}
+
+@media (max-width: 720px) {
+	body.cpm-opl-enroll-page .entry-content {
+		padding-left: 16px !important;
+		padding-right: 16px !important;
+	}
+
+	body.cpm-opl-enroll-page .cpm-opl-page {
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+	}
 }
