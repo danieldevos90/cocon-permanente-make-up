@@ -10,6 +10,8 @@ const LIFECYCLE_MERGE_FIELDS = [
   { tag: 'PERFDATE', name: 'Perfectie Date', type: 'date' },
   { tag: 'REFRSHDUE', name: 'Refresh Due Date', type: 'date' },
   { tag: 'SOURCESYS', name: 'Source System', type: 'dropdown', options: { choices: ['salonized', 'woocommerce', 'import', 'mixed'] } },
+  { tag: 'LASTEMAIL', name: 'Last Automation Email', type: 'text' },
+  { tag: 'LASTEMAILDT', name: 'Last Automation Email Date', type: 'date' },
 ];
 
 function normalizeDate(value) {
@@ -691,6 +693,42 @@ export async function deleteTemplate(templateId) {
 }
 
 /**
+ * Delete a Mailchimp campaign (cleanup after send or failed draft)
+ */
+export async function deleteCampaign(campaignId) {
+  if (!campaignId) return { success: true, skipped: true };
+  const client = initMailchimp();
+  try {
+    await client.campaigns.remove(campaignId);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+/**
+ * Update subscriber merge fields for last automation email sent
+ */
+export async function updateSubscriberLastEmail(email, { subject = '', stage = '', sentAt = new Date() } = {}) {
+  const client = initMailchimp();
+  const listId = config.mailchimp.listId;
+  const subscriberHash = getSubscriberHash(email);
+  const label = (subject || stage || '').slice(0, 255);
+
+  try {
+    await client.lists.updateListMember(listId, subscriberHash, {
+      merge_fields: {
+        LASTEMAIL: label,
+        LASTEMAILDT: normalizeDate(sentAt),
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+/**
  * Send a campaign to specific email addresses (used for aftercare batch sends)
  */
 export async function sendAftercareCampaign({
@@ -705,6 +743,7 @@ export async function sendAftercareCampaign({
 
   const client = initMailchimp();
   const listId = config.mailchimp.listId;
+  let campaignId = null;
 
   const conditions = emails.map(email => ({
     condition_type: 'EmailAddress',
@@ -731,12 +770,17 @@ export async function sendAftercareCampaign({
       },
     });
 
-    await client.campaigns.setContent(campaign.id, { html: htmlContent });
-    await client.campaigns.send(campaign.id);
+    campaignId = campaign.id;
+    await client.campaigns.setContent(campaignId, { html: htmlContent });
+    await client.campaigns.send(campaignId);
+    await deleteCampaign(campaignId);
 
-    return { success: true, campaignId: campaign.id, sent: emails.length };
+    return { success: true, campaignId, sent: emails.length, deleted: true };
   } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
+    if (campaignId) {
+      await deleteCampaign(campaignId);
+    }
+    return { success: false, error: getErrorMessage(error), campaignId };
   }
 }
 
@@ -764,6 +808,8 @@ export default {
   setupLifecycleMergeFields,
   syncSalonizedContact,
   sendAftercareCampaign,
+  deleteCampaign,
+  updateSubscriberLastEmail,
   listTemplates,
   createTemplate,
   updateTemplate,

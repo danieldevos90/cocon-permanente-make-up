@@ -91,9 +91,21 @@ type WhatsAppStatus = {
   }>;
 };
 
+type EmailHistoryEvent = {
+  timestamp: string;
+  email?: string;
+  emails?: string[];
+  stage?: string;
+  treatmentType?: string;
+  subject?: string;
+  success: boolean;
+  error?: string;
+};
+
 export default function DashboardPage() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [cronHistory, setCronHistory] = useState<{ entries: CronEntry[]; configured: boolean } | null>(null);
+  const [emailHistory, setEmailHistory] = useState<{ events: EmailHistoryEvent[]; configured: boolean } | null>(null);
   const [whatsapp, setWhatsApp] = useState<WhatsAppStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -101,9 +113,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [overviewRes, cronRes, waRes] = await Promise.all([
+        const [overviewRes, cronRes, emailRes, waRes] = await Promise.all([
           fetch("/api/overview"),
           fetch("/api/cron-history"),
+          fetch("/api/email-history"),
           fetch("/api/whatsapp-status"),
         ]);
         if (overviewRes.ok) {
@@ -113,6 +126,10 @@ export default function DashboardPage() {
         if (cronRes.ok) {
           const data = await cronRes.json();
           setCronHistory(data);
+        }
+        if (emailRes.ok) {
+          const data = await emailRes.json();
+          setEmailHistory(data);
         }
         if (waRes.ok) {
           const data = await waRes.json();
@@ -445,6 +462,64 @@ export default function DashboardPage() {
               <p className="text-muted-foreground text-sm">
                 Installeer de WhatsApp-module: <code className="font-mono">cd whatsapp-automations && npm install</code>.
                 Zie <code className="font-mono">whatsapp-automations/README.md</code> voor de Meta setup.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Automation email log (Redis) */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Automation email log</CardTitle>
+            <CardDescription>
+              Wie wanneer gemaild — laatste 7 dagen uit Redis + LASTEMAIL in Mailchimp
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {emailHistory?.events && emailHistory.events.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tijd</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Stage</TableHead>
+                    <TableHead>Behandeling</TableHead>
+                    <TableHead>Onderwerp</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {emailHistory.events.slice(0, 25).map((e, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="text-xs whitespace-nowrap">
+                        {new Date(e.timestamp).toLocaleString("nl-NL")}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {e.email || (e.emails || []).join(", ") || "-"}
+                      </TableCell>
+                      <TableCell className="text-xs">{e.stage || "-"}</TableCell>
+                      <TableCell className="text-xs">{e.treatmentType || "-"}</TableCell>
+                      <TableCell className="text-sm max-w-xs truncate" title={e.subject || ""}>
+                        {e.subject || "-"}
+                      </TableCell>
+                      <TableCell>
+                        {e.success ? (
+                          <span className="text-green-600 font-medium">OK</span>
+                        ) : (
+                          <span className="text-destructive font-medium" title={e.error}>
+                            FAIL
+                          </span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                {emailHistory?.configured
+                  ? "Geen automation sends gelogd in laatste 7 dagen"
+                  : "Configureer UPSTASH_REDIS_REST_URL en UPSTASH_REDIS_REST_TOKEN"}
               </p>
             )}
           </CardContent>

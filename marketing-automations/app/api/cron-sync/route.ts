@@ -87,7 +87,14 @@ async function handleCronSync(request: NextRequest) {
     const t = report.totals;
     const dayIso = report.date ?? new Date().toISOString().slice(0, 10);
     const skipped = (t.skippedOlderOrEqual || 0) + (t.skippedNoMatch || 0) + (t.skippedAmbiguous || 0) + (t.skippedFollowup || 0) + (t.skippedTooRecent || 0);
-    log(`Sync done — appointments: ${t.todayAppointments}, updated: ${t.updated}, aftercare: ${t.aftercareSent || 0}, skipped: ${skipped}, errors: ${t.errors}`);
+    log(
+      `Sync done — appointments: ${t.todayAppointments}, updated: ${t.updated}, aftercare: ${t.aftercareSent || 0}, aftercareErrors: ${t.aftercareErrors || 0}, skipped: ${skipped}, errors: ${t.errors}`
+    );
+    if (report.details?.aftercareErrors?.length) {
+      for (const err of report.details.aftercareErrors) {
+        log(`Aftercare send failed (${err.treatmentType}): ${err.error}`);
+      }
+    }
 
     const journeyReport = await runJourneyEmails({ dryRun: false, mailchimpPageSize: 200 });
     const j = journeyReport.totals;

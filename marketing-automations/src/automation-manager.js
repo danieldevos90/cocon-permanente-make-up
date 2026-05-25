@@ -8,8 +8,10 @@ import {
   sendCampaign,
   scheduleCampaign,
   sendTestEmail,
+  sendAftercareCampaign,
 } from './mailchimp-client.js';
 import { getEmailTemplate, getJourneyEmails } from './templates/index.js';
+import { recordSuccessfulEmailSends, recordFailedEmailSend } from './email-delivery-log.js';
 
 /**
  * Email Journey Stages with their timing (in days after treatment)
@@ -110,26 +112,19 @@ export async function sendJourneyEmail({
   // Generate email content
   const htmlContent = template.getContent({ firstName });
 
-  // Create campaign
-  const campaignResult = await createCampaign({
-    subject: template.subject,
-    previewText: template.previewText,
-  });
-
-  if (!campaignResult.success) {
-    return campaignResult;
-  }
-
-  const campaignId = campaignResult.campaign.id;
-
-  // Set content
-  const contentResult = await setCampaignContent(campaignId, htmlContent);
-  if (!contentResult.success) {
-    return contentResult;
-  }
-
-  // Test mode - send test email instead of real send
   if (testMode) {
+    const campaignResult = await createCampaign({
+      subject: template.subject,
+      previewText: template.previewText,
+    });
+    if (!campaignResult.success) {
+      return campaignResult;
+    }
+    const campaignId = campaignResult.campaign.id;
+    const contentResult = await setCampaignContent(campaignId, htmlContent);
+    if (!contentResult.success) {
+      return contentResult;
+    }
     const testResult = await sendTestEmail(campaignId, testEmails.length ? testEmails : [email]);
     return {
       success: testResult.success,
@@ -138,21 +133,40 @@ export async function sendJourneyEmail({
     };
   }
 
-  // Send the campaign
-  const sendResult = await sendCampaign(campaignId);
+  const batchResult = await sendAftercareCampaign({
+    emails: [email],
+    subject: template.subject,
+    previewText: template.previewText,
+    htmlContent,
+  });
 
-  // Mark email as sent with tag
-  if (sendResult.success) {
+  if (batchResult.success) {
     const stageInfo = journeyStages[stage];
     if (stageInfo) {
       await addTagsToSubscriber(email, [stageInfo.tag]);
     }
+    await recordSuccessfulEmailSends({
+      emails: [email],
+      stage,
+      treatmentType,
+      subject: template.subject,
+      campaignId: batchResult.campaignId,
+    });
+  } else {
+    await recordFailedEmailSend({
+      emails: [email],
+      stage,
+      treatmentType,
+      subject: template.subject,
+      error: batchResult.error,
+      campaignId: batchResult.campaignId,
+    });
   }
 
   return {
-    success: sendResult.success,
-    campaignId,
-    message: sendResult.success ? 'Email sent successfully' : sendResult.error,
+    success: batchResult.success,
+    campaignId: batchResult.campaignId,
+    message: batchResult.success ? 'Email sent successfully' : batchResult.error,
   };
 }
 

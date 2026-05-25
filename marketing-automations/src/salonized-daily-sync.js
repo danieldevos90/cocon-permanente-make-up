@@ -3,6 +3,7 @@ import path from 'path';
 import { listAudienceMembers, syncSalonizedContact, addTagsToSubscriber, setSubscriberTags, sendAftercareCampaign } from './mailchimp-client.js';
 import { getEmailTemplate } from './templates/index.js';
 import { getNextJourneyEmail, journeyStages } from './automation-manager.js';
+import { recordSuccessfulEmailSends, recordFailedEmailSend } from './email-delivery-log.js';
 
 /**
  * Lazy hook into ../whatsapp-automations.
@@ -570,9 +571,24 @@ export async function runSalonizedDailySync({
         for (const email of emails) {
           await addTagsToSubscriber(email, ['email-aftercare-sent']);
         }
+        await recordSuccessfulEmailSends({
+          emails,
+          stage: 'aftercare',
+          treatmentType,
+          subject: template.subject,
+          campaignId: result.campaignId,
+        });
       } else {
         report.totals.aftercareErrors += 1;
         report.details.aftercareErrors.push({ treatmentType, emails, error: result.error });
+        await recordFailedEmailSend({
+          emails,
+          stage: 'aftercare',
+          treatmentType,
+          subject: template.subject,
+          error: result.error,
+          campaignId: result.campaignId,
+        });
       }
     }
   }
@@ -692,6 +708,13 @@ export async function runJourneyEmails({ dryRun = false, mailchimpPageSize = 200
           await addTagsToSubscriber(email, [stageInfo.tag]);
         }
       }
+      await recordSuccessfulEmailSends({
+        emails: group.emails,
+        stage: group.stage,
+        treatmentType: group.treatmentType,
+        subject: template.subject,
+        campaignId: result.campaignId,
+      });
     } else {
       report.totals.errors += 1;
       report.details.errors.push({
@@ -699,6 +722,14 @@ export async function runJourneyEmails({ dryRun = false, mailchimpPageSize = 200
         treatmentType: group.treatmentType,
         emails: group.emails,
         error: result.error,
+      });
+      await recordFailedEmailSend({
+        emails: group.emails,
+        stage: group.stage,
+        treatmentType: group.treatmentType,
+        subject: template.subject,
+        error: result.error,
+        campaignId: result.campaignId,
       });
     }
   }
