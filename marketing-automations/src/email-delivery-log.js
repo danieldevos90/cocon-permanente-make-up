@@ -93,7 +93,10 @@ export async function recordSuccessfulEmailSends({
 }) {
   const timestamp = new Date().toISOString();
   for (const email of emails) {
-    await updateSubscriberLastEmail(email, { subject, stage, sentAt: timestamp });
+    const upd = await updateSubscriberLastEmail(email, { subject, stage, sentAt: timestamp });
+    if (!upd.success) {
+      console.warn(`[email-log] LASTEMAIL update failed for ${email}: ${upd.error}`);
+    }
     await logEmailSend({
       email,
       stage,

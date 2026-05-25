@@ -38,3 +38,4 @@ credentials*
 
 # CPM opleidingen secrets on server
 mu-plugins/cpm-opleidingen/.env.local
+.vercel

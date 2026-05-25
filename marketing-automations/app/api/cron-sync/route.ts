@@ -102,7 +102,7 @@ async function handleCronSync(request: NextRequest) {
 
     let whatsappReport: { checked?: number; sent?: number; skipped?: number; failed?: number } | null = null;
     try {
-      const waMod = await import("../../../../whatsapp-automations/src/salonized-hook.js");
+      const waMod = await import("whatsapp-automations/src/salonized-hook.js");
       whatsappReport = await waMod.runScheduledSends();
       log(
         `WhatsApp scheduled done — checked: ${whatsappReport?.checked ?? 0}, ` +

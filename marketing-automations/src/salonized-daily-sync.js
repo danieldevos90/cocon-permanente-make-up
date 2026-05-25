@@ -18,7 +18,7 @@ import { recordSuccessfulEmailSends, recordFailedEmailSend } from './email-deliv
 let whatsappHookPromise;
 async function getWhatsAppHook() {
   if (whatsappHookPromise === undefined) {
-    whatsappHookPromise = import('../../whatsapp-automations/src/salonized-hook.js')
+    whatsappHookPromise = import('whatsapp-automations/src/salonized-hook.js')
       .then(mod => mod.onTreatmentProcessed)
       .catch(error => {
         if (process.env.WHATSAPP_HOOK_DEBUG === 'true') {

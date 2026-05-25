@@ -16,9 +16,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const [{ config }, { listAllWhatsAppTemplates }, deliveryLog] = await Promise.all([
-      import("../../../../whatsapp-automations/src/config.js"),
-      import("../../../../whatsapp-automations/src/templates/index.js"),
-      import("../../../../whatsapp-automations/src/delivery-log.js"),
+      import("whatsapp-automations/src/config.js"),
+      import("whatsapp-automations/src/templates/index.js"),
+      import("whatsapp-automations/src/delivery-log.js"),
     ]);
 
     const templates = listAllWhatsAppTemplates();

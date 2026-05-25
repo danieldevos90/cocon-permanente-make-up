@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   const challenge = request.nextUrl.searchParams.get("hub.challenge");
 
   try {
-    const { verifyWebhook } = await import("../../../../whatsapp-automations/src/whatsapp-client.js");
+    const { verifyWebhook } = await import("whatsapp-automations/src/whatsapp-client.js");
     const result = verifyWebhook({ mode, token, challenge });
     if (result.ok && challenge) {
       return new NextResponse(challenge, { status: 200, headers: { "Content-Type": "text/plain" } });
@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const [{ verifyMetaSignature, parseInboundWebhook }, { logInbound, logStatus }] = await Promise.all([
-      import("../../../../whatsapp-automations/src/webhook-parser.js"),
-      import("../../../../whatsapp-automations/src/delivery-log.js"),
+      import("whatsapp-automations/src/webhook-parser.js"),
+      import("whatsapp-automations/src/delivery-log.js"),
     ]);
 
     const signature = request.headers.get("x-hub-signature-256") || "";
