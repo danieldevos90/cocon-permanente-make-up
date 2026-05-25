@@ -11,7 +11,7 @@ const LIFECYCLE_MERGE_FIELDS = [
   { tag: 'REFRSHDUE', name: 'Refresh Due Date', type: 'date' },
   { tag: 'SOURCESYS', name: 'Source System', type: 'dropdown', options: { choices: ['salonized', 'woocommerce', 'import', 'mixed'] } },
   { tag: 'LASTEMAIL', name: 'Last Automation Email', type: 'text' },
-  { tag: 'LASTEMAILDT', name: 'Last Automation Email Date', type: 'date' },
+  { tag: 'LASTEMAILD', name: 'Last Automation Email Date', type: 'date' },
 ];
 
 function normalizeDate(value) {
@@ -498,7 +498,12 @@ export async function ensureMergeFields(mergeFieldsToCreate) {
       await client.lists.addListMergeField(listId, field);
       results.push({ success: true, field: field.tag, status: 'created' });
     } catch (error) {
-      results.push({ success: false, field: field.tag, error: getErrorMessage(error) });
+      const message = getErrorMessage(error);
+      if (/already exists/i.test(message)) {
+        results.push({ success: true, field: field.tag, status: 'exists' });
+      } else {
+        results.push({ success: false, field: field.tag, error: message });
+      }
     }
   }
 
@@ -695,10 +700,27 @@ export async function deleteTemplate(templateId) {
 /**
  * Delete a Mailchimp campaign (cleanup after send or failed draft)
  */
-export async function deleteCampaign(campaignId) {
+async function waitForCampaignDeletable(campaignId, { maxWaitMs = 45000, intervalMs = 2000 } = {}) {
+  const client = initMailchimp();
+  const deadline = Date.now() + maxWaitMs;
+  while (Date.now() < deadline) {
+    const campaign = await client.campaigns.get(campaignId);
+    const status = campaign?.status;
+    if (status === 'save' || status === 'sent' || status === 'cancelled') {
+      return status;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+  return null;
+}
+
+export async function deleteCampaign(campaignId, { wait = false } = {}) {
   if (!campaignId) return { success: true, skipped: true };
   const client = initMailchimp();
   try {
+    if (wait) {
+      await waitForCampaignDeletable(campaignId);
+    }
     await client.campaigns.remove(campaignId);
     return { success: true };
   } catch (error) {
@@ -716,10 +738,14 @@ export async function updateSubscriberLastEmail(email, { subject = '', stage = '
   const label = (subject || stage || '').slice(0, 255);
 
   try {
-    await client.lists.updateListMember(listId, subscriberHash, {
+    const existing = await client.lists.getListMember(listId, subscriberHash);
+    await client.lists.setListMember(listId, subscriberHash, {
+      email_address: email,
+      status_if_new: existing.status || 'subscribed',
       merge_fields: {
+        ...existing.merge_fields,
         LASTEMAIL: label,
-        LASTEMAILDT: normalizeDate(sentAt),
+        LASTEMAILD: normalizeDate(sentAt),
       },
     });
     return { success: true };
@@ -773,7 +799,7 @@ export async function sendAftercareCampaign({
     campaignId = campaign.id;
     await client.campaigns.setContent(campaignId, { html: htmlContent });
     await client.campaigns.send(campaignId);
-    await deleteCampaign(campaignId);
+    await deleteCampaign(campaignId, { wait: true });
 
     return { success: true, campaignId, sent: emails.length, deleted: true };
   } catch (error) {

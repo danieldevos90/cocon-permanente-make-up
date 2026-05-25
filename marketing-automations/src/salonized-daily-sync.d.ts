@@ -14,6 +14,7 @@ export interface SalonizedDailySyncReport {
     todayAppointments: number;
     rawTodayAppointments?: number;
     updated: number;
+    plannedUpdates?: number;
     skippedOlderOrEqual: number;
     skippedNoMatch: number;
     skippedAmbiguous: number;
@@ -23,6 +24,11 @@ export interface SalonizedDailySyncReport {
     aftercareSent: number;
     aftercareErrors: number;
     errors: number;
+  };
+  details?: {
+    aftercareErrors?: Array<{ treatmentType: string; emails: string[]; error: string }>;
+    aftercareSent?: Array<{ treatmentType: string; emails: string[]; campaignId?: string }>;
+    errors?: Array<{ email: string; error: string }>;
   };
 }
 
