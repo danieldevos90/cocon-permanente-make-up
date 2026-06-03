@@ -33,8 +33,10 @@ export async function loadTenantSummaries(): Promise<TenantSummary[]> {
     "whatsapp-automations/src/tenant-store.js"
   );
 
+  const knownIds = listClientIds();
+  const redisIds = await listTenantIds();
   const ids = Array.from(
-    new Set([...(await listTenantIds()), ...listClientIds()])
+    new Set([...knownIds, ...redisIds.filter((id) => knownIds.includes(id))])
   ).sort();
   const gate = process.env.WHATSAPP_ONBOARD_ACCESS_TOKEN || "";
   const host =

@@ -3,7 +3,20 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const configRoot = path.join(__dirname, '..', 'config');
+
+function resolveConfigRoot() {
+  const candidates = [
+    path.join(__dirname, '..', 'config'),
+    path.join(process.cwd(), 'vendor', 'whatsapp-automations', 'config'),
+    path.join(process.cwd(), '..', 'whatsapp-automations', 'config'),
+  ];
+  for (const root of candidates) {
+    if (existsSync(path.join(root, 'platform.json'))) return root;
+  }
+  return candidates[0];
+}
+
+const configRoot = resolveConfigRoot();
 
 function readJson(relativePath) {
   const fullPath = path.join(configRoot, relativePath);
@@ -30,7 +43,7 @@ const client = {
   wabaId: clientRaw.wabaId || '',
 };
 
-export { platform, client };
+export { platform, client, configRoot };
 export const clientId = defaultClientId;
 
 export function getPlatformMeta() {
@@ -61,3 +74,14 @@ export function getClientById(id) {
     wabaId: raw.wabaId || '',
   };
 }
+
+export default {
+  platform,
+  client,
+  clientId,
+  configRoot,
+  getPlatformMeta,
+  getActiveClient,
+  listClientIds,
+  getClientById,
+};

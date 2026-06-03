@@ -16,7 +16,7 @@ const PMU_STAGE_MAP = {
 };
 
 function isMarketingProfile(options = {}) {
-  return options.profile === 'marketing' || options.clientId === 'demo-store-gym';
+  return options.profile === 'marketing';
 }
 
 function stageMapFor(options = {}) {
