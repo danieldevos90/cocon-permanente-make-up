@@ -6,14 +6,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function resolveConfigRoot() {
   const candidates = [
-    path.join(__dirname, '..', 'config'),
     path.join(process.cwd(), 'vendor', 'whatsapp-automations', 'config'),
     path.join(process.cwd(), '..', 'whatsapp-automations', 'config'),
+    path.join(__dirname, '..', 'config'),
   ];
   for (const root of candidates) {
-    if (existsSync(path.join(root, 'platform.json'))) return root;
+    const clientDir = path.join(root, 'clients');
+    if (
+      existsSync(path.join(root, 'platform.json')) &&
+      existsSync(clientDir) &&
+      readdirSync(clientDir).some((f) => f.endsWith('.json'))
+    ) {
+      return root;
+    }
   }
-  return candidates[0];
+  return path.join(__dirname, '..', 'config');
 }
 
 const configRoot = resolveConfigRoot();
