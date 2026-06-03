@@ -48,7 +48,14 @@ type WhatsAppStatus = {
   installed: boolean;
   reason?: string;
   platform?: { name?: string; appId?: string };
-  client?: { id?: string; displayName?: string; displayPhone?: string; wabaId?: string };
+  client?: {
+    id?: string;
+    displayName?: string;
+    description?: string;
+    displayPhone?: string;
+    wabaId?: string;
+    phoneNumberId?: string;
+  };
   config?: {
     dryRun: boolean;
     provider: string;
@@ -102,6 +109,12 @@ type WhatsAppStatus = {
     due: string;
   }>;
   integrations?: { mailchimp?: boolean; salonized?: boolean };
+  automation?: {
+    profile?: string;
+    stages?: string[];
+    segments?: string[];
+    segmentLabel?: string;
+  };
 };
 
 type EmailHistoryEvent = {
@@ -131,6 +144,8 @@ export default function DashboardPage() {
   const [whatsapp, setWhatsApp] = useState<WhatsAppStatus | null>(null);
   const [testPhone, setTestPhone] = useState("");
   const [testFirstName, setTestFirstName] = useState("Test");
+  const PMU_STAGES = ["aftercare", "browsRefresh", "lipsRefresh"];
+  const PMU_SEGMENTS = ["wenkbrauwen", "eyeliner", "lippen"];
   const [testStage, setTestStage] = useState("aftercare");
   const [testTreatment, setTestTreatment] = useState("wenkbrauwen");
   const [testSending, setTestSending] = useState(false);
@@ -179,6 +194,27 @@ export default function DashboardPage() {
     }
     fetchData();
   }, [activeClient]);
+
+  const stageOptions =
+    whatsapp?.automation?.stages?.length
+      ? whatsapp.automation.stages
+      : PMU_STAGES;
+  const segmentOptions =
+    whatsapp?.automation?.segments?.length
+      ? whatsapp.automation.segments
+      : PMU_SEGMENTS;
+  const segmentLabel =
+    whatsapp?.automation?.segmentLabel === "segment" ? "Segment" : "Treatment";
+  const isMarketingDemo = whatsapp?.automation?.profile === "marketing";
+
+  useEffect(() => {
+    if (!stageOptions.includes(testStage)) {
+      setTestStage(stageOptions[0] || "aftercare");
+    }
+    if (!segmentOptions.includes(testTreatment)) {
+      setTestTreatment(segmentOptions[0] || "wenkbrauwen");
+    }
+  }, [activeClient, stageOptions.join(","), segmentOptions.join(",")]);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -248,29 +284,18 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {activeClient === "marketing-test" && (
-          <Card className="border-amber-200 bg-amber-50/50">
-            <CardHeader>
-              <CardTitle className="text-base">WhatsApp marketing automation test</CardTitle>
-              <CardDescription>
-                Gebruik deze tenant om onboard, templates, webhook, dry-run en test sends te
-                valideren. Productie-mail en Salonized draaien alleen op{" "}
-                <Link href="/t/cocon/dashboard" className="underline">
-                  Cocon
-                </Link>
-                . API: <code className="text-xs">client=marketing-test</code> in JWT-requests.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )}
-
-        {!showMailchimp && activeClient !== "marketing-test" && (
+        {!showMailchimp && (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">E-mail (Mailchimp)</CardTitle>
               <CardDescription>
-                Voor tenant <code>{activeClient}</code> is alleen WhatsApp geconfigureerd.
-                Mailchimp + Salonized-sync draaien op <Link href="/t/cocon/dashboard" className="underline">Cocon</Link>.
+                {whatsapp?.client?.description ||
+                  `Tenant ${activeClient}: alleen WhatsApp.`}{" "}
+                Mailchimp + Salonized draaien op{" "}
+                <Link href="/t/cocon/dashboard" className="underline">
+                  Cocon
+                </Link>
+                .
               </CardDescription>
             </CardHeader>
           </Card>
@@ -374,9 +399,11 @@ export default function DashboardPage() {
             </CardTitle>
             <CardDescription>
               {whatsapp?.installed
-                ? whatsapp.config?.dryRun
-                  ? "Module geïnstalleerd — DRY RUN (geen live verzending)"
-                  : "Module geïnstalleerd — LIVE"
+                ? `${isMarketingDemo ? "Marketing test (store / gym)" : "PMU automation"} · ${
+                    whatsapp.config?.dryRun
+                      ? "DRY RUN (geen live verzending)"
+                      : "LIVE"
+                  }`
                 : `Niet geïnstalleerd${whatsapp?.reason ? ` (${whatsapp.reason})` : ""}`}
             </CardDescription>
           </CardHeader>
@@ -488,21 +515,25 @@ export default function DashboardPage() {
                       value={testStage}
                       onChange={(e) => setTestStage(e.target.value)}
                     >
-                      <option value="aftercare">aftercare</option>
-                      <option value="browsRefresh">browsRefresh</option>
-                      <option value="lipsRefresh">lipsRefresh</option>
+                      {stageOptions.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">Treatment</label>
+                    <label className="text-xs text-muted-foreground">{segmentLabel}</label>
                     <select
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       value={testTreatment}
                       onChange={(e) => setTestTreatment(e.target.value)}
                     >
-                      <option value="wenkbrauwen">wenkbrauwen</option>
-                      <option value="eyeliner">eyeliner</option>
-                      <option value="lippen">lippen</option>
+                      {segmentOptions.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div className="flex items-end">

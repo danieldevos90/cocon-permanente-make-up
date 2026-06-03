@@ -9,7 +9,6 @@
  */
 
 import { config } from './config.js';
-import { getClientById } from './client-config.js';
 
 let redisPromise = null;
 
@@ -129,20 +128,10 @@ export async function listTenantIds() {
     const { readdirSync } = await import('fs');
     const { join, dirname } = await import('path');
     const { fileURLToPath } = await import('url');
-    const roots = [
-      join(dirname(fileURLToPath(import.meta.url)), '..', 'config', 'clients'),
-      join(process.cwd(), 'vendor/whatsapp-automations/config/clients'),
-      join(process.cwd(), '../whatsapp-automations/config/clients'),
-    ];
-    for (const dir of roots) {
-      try {
-        for (const f of readdirSync(dir)) {
-          if (f.endsWith('.json') && !f.startsWith('_')) {
-            fromDisk.push(f.replace('.json', ''));
-          }
-        }
-      } catch {
-        // try next root
+    const dir = join(dirname(fileURLToPath(import.meta.url)), '..', 'config', 'clients');
+    for (const f of readdirSync(dir)) {
+      if (f.endsWith('.json') && !f.startsWith('_')) {
+        fromDisk.push(f.replace('.json', ''));
       }
     }
   } catch {
@@ -165,10 +154,6 @@ export async function listTenantIds() {
 export async function seedTenantFromEnv(clientId) {
   const existing = await getTenant(clientId);
   if (existing?.phoneNumberId && existing?.accessToken) return existing;
-
-  const client = getClientById(clientId);
-  const defaultId = process.env.CLIENT_ID || process.env.DEFAULT_CLIENT_ID || 'cocon';
-  if (client.envSeed === false || clientId !== defaultId) return existing;
 
   const wabaId = process.env.META_WHATSAPP_BUSINESS_ACCOUNT_ID || '';
   const phoneNumberId = process.env.META_WHATSAPP_PHONE_NUMBER_ID || '';

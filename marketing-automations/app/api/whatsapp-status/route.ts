@@ -17,10 +17,18 @@ export async function GET(request: NextRequest) {
     const { listAllWhatsAppTemplates } = await import(
       "whatsapp-automations/src/templates/index.js"
     );
+    const { getClientById } = await import(
+      "whatsapp-automations/src/client-config.js"
+    );
     const deliveryLog = await import("whatsapp-automations/src/delivery-log.js");
 
     const config = await buildConfigForClient(clientId);
-    const templates = listAllWhatsAppTemplates();
+    const clientMeta = getClientById(clientId);
+    const templates = listAllWhatsAppTemplates({
+      clientId,
+      profile: config.automationProfile,
+    });
+    const stages = Array.from(new Set(templates.map((t) => t.stage)));
     const logOpts = { days: 7, clientId };
     const recent = await deliveryLog.getRecentEvents(
       logOpts as { days?: number }
@@ -77,9 +85,17 @@ export async function GET(request: NextRequest) {
       client: {
         id: config.client?.id,
         displayName: config.client?.displayName,
+        description: clientMeta.description || "",
         displayPhone: config.sender?.displayPhone,
         wabaId: config.meta.businessAccountId,
         phoneNumberId: config.meta.phoneNumberId,
+      },
+      automation: {
+        profile: config.automationProfile || "pmu",
+        stages,
+        segments: config.treatmentTypes || [],
+        segmentLabel:
+          config.automationProfile === "marketing" ? "segment" : "treatment",
       },
       config: {
         dryRun: config.dryRun,

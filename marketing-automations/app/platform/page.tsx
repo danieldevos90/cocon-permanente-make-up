@@ -47,7 +47,7 @@ export default function PlatformPage() {
           <div>
             <h1 className="text-2xl font-semibold">{platformName}</h1>
             <p className="text-sm text-muted-foreground">
-              Kies een tenant — productie (Cocon) of de algemene WhatsApp marketing test.
+              Kies een tenant — productie (Cocon) of de algemene WhatsApp marketing test (Store / Gym).
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={logout}>
@@ -68,7 +68,7 @@ export default function PlatformPage() {
                     {t.displayName}
                     {t.isTestTenant && (
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
-                        Test
+                        Marketing test
                       </span>
                     )}
                   </CardTitle>

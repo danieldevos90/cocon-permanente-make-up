@@ -9,7 +9,7 @@ Eén Meta-app (**AFA - Message Platform**), meerdere klanten (tenants).
 | `/login` | Dashboard-wachtwoord |
 | `/platform` | Tenant-kiezer |
 | `/t/cocon/dashboard` | Cocon dashboard + Mailchimp sync |
-| `/t/marketing-test/dashboard` | Algemene WhatsApp marketing automation test |
+| `/t/demo-store-gym/dashboard` | Demo Store / Gym — algemene WhatsApp marketing test |
 | `/whatsapp/onboard?client=cocon&token=…` | Embedded Signup per tenant |
 | `/api/whatsapp-webhook` | Eén webhook; routing via `phone_number_id` |
 
@@ -51,10 +51,6 @@ Header alternatief: `X-AFA-Client: cocon`
 - `wa:{clientId}:inbox:*` — inbound webhook
 - `wa:{clientId}:schedule` — geplande sends
 
-## Testtenant (`marketing-test`)
-
-Algemene WhatsApp marketing automation test — geen Mailchimp/Salonized. Gebruik voor onboard, dry-run, webhook en JWT API (`client=marketing-test`). Oude URL `/t/demo-salon/*` redirect naar `/t/marketing-test/*`.
-
 ## Cocon-specifiek (Mailchimp + Salonized)
 
 - **Mailchimp** en **Salonized** draaien op **globale** Vercel-env (`API_KEY_MAILCHIMP`, `MAILCHIMP_LIST_ID`, Salonized-credentials in `marketing-automations`).
@@ -68,6 +64,10 @@ Algemene WhatsApp marketing automation test — geen Mailchimp/Salonized. Gebrui
 ```
 
 ```json
-// config/clients/marketing-test.json — WhatsApp-only testtenant
+// config/clients/demo-store-gym.json — marketing automation (store + gym)
+"automationProfile": "marketing",
 "integrations": { "mailchimp": false, "salonized": false }
+```
+
+Stages: `welcome`, `promo`, `reminder` · segmenten: `store`, `gym` · templates `demo_*_v1` (MARKETING).
 ```

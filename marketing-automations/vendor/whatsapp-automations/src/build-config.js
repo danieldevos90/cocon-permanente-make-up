@@ -118,12 +118,18 @@ export async function buildConfigForClient(clientId, tenantOverride = null) {
       },
     },
 
+    automationProfile: client.automationProfile || 'pmu',
+    marketingStages: client.marketingStages || {},
+
     treatmentTypes: client.treatmentTypes || ['wenkbrauwen', 'eyeliner', 'lippen'],
 
     messageTiming: {
       aftercare: client.messageTiming?.aftercare ?? 0,
       browsRefresh: client.messageTiming?.browsRefresh ?? 300,
       lipsRefresh: client.messageTiming?.lipsRefresh ?? 300,
+      welcome: client.messageTiming?.welcome ?? 0,
+      promo: client.messageTiming?.promo ?? 3,
+      reminder: client.messageTiming?.reminder ?? 14,
     },
 
     optIn: {

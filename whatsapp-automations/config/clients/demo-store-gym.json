@@ -1,0 +1,42 @@
+{
+  "id": "demo-store-gym",
+  "displayName": "Demo Store / Gym",
+  "description": "Algemene WhatsApp marketing automation test (store + gym) — geen PMU of Salonized",
+  "isTestTenant": true,
+  "displayPhone": "",
+  "onboardContactName": "Demo Owner",
+  "templatePrefix": "demo",
+  "senderName": "Demo Store / Gym",
+  "automationProfile": "marketing",
+  "treatmentTypes": ["store", "gym"],
+  "messageTiming": {
+    "welcome": 0,
+    "promo": 3,
+    "reminder": 14
+  },
+  "marketingStages": {
+    "welcome": {
+      "name": "Welcome",
+      "tag": "wa-demo-welcome-sent"
+    },
+    "promo": {
+      "name": "Promo",
+      "tag": "wa-demo-promo-sent"
+    },
+    "reminder": {
+      "name": "Reminder",
+      "tag": "wa-demo-reminder-sent"
+    }
+  },
+  "urls": {
+    "booking": "https://example.com/demo-book",
+    "landing": {
+      "store": "https://example.com/demo-store",
+      "gym": "https://example.com/demo-gym"
+    }
+  },
+  "integrations": {
+    "mailchimp": false,
+    "salonized": false
+  }
+}

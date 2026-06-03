@@ -10,14 +10,6 @@ export function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
-
-  // Legacy demo tenant → marketing test
-  const legacyDemo = pathname.match(/^\/t\/demo-salon(\/.*)?$/);
-  if (legacyDemo) {
-    const rest = legacyDemo[1] || "";
-    return NextResponse.redirect(new URL(`/t/marketing-test${rest}`, request.url));
-  }
-
   const isLogin = pathname === "/login";
   const isAuthApi = pathname.startsWith("/api/auth/");
   const isWhatsAppPublic =

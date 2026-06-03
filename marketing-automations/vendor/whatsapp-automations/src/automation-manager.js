@@ -20,6 +20,18 @@ import { logSend, markSent, hasSent } from './delivery-log.js';
 import { normalizePhone } from './phone.js';
 
 function getStages(cfg) {
+  if (cfg.automationProfile === 'marketing') {
+    const stages = {};
+    const defs = cfg.marketingStages || {};
+    for (const [key, def] of Object.entries(defs)) {
+      stages[key] = {
+        name: def.name || key,
+        daysAfter: cfg.messageTiming?.[key] ?? 0,
+        tag: def.tag || `wa-${key}-sent`,
+      };
+    }
+    return stages;
+  }
   return {
     aftercare: {
       name: 'Aftercare',
@@ -93,7 +105,10 @@ async function sendWhatsAppForStageInner(input, clientId) {
     return result;
   }
 
-  const template = getWhatsAppTemplate(stage, treatmentType);
+  const template = getWhatsAppTemplate(stage, treatmentType, {
+    clientId,
+    profile: cfg.automationProfile,
+  });
   if (!template) {
     result.reason = `no-template:${stage}/${treatmentType}`;
     await logSend({
@@ -192,6 +207,19 @@ export function planStagesForTreatment({ treatmentType, treatmentDate = new Date
   const stages = getStages(cfg);
   const planned = [];
   const date = treatmentDate instanceof Date ? treatmentDate : new Date(treatmentDate);
+
+  if (cfg.automationProfile === 'marketing') {
+    for (const [stageKey, stageInfo] of Object.entries(stages)) {
+      if (!cfg.treatmentTypes.includes(treatmentType)) continue;
+      planned.push({
+        stage: stageKey,
+        treatmentType,
+        scheduledDate: addDays(date, stageInfo.daysAfter),
+        clientId: clientId || cfg.client?.id,
+      });
+    }
+    return planned;
+  }
 
   if (stages.aftercare && cfg.treatmentTypes.includes(treatmentType)) {
     planned.push({

@@ -303,6 +303,25 @@ Conform `cocon-whatsapp-automatisering.md`:
 
 (Conversatie = 24-uurs venster vanaf eerste bericht.)
 
+## Demo tenant: Store / Gym (marketing test)
+
+Tenant `demo-store-gym` in `config/clients/demo-store-gym.json` — **geen PMU**, geen Mailchimp/Salonized.
+
+| | Cocon (`pmu`) | Demo Store / Gym (`marketing`) |
+|--|--|--|
+| Segmenten | wenkbrauwen, eyeliner, lippen | store, gym |
+| Stages | aftercare, browsRefresh, lipsRefresh | welcome, promo, reminder |
+| Templates | `cocon_*` (UTILITY) | `demo_*` (MARKETING) |
+
+Test via dashboard: `/t/demo-store-gym/dashboard` → **Send test** (phone + stage + segment).
+
+API:
+
+```http
+POST /api/v1/whatsapp/messages
+{ "client": "demo-store-gym", "phone": "316…", "stage": "welcome", "treatmentType": "store", "firstName": "Test" }
+```
+
 ## Roadmap
 
 ### Fase 1 — MVP (huidige scaffold)

@@ -79,8 +79,11 @@ await pass("GET /api/email-history", "GET", "/api/email-history", (s) => s === 2
 await pass("GET /api/whatsapp-status", "GET", "/api/whatsapp-status?client=cocon", (s, _t, j) =>
   s === 200 && j?.integrations?.mailchimp === true
 );
-await pass("GET /api/whatsapp-status test tenant", "GET", "/api/whatsapp-status?client=marketing-test", (s, _t, j) =>
-  s === 200 && j?.integrations?.mailchimp === false && j?.client?.id === "marketing-test"
+await pass("GET /api/whatsapp-status demo", "GET", "/api/whatsapp-status?client=demo-store-gym", (s, _t, j) =>
+  s === 200 &&
+    j?.integrations?.mailchimp === false &&
+    j?.automation?.profile === "marketing" &&
+    j?.templates?.length >= 6
 );
 await pass("GET /platform (no cookie)", "GET", "/platform", (s) => s === 302 || s === 307);
 await pass("GET /api/auth/verify (no cookie)", "GET", "/api/auth/verify", (s) => s === 401 || s === 200);
