@@ -21,6 +21,15 @@ const client = readJson(path.join(waRoot, 'config', 'clients', `${clientId}.json
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/**': [
+        './vendor/whatsapp-automations/config/**/*',
+        './vendor/whatsapp-automations/src/**/*.js',
+      ],
+      '/t/**': ['./vendor/whatsapp-automations/config/**/*'],
+    },
+  },
   env: {
     NEXT_PUBLIC_PLATFORM_NAME:
       process.env.NEXT_PUBLIC_PLATFORM_NAME ||
