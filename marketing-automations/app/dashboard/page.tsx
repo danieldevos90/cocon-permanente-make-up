@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -12,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckCircle2, XCircle, Loader2, LogOut, MessageCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, LogOut, MessageCircle, Send } from "lucide-react";
+import { dashboardTitle, metaAppId, clientId } from "@/lib/platform";
 
 type Overview = {
   generatedAt: string;
@@ -33,6 +35,10 @@ type CronEntry = {
   appointments: number;
   updated: number;
   errors: number;
+  aftercareSent?: number;
+  aftercareErrors?: number;
+  journeySent?: number;
+  journeyErrors?: number;
   elapsed: string;
 };
 
@@ -40,10 +46,15 @@ type WhatsAppStatus = {
   ok: boolean;
   installed: boolean;
   reason?: string;
+  platform?: { name?: string; appId?: string };
+  client?: { id?: string; displayName?: string; displayPhone?: string; wabaId?: string };
   config?: {
     dryRun: boolean;
     provider: string;
     apiVersion: string;
+    appId?: string;
+    embeddedSignupConfigured?: boolean;
+    accessTokenConfigured?: boolean;
     phoneNumberConfigured: boolean;
     wabaConfigured: boolean;
     fallbackToEmail: boolean;
@@ -107,6 +118,12 @@ export default function DashboardPage() {
   const [cronHistory, setCronHistory] = useState<{ entries: CronEntry[]; configured: boolean } | null>(null);
   const [emailHistory, setEmailHistory] = useState<{ events: EmailHistoryEvent[]; configured: boolean } | null>(null);
   const [whatsapp, setWhatsApp] = useState<WhatsAppStatus | null>(null);
+  const [testPhone, setTestPhone] = useState("");
+  const [testFirstName, setTestFirstName] = useState("Test");
+  const [testStage, setTestStage] = useState("aftercare");
+  const [testTreatment, setTestTreatment] = useState("wenkbrauwen");
+  const [testSending, setTestSending] = useState(false);
+  const [testResult, setTestResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -150,6 +167,37 @@ export default function DashboardPage() {
     router.refresh();
   }
 
+  async function handleTestSend(e: React.FormEvent) {
+    e.preventDefault();
+    setTestSending(true);
+    setTestResult(null);
+    try {
+      const res = await fetch("/api/whatsapp-test-send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stage: testStage,
+          treatmentType: testTreatment,
+          phone: testPhone,
+          firstName: testFirstName,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        const mode = data.dryRun ? "DRY RUN" : "LIVE";
+        setTestResult(`${mode}: ${data.templateName} → ${data.phone}${data.messageId ? ` (${data.messageId})` : ""}`);
+        const waRes = await fetch("/api/whatsapp-status");
+        if (waRes.ok) setWhatsApp(await waRes.json());
+      } else {
+        setTestResult(data.reason || data.error || "Send failed");
+      }
+    } catch {
+      setTestResult("Network error");
+    } finally {
+      setTestSending(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -162,7 +210,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Cocon Marketing Dashboard</h1>
+          <h1 className="text-xl font-semibold">{dashboardTitle}</h1>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Uitloggen
@@ -225,6 +273,8 @@ export default function DashboardPage() {
                     <TableHead className="text-center">Syncs</TableHead>
                     <TableHead className="text-center">Appointments</TableHead>
                     <TableHead className="text-center">Updated</TableHead>
+                    <TableHead className="text-center">Nazorg</TableHead>
+                    <TableHead className="text-center">Journey</TableHead>
                     <TableHead className="text-center">Errors</TableHead>
                     <TableHead>Elapsed</TableHead>
                   </TableRow>
@@ -236,6 +286,8 @@ export default function DashboardPage() {
                       <TableCell className="text-center">{row.syncs ?? 1}</TableCell>
                       <TableCell className="text-center">{row.appointments}</TableCell>
                       <TableCell className="text-center">{row.updated}</TableCell>
+                      <TableCell className="text-center">{row.aftercareSent ?? 0}</TableCell>
+                      <TableCell className="text-center">{row.journeySent ?? 0}</TableCell>
                       <TableCell className="text-center">{row.errors}</TableCell>
                       <TableCell>{row.elapsed}</TableCell>
                     </TableRow>
@@ -268,6 +320,24 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <p className="text-sm">
+              Client:{" "}
+              <span className="font-medium">
+                {whatsapp?.client?.displayName || clientId}
+              </span>
+              {whatsapp?.client?.displayPhone ? (
+                <> · {whatsapp.client.displayPhone}</>
+              ) : null}
+              {" · "}
+              <a
+                href={`/whatsapp/onboard?client=${encodeURIComponent(whatsapp?.client?.id || clientId)}`}
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                WhatsApp onboarding
+              </a>
+              {" · "}
+              Meta app <span className="font-mono text-xs">{metaAppId}</span>
+            </p>
             {whatsapp?.installed && whatsapp.config && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                 <div>
@@ -285,6 +355,30 @@ export default function DashboardPage() {
                   <span className="font-medium">{whatsapp.config.apiVersion}</span>
                 </div>
                 <div>
+                  <span className="text-muted-foreground">Embedded Signup:</span>{" "}
+                  <span
+                    className={
+                      whatsapp.config.embeddedSignupConfigured
+                        ? "text-green-600"
+                        : "text-yellow-600 font-medium"
+                    }
+                  >
+                    {whatsapp.config.embeddedSignupConfigured ? "ok" : "config ID ontbreekt"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Access token:</span>{" "}
+                  <span
+                    className={
+                      whatsapp.config.accessTokenConfigured
+                        ? "text-green-600"
+                        : "text-yellow-600 font-medium"
+                    }
+                  >
+                    {whatsapp.config.accessTokenConfigured ? "ok" : "nieuw token nodig"}
+                  </span>
+                </div>
+                <div>
                   <span className="text-muted-foreground">Phone:</span>{" "}
                   <span className={whatsapp.config.phoneNumberConfigured ? "text-green-600" : "text-muted-foreground"}>
                     {whatsapp.config.phoneNumberConfigured ? "configured" : "not set"}
@@ -300,6 +394,75 @@ export default function DashboardPage() {
                   <span className="text-muted-foreground">Fallback email:</span>{" "}
                   <span className="font-medium">{whatsapp.config.fallbackToEmail ? "aan" : "uit"}</span>
                 </div>
+              </div>
+            )}
+
+            {whatsapp?.installed && (
+              <div className="rounded-lg border p-4 space-y-3">
+                <h3 className="text-sm font-medium flex items-center gap-2">
+                  <Send className="h-4 w-4" />
+                  Test send (App Review / QA)
+                </h3>
+                <form onSubmit={handleTestSend} className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+                  <div>
+                    <label className="text-xs text-muted-foreground">Phone (E.164, no +)</label>
+                    <Input
+                      value={testPhone}
+                      onChange={(e) => setTestPhone(e.target.value)}
+                      placeholder="31612345678"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">First name</label>
+                    <Input
+                      value={testFirstName}
+                      onChange={(e) => setTestFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">Stage</label>
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={testStage}
+                      onChange={(e) => setTestStage(e.target.value)}
+                    >
+                      <option value="aftercare">aftercare</option>
+                      <option value="browsRefresh">browsRefresh</option>
+                      <option value="lipsRefresh">lipsRefresh</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">Treatment</label>
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={testTreatment}
+                      onChange={(e) => setTestTreatment(e.target.value)}
+                    >
+                      <option value="wenkbrauwen">wenkbrauwen</option>
+                      <option value="eyeliner">eyeliner</option>
+                      <option value="lippen">lippen</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button type="submit" className="w-full" disabled={testSending}>
+                      {testSending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending…
+                        </>
+                      ) : (
+                        "Send test"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+                {testResult && (
+                  <p className="text-sm text-muted-foreground font-mono">{testResult}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Skips opt-in and dedupe. In DRY RUN mode logs only; set WHATSAPP_DRY_RUN=false for live App Review video.
+                </p>
               </div>
             )}
 
@@ -377,7 +540,7 @@ export default function DashboardPage() {
                   Recente klant-replies (observer mode)
                 </h3>
                 <p className="text-xs text-muted-foreground mb-2">
-                  Binnenkomende berichten worden alleen gelogd — Daniela reageert vanaf de telefoon (coexistence).
+                  Incoming messages are logged only — the business replies from their phone (coexistence).
                 </p>
                 {whatsapp.inbox.messages.length > 0 ? (
                   <Table>

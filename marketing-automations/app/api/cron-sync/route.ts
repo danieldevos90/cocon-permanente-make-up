@@ -4,6 +4,7 @@ export const maxDuration = 300;
 import { runSalonizedDailySync, runJourneyEmails } from "../../../src/salonized-daily-sync.js";
 import { listCampaignsSentSince } from "../../../src/mailchimp-client.js";
 import { Redis } from "@upstash/redis";
+import { appendCronRun } from "../../../src/cron-history-store.js";
 
 const REDIS_URL =
   process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
@@ -16,28 +17,42 @@ type CronRun = {
   appointments: number;
   updated: number;
   errors: number;
+  aftercareSent: number;
+  aftercareErrors: number;
+  journeySent: number;
+  journeyErrors: number;
   elapsed: string;
 };
 
 async function writeCronToRedis(
   date: string,
-  totals: { todayAppointments?: number; rawTodayAppointments?: number; updated?: number; errors?: number },
+  totals: {
+    todayAppointments?: number;
+    rawTodayAppointments?: number;
+    updated?: number;
+    errors?: number;
+    aftercareSent?: number;
+    aftercareErrors?: number;
+  },
+  journeyTotals: { sent?: number; errors?: number } | null,
   elapsed: string
 ) {
   if (!REDIS_URL || !REDIS_TOKEN) return;
   try {
     const redis = new Redis({ url: REDIS_URL, token: REDIS_TOKEN });
-    const key = `cron:${date}`;
     const run: CronRun = {
       date,
       time: new Date().toISOString(),
       appointments: totals.todayAppointments ?? totals.rawTodayAppointments ?? 0,
       updated: totals.updated ?? 0,
       errors: totals.errors ?? 0,
+      aftercareSent: totals.aftercareSent ?? 0,
+      aftercareErrors: totals.aftercareErrors ?? 0,
+      journeySent: journeyTotals?.sent ?? 0,
+      journeyErrors: journeyTotals?.errors ?? 0,
       elapsed: `${elapsed}s`,
     };
-    await redis.rpush(key, JSON.stringify(run));
-    await redis.expire(key, 60 * 60 * 24 * 90); // 90 dagen bewaren
+    await appendCronRun(redis, date, run);
   } catch (err) {
     console.error("[cron-sync] Redis write failed:", (err as Error).message);
   }
@@ -114,7 +129,7 @@ async function handleCronSync(request: NextRequest) {
     }
 
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-    await writeCronToRedis(dayIso, t, elapsed);
+    await writeCronToRedis(dayIso, t, j, elapsed);
 
     const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const campaignsResult = await listCampaignsSentSince(since24h);
@@ -139,6 +154,7 @@ async function handleCronSync(request: NextRequest) {
       await writeCronToRedis(
         dayIso,
         { todayAppointments: 0, updated: 0, errors: 1 },
+        null,
         elapsed
       );
     }
