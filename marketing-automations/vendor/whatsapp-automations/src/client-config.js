@@ -3,16 +3,34 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const configRoot = path.join(__dirname, '..', 'config');
+
+function configRoots() {
+  return [
+    path.join(__dirname, '..', 'config'),
+    path.join(process.cwd(), 'vendor/whatsapp-automations/config'),
+    path.join(process.cwd(), '../whatsapp-automations/config'),
+  ];
+}
 
 function readJson(relativePath) {
-  const fullPath = path.join(configRoot, relativePath);
-  if (!existsSync(fullPath)) return null;
-  try {
-    return JSON.parse(readFileSync(fullPath, 'utf8'));
-  } catch {
-    return null;
+  for (const root of configRoots()) {
+    const fullPath = path.join(root, relativePath);
+    if (!existsSync(fullPath)) continue;
+    try {
+      return JSON.parse(readFileSync(fullPath, 'utf8'));
+    } catch {
+      return null;
+    }
   }
+  return null;
+}
+
+function clientsDir() {
+  for (const root of configRoots()) {
+    const dir = path.join(root, 'clients');
+    if (existsSync(dir)) return dir;
+  }
+  return null;
 }
 
 const platform = readJson('platform.json') || {};
@@ -43,7 +61,9 @@ export function getActiveClient() {
 
 export function listClientIds() {
   try {
-    return readdirSync(path.join(configRoot, 'clients'))
+    const dir = clientsDir();
+    if (!dir) return [defaultClientId];
+    return readdirSync(dir)
       .filter((f) => f.endsWith('.json') && !f.startsWith('_'))
       .map((f) => f.replace('.json', ''))
       .sort();

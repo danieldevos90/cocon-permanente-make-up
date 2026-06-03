@@ -129,10 +129,20 @@ export async function listTenantIds() {
     const { readdirSync } = await import('fs');
     const { join, dirname } = await import('path');
     const { fileURLToPath } = await import('url');
-    const dir = join(dirname(fileURLToPath(import.meta.url)), '..', 'config', 'clients');
-    for (const f of readdirSync(dir)) {
-      if (f.endsWith('.json') && !f.startsWith('_')) {
-        fromDisk.push(f.replace('.json', ''));
+    const roots = [
+      join(dirname(fileURLToPath(import.meta.url)), '..', 'config', 'clients'),
+      join(process.cwd(), 'vendor/whatsapp-automations/config/clients'),
+      join(process.cwd(), '../whatsapp-automations/config/clients'),
+    ];
+    for (const dir of roots) {
+      try {
+        for (const f of readdirSync(dir)) {
+          if (f.endsWith('.json') && !f.startsWith('_')) {
+            fromDisk.push(f.replace('.json', ''));
+          }
+        }
+      } catch {
+        // try next root
       }
     }
   } catch {
