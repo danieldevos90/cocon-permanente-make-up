@@ -1,0 +1,20 @@
+{
+  "appId": "823081517310848",
+  "appName": "AFA - Message Platform",
+  "businessPortfolioId": "880029304670791",
+  "businessPortfolioName": "Alt F Awesome",
+  "embeddedSignupConfigId": "971625582419184",
+  "systemUserId": "61590276314460",
+  "systemUserName": "afawhatsappfunction",
+  "vercelHost": "marketing-automations-kohl.vercel.app",
+  "onboardPath": "/whatsapp/onboard",
+  "webhookPath": "/api/whatsapp-webhook",
+  "metaUrls": {
+    "dashboard": "https://developers.facebook.com/apps/823081517310848/dashboard/?business_id=880029304670791",
+    "basicSettings": "https://developers.facebook.com/apps/823081517310848/settings/basic/?business_id=880029304670791",
+    "whatsappCustomize": "https://developers.facebook.com/apps/823081517310848/use_cases/customize/wa-dev-console/?product_route=whatsapp-business&business_id=880029304670791",
+    "businessSettings": "https://business.facebook.com/latest/settings/?business_id=880029304670791",
+    "systemUsers": "https://business.facebook.com/latest/settings/system_users/?business_id=880029304670791",
+    "whatsappAccounts": "https://business.facebook.com/latest/settings/whatsapp_account?business_id=880029304670791"
+  }
+}

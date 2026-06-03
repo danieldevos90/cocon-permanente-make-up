@@ -1,6 +1,7 @@
 .vercel
 .env
 .env.local
+.env.production.local
 DASHBOARD_PASSWORD.txt
 node_modules/
 .next/

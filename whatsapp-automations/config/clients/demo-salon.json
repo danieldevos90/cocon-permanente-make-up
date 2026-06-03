@@ -1,0 +1,25 @@
+{
+  "id": "demo-salon",
+  "displayName": "Demo Salon",
+  "displayPhone": "",
+  "onboardContactName": "Owner",
+  "templatePrefix": "demo",
+  "senderName": "Demo Salon",
+  "treatmentTypes": ["wenkbrauwen", "lippen"],
+  "messageTiming": {
+    "aftercare": 0,
+    "browsRefresh": 300,
+    "lipsRefresh": 300
+  },
+  "urls": {
+    "booking": "https://example.com/book",
+    "aftercare": {
+      "wenkbrauwen": "https://example.com/aftercare-brows",
+      "lippen": "https://example.com/aftercare-lips"
+    }
+  },
+  "integrations": {
+    "mailchimp": false,
+    "salonized": false
+  }
+}

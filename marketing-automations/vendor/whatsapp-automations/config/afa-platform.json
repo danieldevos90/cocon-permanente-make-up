@@ -1,0 +1,15 @@
+{
+  "$schema": "platform pointer — see config/platform.json and config/clients/*.json",
+  "appId": "823081517310848",
+  "appName": "AFA - Message Platform",
+  "businessPortfolioId": "880029304670791",
+  "businessPortfolioName": "Alt F Awesome",
+  "defaultClientId": "cocon",
+  "configPaths": {
+    "platform": "config/platform.json",
+    "clients": "config/clients/"
+  },
+  "vercelHost": "marketing-automations-kohl.vercel.app",
+  "onboardPath": "/whatsapp/onboard",
+  "webhookPath": "/api/whatsapp-webhook"
+}

@@ -14,8 +14,17 @@
  */
 
 import { config } from './config.js';
+import { getContextClientId } from './tenant-context.js';
 
 let redisClientPromise = null;
+
+function resolveClientId(clientId) {
+  return clientId || getContextClientId() || config.client?.id || process.env.CLIENT_ID || 'cocon';
+}
+
+function ns(clientId) {
+  return `wa:${resolveClientId(clientId)}`;
+}
 
 async function getRedis() {
   if (!config.redis.url || !config.redis.token) return null;
@@ -27,11 +36,11 @@ async function getRedis() {
   return redisClientPromise;
 }
 
-function todayKey(date = new Date()) {
+function todayKey(date = new Date(), clientId) {
   const yyyy = date.getUTCFullYear();
   const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
   const dd = String(date.getUTCDate()).padStart(2, '0');
-  return `wa:log:${yyyy}-${mm}-${dd}`;
+  return `${ns(clientId)}:log:${yyyy}-${mm}-${dd}`;
 }
 
 /**
@@ -49,9 +58,10 @@ function todayKey(date = new Date()) {
  * @param {string} [event.error]
  * @param {string} [event.fallback]     "email-sent" | "none"
  */
-export async function logSend(event) {
+export async function logSend(event, { clientId } = {}) {
   const enriched = {
     timestamp: new Date().toISOString(),
+    clientId: resolveClientId(clientId),
     dryRun: !!event.dryRun,
     ...event,
   };
@@ -68,7 +78,7 @@ export async function logSend(event) {
   if (!redis) return { logged: false, reason: 'redis-not-configured' };
 
   try {
-    const key = todayKey();
+    const key = todayKey(new Date(), enriched.clientId);
     await redis.rpush(key, JSON.stringify(enriched));
     await redis.expire(key, 60 * 60 * 24 * 180);
     return { logged: true };
@@ -82,11 +92,11 @@ export async function logSend(event) {
  * Markeer een (stage + email) als verstuurd, om dubbele sends te voorkomen
  * binnen dezelfde cron-cyclus.
  */
-export async function markSent({ stage, treatmentType, email }) {
+export async function markSent({ stage, treatmentType, email, clientId }) {
   const redis = await getRedis();
   if (!redis) return false;
   try {
-    const key = `wa:tag:${stage}:${treatmentType}:${(email || '').toLowerCase()}`;
+    const key = `${ns(clientId)}:tag:${stage}:${treatmentType}:${(email || '').toLowerCase()}`;
     await redis.set(key, 'yes', { ex: 60 * 60 * 24 * 400 }); // ~13 maanden
     return true;
   } catch (error) {
@@ -95,11 +105,11 @@ export async function markSent({ stage, treatmentType, email }) {
   }
 }
 
-export async function hasSent({ stage, treatmentType, email }) {
+export async function hasSent({ stage, treatmentType, email, clientId }) {
   const redis = await getRedis();
   if (!redis) return false;
   try {
-    const key = `wa:tag:${stage}:${treatmentType}:${(email || '').toLowerCase()}`;
+    const key = `${ns(clientId)}:tag:${stage}:${treatmentType}:${(email || '').toLowerCase()}`;
     const result = await redis.get(key);
     return result === 'yes';
   } catch {
@@ -110,16 +120,17 @@ export async function hasSent({ stage, treatmentType, email }) {
 /**
  * Laad de laatste N dagen aan WhatsApp send events voor het dashboard.
  */
-export async function getRecentEvents({ days = 7 } = {}) {
+export async function getRecentEvents({ days = 7, clientId } = {}) {
   const redis = await getRedis();
   if (!redis) return { configured: false, events: [] };
 
   const events = [];
+  const cid = resolveClientId(clientId);
   const now = new Date();
   for (let i = 0; i < days; i += 1) {
     const date = new Date(now);
     date.setUTCDate(date.getUTCDate() - i);
-    const key = todayKey(date);
+    const key = todayKey(date, cid);
     try {
       const raw = await redis.lrange(key, 0, -1);
       for (const item of raw) {
@@ -138,11 +149,11 @@ export async function getRecentEvents({ days = 7 } = {}) {
   return { configured: true, events };
 }
 
-function inboxKey(date = new Date()) {
+function inboxKey(date = new Date(), clientId) {
   const yyyy = date.getUTCFullYear();
   const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
   const dd = String(date.getUTCDate()).padStart(2, '0');
-  return `wa:inbox:${yyyy}-${mm}-${dd}`;
+  return `${ns(clientId)}:inbox:${yyyy}-${mm}-${dd}`;
 }
 
 /**
@@ -161,9 +172,11 @@ function inboxKey(date = new Date()) {
  * @param {string} [message.waMessageId]
  * @param {string} [message.timestamp]    ISO of Meta timestamp seconds
  */
-export async function logInbound(message) {
+export async function logInbound(message, { clientId } = {}) {
+  const cid = resolveClientId(clientId);
   const enriched = {
     direction: 'inbound',
+    clientId: cid,
     timestamp: message.timestamp
       ? (typeof message.timestamp === 'number' || /^\d+$/.test(String(message.timestamp))
         ? new Date(Number(message.timestamp) * 1000).toISOString()
@@ -181,7 +194,7 @@ export async function logInbound(message) {
   if (!redis) return { logged: false, reason: 'redis-not-configured' };
 
   try {
-    const key = inboxKey();
+    const key = inboxKey(new Date(), cid);
     await redis.rpush(key, JSON.stringify(enriched));
     await redis.expire(key, 60 * 60 * 24 * 180);
     return { logged: true };
@@ -194,9 +207,11 @@ export async function logInbound(message) {
 /**
  * Log een delivery-status update van Meta (sent/delivered/read/failed).
  */
-export async function logStatus(status) {
+export async function logStatus(status, { clientId } = {}) {
+  const cid = resolveClientId(clientId);
   const enriched = {
     direction: 'status',
+    clientId: cid,
     timestamp: status.timestamp
       ? (typeof status.timestamp === 'number' || /^\d+$/.test(String(status.timestamp))
         ? new Date(Number(status.timestamp) * 1000).toISOString()
@@ -214,7 +229,7 @@ export async function logStatus(status) {
   if (!redis) return { logged: false, reason: 'redis-not-configured' };
 
   try {
-    const key = todayKey();
+    const key = todayKey(new Date(), enriched.clientId);
     await redis.rpush(key, JSON.stringify(enriched));
     await redis.expire(key, 60 * 60 * 24 * 180);
     return { logged: true };
@@ -226,16 +241,17 @@ export async function logStatus(status) {
 /**
  * Laad recente inkomende klant-berichten (laatste N dagen).
  */
-export async function getRecentInbox({ days = 7 } = {}) {
+export async function getRecentInbox({ days = 7, clientId } = {}) {
   const redis = await getRedis();
   if (!redis) return { configured: false, messages: [] };
 
   const messages = [];
+  const cid = resolveClientId(clientId);
   const now = new Date();
   for (let i = 0; i < days; i += 1) {
     const date = new Date(now);
     date.setUTCDate(date.getUTCDate() - i);
-    const key = inboxKey(date);
+    const key = inboxKey(date, cid);
     try {
       const raw = await redis.lrange(key, 0, -1);
       for (const item of raw) {

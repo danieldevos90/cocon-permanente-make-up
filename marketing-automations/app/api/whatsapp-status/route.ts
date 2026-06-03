@@ -1,36 +1,47 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { resolveClientId } from "@/lib/tenants";
+import { tenantIntegrations } from "@/lib/client-integrations.server";
 
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/whatsapp-status
- *
- * Verzamelt status van de ../whatsapp-automations module voor het dashboard:
- *   - config (dry-run, geconfigureerde providers)
- *   - lokale templates + Meta-status
- *   - recente delivery events uit Redis (laatste 7 dagen)
- *   - geplande sends uit Redis ZSET
- *
- * Faalt gracefully wanneer de WhatsApp-module nog niet geïnstalleerd is.
+ * GET /api/whatsapp-status?client=cocon
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const clientId = resolveClientId(request.nextUrl.searchParams.get("client"));
+
   try {
-    const [{ config }, { listAllWhatsAppTemplates }, deliveryLog] = await Promise.all([
-      import("whatsapp-automations/src/config.js"),
-      import("whatsapp-automations/src/templates/index.js"),
-      import("whatsapp-automations/src/delivery-log.js"),
-    ]);
+    const { buildConfigForClient } = await import(
+      "whatsapp-automations/src/build-config.js"
+    );
+    const { listAllWhatsAppTemplates } = await import(
+      "whatsapp-automations/src/templates/index.js"
+    );
+    const deliveryLog = await import("whatsapp-automations/src/delivery-log.js");
 
+    const config = await buildConfigForClient(clientId);
     const templates = listAllWhatsAppTemplates();
-    const recent = await deliveryLog.getRecentEvents({ days: 7 });
-    const inbox = await deliveryLog.getRecentInbox({ days: 7 });
+    const logOpts = { days: 7, clientId };
+    const recent = await deliveryLog.getRecentEvents(
+      logOpts as { days?: number }
+    );
+    const inbox = await deliveryLog.getRecentInbox(
+      logOpts as { days?: number }
+    );
 
-    let scheduled: Array<{ stage: string; treatmentType: string; email: string; due: string }> = [];
+    let scheduled: Array<{
+      stage: string;
+      treatmentType: string;
+      email: string;
+      due: string;
+    }> = [];
+
     if (config.redis.url && config.redis.token) {
       try {
         const { Redis } = await import("@upstash/redis");
         const redis = new Redis({ url: config.redis.url, token: config.redis.token });
-        const raw = await redis.zrange<string[]>("wa:schedule", 0, -1, { withScores: true });
+        const scheduleKey = `wa:${clientId}:schedule`;
+        const raw = await redis.zrange<string[]>(scheduleKey, 0, -1, { withScores: true });
         for (let i = 0; i < raw.length; i += 2) {
           const member = raw[i] as unknown as string;
           const score = Number(raw[i + 1]);
@@ -43,7 +54,7 @@ export async function GET() {
               due: new Date(score * 1000).toISOString(),
             });
           } catch {
-            // skip invalid entry
+            // skip
           }
         }
       } catch (error) {
@@ -55,10 +66,28 @@ export async function GET() {
       ok: true,
       generatedAt: new Date().toISOString(),
       installed: true,
+      clientId,
+      integrations: tenantIntegrations(clientId),
+      platform: {
+        name: config.platform?.name,
+        appId: config.meta.appId,
+        businessPortfolioId: config.platform?.businessPortfolioId,
+        businessPortfolioName: config.platform?.businessPortfolioName,
+      },
+      client: {
+        id: config.client?.id,
+        displayName: config.client?.displayName,
+        displayPhone: config.sender?.displayPhone,
+        wabaId: config.meta.businessAccountId,
+        phoneNumberId: config.meta.phoneNumberId,
+      },
       config: {
         dryRun: config.dryRun,
         provider: config.provider,
         apiVersion: config.meta.apiVersion,
+        appId: config.meta.appId || "",
+        embeddedSignupConfigured: Boolean(config.meta.embeddedSignupConfigId),
+        accessTokenConfigured: Boolean(config.meta.accessToken),
         phoneNumberConfigured: Boolean(config.meta.phoneNumberId),
         wabaConfigured: Boolean(config.meta.businessAccountId),
         fallbackToEmail: config.fallbackToEmail,
@@ -86,6 +115,8 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       installed: false,
+      clientId,
+      integrations: tenantIntegrations(clientId),
       reason: (error as Error).message,
       generatedAt: new Date().toISOString(),
     });

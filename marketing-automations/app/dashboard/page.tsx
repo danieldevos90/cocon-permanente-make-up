@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 import { CheckCircle2, XCircle, Loader2, LogOut, MessageCircle, Send } from "lucide-react";
 import { dashboardTitle, metaAppId, clientId } from "@/lib/platform";
 
@@ -100,6 +101,7 @@ type WhatsAppStatus = {
     email: string;
     due: string;
   }>;
+  integrations?: { mailchimp?: boolean; salonized?: boolean };
 };
 
 type EmailHistoryEvent = {
@@ -114,6 +116,15 @@ type EmailHistoryEvent = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const routeClient = useMemo(
+    () => pathname.match(/^\/t\/([^/]+)\/dashboard/)?.[1],
+    [pathname]
+  );
+  const activeClient = routeClient || clientId;
+  const [showMailchimp, setShowMailchimp] = useState(activeClient === "cocon");
+
   const [overview, setOverview] = useState<Overview | null>(null);
   const [cronHistory, setCronHistory] = useState<{ entries: CronEntry[]; configured: boolean } | null>(null);
   const [emailHistory, setEmailHistory] = useState<{ events: EmailHistoryEvent[]; configured: boolean } | null>(null);
@@ -125,33 +136,41 @@ export default function DashboardPage() {
   const [testSending, setTestSending] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       try {
-        const [overviewRes, cronRes, emailRes, waRes] = await Promise.all([
-          fetch("/api/overview"),
-          fetch("/api/cron-history"),
-          fetch("/api/email-history"),
-          fetch("/api/whatsapp-status"),
-        ]);
-        if (overviewRes.ok) {
-          const data = await overviewRes.json();
-          setOverview(data);
-        }
-        if (cronRes.ok) {
-          const data = await cronRes.json();
-          setCronHistory(data);
-        }
-        if (emailRes.ok) {
-          const data = await emailRes.json();
-          setEmailHistory(data);
-        }
+        const waRes = await fetch(
+          `/api/whatsapp-status?client=${encodeURIComponent(activeClient)}`
+        );
+        let mailchimpEnabled = activeClient === "cocon";
         if (waRes.ok) {
-          const data = await waRes.json();
-          setWhatsApp(data);
+          const wa = (await waRes.json()) as WhatsAppStatus;
+          setWhatsApp(wa);
+          mailchimpEnabled = wa.integrations?.mailchimp ?? activeClient === "cocon";
         }
+        setShowMailchimp(mailchimpEnabled);
+
+        const fetches: Promise<void>[] = [];
+        if (mailchimpEnabled) {
+          fetches.push(
+            fetch("/api/overview").then(async (overviewRes) => {
+              if (overviewRes.ok) setOverview(await overviewRes.json());
+            }),
+            fetch("/api/cron-history").then(async (cronRes) => {
+              if (cronRes.ok) setCronHistory(await cronRes.json());
+            }),
+            fetch("/api/email-history").then(async (emailRes) => {
+              if (emailRes.ok) setEmailHistory(await emailRes.json());
+            })
+          );
+        } else {
+          setOverview(null);
+          setCronHistory(null);
+          setEmailHistory(null);
+        }
+        await Promise.all(fetches);
       } catch (err) {
         console.error(err);
       } finally {
@@ -159,7 +178,7 @@ export default function DashboardPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [activeClient]);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -176,6 +195,7 @@ export default function DashboardPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          client: activeClient,
           stage: testStage,
           treatmentType: testTreatment,
           phone: testPhone,
@@ -186,7 +206,9 @@ export default function DashboardPage() {
       if (data.ok) {
         const mode = data.dryRun ? "DRY RUN" : "LIVE";
         setTestResult(`${mode}: ${data.templateName} → ${data.phone}${data.messageId ? ` (${data.messageId})` : ""}`);
-        const waRes = await fetch("/api/whatsapp-status");
+        const waRes = await fetch(
+          `/api/whatsapp-status?client=${encodeURIComponent(activeClient)}`
+        );
         if (waRes.ok) setWhatsApp(await waRes.json());
       } else {
         setTestResult(data.reason || data.error || "Send failed");
@@ -210,7 +232,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">{dashboardTitle}</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold">
+              {whatsapp?.client?.displayName || activeClient}
+            </h1>
+            <Button variant="link" size="sm" className="px-0" asChild>
+              <Link href="/platform">Alle tenants</Link>
+            </Button>
+          </div>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Uitloggen
@@ -219,6 +248,20 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
+        {!showMailchimp && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">E-mail (Mailchimp)</CardTitle>
+              <CardDescription>
+                Voor tenant <code>{activeClient}</code> is alleen WhatsApp geconfigureerd.
+                Mailchimp + Salonized-sync draaien op <Link href="/t/cocon/dashboard" className="underline">Cocon</Link>.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
+
+        {showMailchimp && (
+        <>
         {/* Mailchimp health */}
         <Card>
           <CardHeader>
@@ -303,6 +346,8 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
+        </>
+        )}
 
         {/* WhatsApp */}
         <Card>
@@ -330,7 +375,7 @@ export default function DashboardPage() {
               ) : null}
               {" · "}
               <a
-                href={`/whatsapp/onboard?client=${encodeURIComponent(whatsapp?.client?.id || clientId)}`}
+                href={`/whatsapp/onboard?client=${encodeURIComponent(activeClient)}`}
                 className="text-primary underline-offset-4 hover:underline"
               >
                 WhatsApp onboarding
@@ -630,6 +675,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {showMailchimp && (
+        <>
         {/* Automation email log (Redis) */}
         <Card>
           <CardHeader>
@@ -723,6 +770,8 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
+        </>
+        )}
       </main>
     </div>
   );

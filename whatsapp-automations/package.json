@@ -1,8 +1,8 @@
 {
-  "name": "cocon-whatsapp-automations",
+  "name": "afa-whatsapp-automations",
   "version": "0.1.0-scaffold",
   "private": true,
-  "description": "WhatsApp automation scaffold for Cocon Cosmetics PMU treatments (Meta WhatsApp Cloud API). Hergebruikt Salonized data uit ../marketing-automations.",
+  "description": "WhatsApp automation module for AFA Message Platform (Meta Cloud API). Tenant config via config/clients/*.json",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "pmu",
     "cocon-cosmetics"
   ],
-  "author": "Cocon Cosmetics",
+  "author": "Alt F Awesome",
   "license": "MIT",
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.80",

@@ -148,23 +148,69 @@ twee merge fields toe:
 
 > Het bestaande `PHONE` veld in Mailchimp kun je hergebruiken als het al bestaat.
 
-## Live gaan — checklist
+## Live gaan (coexistence-veilig) — checklist
+
+> ⛔️ **KRITIEK — telefoon mag NIET geblokkeerd worden.**
+> Het nummer **+31 6 23943507** staat live op de **WhatsApp Business-app**
+> op Daniela's telefoon. Gebruik **uitsluitend de Coexistence-route**.
+>
+> Doe **NOOIT**:
+> - WhatsApp Manager → "Add phone number" + **SMS/voice-verificatie**
+> - "Migrate to Cloud API" op het bestaande nummer
+> - het nummer uit de WhatsApp Business-app verwijderen
+>
+> Elk van deze acties **koppelt het nummer los van de telefoon** (Daniela
+> raakt haar WhatsApp kwijt). De code in dit pakket kan dit niet doen
+> (zie de coexistence-guard in `whatsapp-client.js`), maar in de Meta-UI
+> moet je dit zelf vermijden.
 
 Houd deze volgorde aan. Pas **na stap 5** zet je `WHATSAPP_DRY_RUN=false`.
 
-### 1. WhatsApp Business Account
+### 1. Business verificatie
 
-- Maak een Meta Business Account: <https://business.facebook.com>
-- Voeg WhatsApp toe als product
-- Verifieer je bedrijf (kan tot 1-2 weken duren — KvK + facturen vereist)
+- Meta Business Account: <https://business.facebook.com>
+- Verifieer het bedrijf (Business Verification — KvK + adresbewijs; kan 1–2 weken duren)
+- Domeinverificatie staat al live (`mu-plugins/coconpm-facebook-domain-verification.php`)
 
-### 2. Phone Number
+### 2. Coexistence onboarding (nummer blijft op de telefoon)
 
-- In WhatsApp Manager: **Phone numbers → Add phone number**
-- Gebruik een nummer dat NIET in de reguliere WhatsApp app actief is
-- Verifieer via SMS of voice-call
-- Noteer de `Phone number ID` (lange numerieke waarde) → `META_WHATSAPP_PHONE_NUMBER_ID`
-- Noteer het `WhatsApp Business Account ID` → `META_WHATSAPP_BUSINESS_ACCOUNT_ID`
+> **Alt F Awesome Tech Provider:** volledig stappenplan in
+> [`reports/ALT-F-TECH-PROVIDER-SETUP.md`](reports/ALT-F-TECH-PROVIDER-SETUP.md).
+> Onboarding-UI: `marketing-automations/app/whatsapp/onboard` → `/whatsapp/onboard`.
+
+Coexistence laat hetzelfde nummer **tegelijk** op de Business-app én de
+Cloud API draaien. Bestaande chats blijven op de telefoon; nieuwe berichten
+synchroniseren beide kanten op.
+
+Voorwaarden (Meta, doc bijgewerkt 2026):
+- WhatsApp **Business-app** v**2.24.17+** op de telefoon (niet de consumenten-app)
+- Nummer ≥ **7 dagen** (liefst 30–60) actief gebruikt op de Business-app
+- Ondersteund land (NL/EER = ja)
+- Nummer **niet** al gekoppeld aan een andere Cloud-API-provider
+
+Onboarding-flow (via **Embedded Signup → "Connect a WhatsApp Business App"**):
+1. Start de Coexistence Embedded Signup (zelf opzetten, of via een Meta
+   Tech/Solution Partner zoals 360dialog, Twilio, Wati, Whautomate — zij
+   draaien de signup namens Cocon).
+2. Voer **+31 6 23943507** in → je krijgt een **verificatiecode**.
+3. Op de telefoon: WhatsApp Business-app → **Instellingen → Account →
+   Business Platform → Connect** → plak de code → bevestig.
+4. Na succes geeft de flow de **Phone Number ID** + **WABA ID** terug
+   → vul `META_WHATSAPP_PHONE_NUMBER_ID` en `META_WHATSAPP_BUSINESS_ACCOUNT_ID`.
+
+> **Huidige status van het nummer** (gecheckt via `node src/cli.js phone-status`):
+> `platform_type=ON_PREMISE`, `code_verification_status=NOT_VERIFIED`,
+> `is_on_biz_app=YES`. Het nummer staat dus op de Business-app (goed voor
+> coexistence) maar hangt in een half-afgeronde ON_PREMISE-staat en heeft
+> nog geen leesbare WABA (`node src/cli.js waba` geeft een #100-fout).
+> **Rond de ON_PREMISE-migratie NIET af.** Laat de coexistence-onboarding
+> bij voorkeur door een Tech Provider doen; mogelijk moet de oude
+> ON_PREMISE/WABA-koppeling eerst opgeschoond worden (Meta vereist soms
+> 1–2 maanden cooldown vóór coexistence). Verifieer dit met de provider.
+
+> **Alternatief (100% telefoonveilig):** gebruik een **apart, nieuw nummer**
+> voor de Cloud API. Dan raakt Daniela's huidige nummer gegarandeerd niet.
+> Nadeel: klanten zien een ander afzendernummer dan ze gewend zijn.
 
 ### 3. System User access token (langlevend)
 

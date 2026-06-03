@@ -13,27 +13,69 @@
  * Wanneer alles klaar staat: zet WHATSAPP_DRY_RUN=false in .env.
  */
 
-import { config } from './config.js';
+import { config as defaultConfig } from './config.js';
+import { getContextClientId } from './tenant-context.js';
 
 const GRAPH_API_BASE = 'https://graph.facebook.com';
 
-function endpoint(path) {
-  return `${GRAPH_API_BASE}/${config.meta.apiVersion}${path}`;
+function resolveConfig(override) {
+  return override || defaultConfig;
 }
 
-function authHeaders() {
+function waLog(message, data) {
+  const verbose =
+    process.env.WHATSAPP_API_LOG === 'true' ||
+    process.env.LOG_LEVEL === 'debug';
+  if (!verbose) return;
+  if (data) console.log(`[whatsapp-api] ${message}`, JSON.stringify(data));
+  else console.log(`[whatsapp-api] ${message}`);
+}
+
+/**
+ * COEXISTENCE SAFETY GUARD.
+ *
+ * Het nummer +31 6 23943507 draait in COEXISTENCE: tegelijk op de WhatsApp
+ * Business-app (Daniela's telefoon) én de Cloud API. De Graph API endpoints
+ * hieronder (her)registreren of migreren een nummer en zouden het van de
+ * telefoon LOSKOPPELEN. Deze codebase mag ze NOOIT aanroepen — ook niet per
+ * ongeluk in de toekomst.
+ *
+ * Onboarding/registratie gebeurt uitsluitend handmatig via Coexistence
+ * Embedded Signup (verificatiecode in de Business-app), niet via dit pakket.
+ * Zie README sectie "Live gaan (coexistence-veilig)".
+ */
+const FORBIDDEN_ENDPOINT = /\/(register|deregister|request_code|verify_code|migrate|two_step|set_two_step)(\/|\?|$)/i;
+
+export function assertSafeEndpoint(path) {
+  if (FORBIDDEN_ENDPOINT.test(path)) {
+    throw new Error(
+      `[coexistence-guard] Geblokkeerd endpoint "${path}". Dit zou het nummer ` +
+      'loskoppelen van de WhatsApp Business-app op de telefoon. Registratie/' +
+      'migratie mag ALLEEN handmatig via Coexistence Embedded Signup.',
+    );
+  }
+  return path;
+}
+
+function endpoint(path, cfg = defaultConfig) {
+  assertSafeEndpoint(path);
+  return `${GRAPH_API_BASE}/${cfg.meta.apiVersion}${path}`;
+}
+
+function authHeaders(cfg = defaultConfig) {
   return {
-    'Authorization': `Bearer ${config.meta.accessToken}`,
+    Authorization: `Bearer ${cfg.meta.accessToken}`,
     'Content-Type': 'application/json',
   };
 }
 
 /**
  * Test of de credentials werken door het phone number resource op te vragen.
- * In dry-run returnt dit een gefakete response.
+ * @param {{ config?: object }} [options]
  */
-export async function testConnection() {
-  if (config.dryRun) {
+export async function testConnection(options = {}) {
+  const cfg = resolveConfig(options.config);
+  if (cfg.dryRun) {
     return {
       success: true,
       dryRun: true,
@@ -41,7 +83,7 @@ export async function testConnection() {
     };
   }
 
-  if (!config.meta.accessToken || !config.meta.phoneNumberId) {
+  if (!cfg.meta.accessToken || !cfg.meta.phoneNumberId) {
     return {
       success: false,
       error: 'Missing META_WHATSAPP_ACCESS_TOKEN of META_WHATSAPP_PHONE_NUMBER_ID',
@@ -49,13 +91,18 @@ export async function testConnection() {
   }
 
   try {
-    const response = await fetch(endpoint(`/${config.meta.phoneNumberId}`), {
+    const response = await fetch(endpoint(`/${cfg.meta.phoneNumberId}`, cfg), {
       method: 'GET',
-      headers: authHeaders(),
+      headers: authHeaders(cfg),
     });
     const data = await response.json();
     if (!response.ok) {
-      return { success: false, error: data?.error?.message || `HTTP ${response.status}` };
+      const msg = data?.error?.message || `HTTP ${response.status}`;
+      const hint =
+        data?.error?.error_subcode === 33
+          ? ' System user heeft geen toegang tot deze WABA — koppel WhatsApp-account in Business Settings → System users → Assign assets.'
+          : '';
+      return { success: false, error: msg + hint, errorCode: data?.error?.code };
     }
     return {
       success: true,
@@ -83,13 +130,17 @@ export async function testConnection() {
  * @param {Array<object>} [params.components]  Body/header/button componenten
  * @param {object} [params.context]        Trace info voor logging (treatmentType, stage, email)
  */
-export async function sendTemplate({
-  to,
-  templateName,
-  languageCode = 'nl',
-  components = [],
-  context = {},
-}) {
+export async function sendTemplate(
+  {
+    to,
+    templateName,
+    languageCode = 'nl',
+    components = [],
+    context = {},
+  },
+  options = {},
+) {
+  const cfg = resolveConfig(options.config);
   if (!to || !templateName) {
     return { success: false, error: 'sendTemplate vereist "to" en "templateName"' };
   }
@@ -105,8 +156,8 @@ export async function sendTemplate({
     },
   };
 
-  if (config.dryRun) {
-    return {
+  if (cfg.dryRun) {
+    const dryResult = {
       success: true,
       dryRun: true,
       messageId: `dryrun_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -117,16 +168,18 @@ export async function sendTemplate({
       context,
       message: 'DRY RUN — bericht is NIET verstuurd, alleen gelogd.',
     };
+    waLog('sendTemplate dry-run', { to, templateName, context });
+    return dryResult;
   }
 
-  if (!config.meta.accessToken || !config.meta.phoneNumberId) {
+  if (!cfg.meta.accessToken || !cfg.meta.phoneNumberId) {
     return { success: false, error: 'Meta credentials ontbreken — kan niet live versturen' };
   }
 
   try {
-    const response = await fetch(endpoint(`/${config.meta.phoneNumberId}/messages`), {
+    const response = await fetch(endpoint(`/${cfg.meta.phoneNumberId}/messages`, cfg), {
       method: 'POST',
-      headers: authHeaders(),
+      headers: authHeaders(cfg),
       body: JSON.stringify(payload),
     });
     const data = await response.json();
@@ -154,8 +207,9 @@ export async function sendTemplate({
  * Lijst goedgekeurde templates op vanuit WhatsApp Business Account.
  * Handig voor de dashboard tab "WhatsApp templates".
  */
-export async function listMessageTemplates() {
-  if (config.dryRun) {
+export async function listMessageTemplates(options = {}) {
+  const cfg = resolveConfig(options.config);
+  if (cfg.dryRun) {
     return {
       success: true,
       dryRun: true,
@@ -163,14 +217,14 @@ export async function listMessageTemplates() {
       message: 'DRY RUN — geen call naar Meta gedaan.',
     };
   }
-  if (!config.meta.accessToken || !config.meta.businessAccountId) {
+  if (!cfg.meta.accessToken || !cfg.meta.businessAccountId) {
     return { success: false, error: 'META_WHATSAPP_ACCESS_TOKEN of META_WHATSAPP_BUSINESS_ACCOUNT_ID ontbreekt' };
   }
 
   try {
     const response = await fetch(
-      endpoint(`/${config.meta.businessAccountId}/message_templates?limit=100`),
-      { method: 'GET', headers: authHeaders() },
+      endpoint(`/${cfg.meta.businessAccountId}/message_templates?limit=100`, cfg),
+      { method: 'GET', headers: authHeaders(cfg) },
     );
     const data = await response.json();
     if (!response.ok) {
@@ -196,7 +250,9 @@ export async function listMessageTemplates() {
  * Gebruikt vanuit de Next.js webhook route in marketing-automations.
  */
 export function verifyWebhook({ mode, token, challenge }) {
-  if (mode === 'subscribe' && token && token === config.meta.webhookVerifyToken) {
+  const verifyToken =
+    defaultConfig.meta.webhookVerifyToken || process.env.META_WHATSAPP_WEBHOOK_VERIFY_TOKEN || '';
+  if (mode === 'subscribe' && token && token === verifyToken) {
     return { ok: true, challenge };
   }
   return { ok: false };
@@ -212,20 +268,22 @@ export function verifyWebhook({ mode, token, challenge }) {
  * Werkt NIET in dry-run, want het is een read-only call die je expliciet
  * doet om setup te verifiëren.
  */
-export async function listPhoneNumbers() {
-  if (!config.meta.accessToken) {
+export async function listPhoneNumbers(options = {}) {
+  const cfg = resolveConfig(options.config);
+  if (!cfg.meta.accessToken) {
     return { success: false, error: 'META_WHATSAPP_ACCESS_TOKEN ontbreekt' };
   }
-  if (!config.meta.businessAccountId) {
+  if (!cfg.meta.businessAccountId) {
     return { success: false, error: 'META_WHATSAPP_BUSINESS_ACCOUNT_ID ontbreekt' };
   }
 
   try {
     const url = endpoint(
-      `/${config.meta.businessAccountId}/phone_numbers` +
+      `/${cfg.meta.businessAccountId}/phone_numbers` +
       `?fields=id,display_phone_number,verified_name,quality_rating,code_verification_status,name_status,platform_type`,
+      cfg,
     );
-    const response = await fetch(url, { method: 'GET', headers: authHeaders() });
+    const response = await fetch(url, { method: 'GET', headers: authHeaders(cfg) });
     const data = await response.json();
     if (!response.ok) {
       return { success: false, error: data?.error?.message || `HTTP ${response.status}`, errorDetail: data?.error };
@@ -258,8 +316,9 @@ export async function listPhoneNumbers() {
  * @param {object} options
  * @param {string} [options.businessId]   Meta Business ID (Business Manager)
  */
-export async function listWhatsAppBusinessAccounts({ businessId } = {}) {
-  if (!config.meta.accessToken) {
+export async function listWhatsAppBusinessAccounts({ businessId } = {}, options = {}) {
+  const cfg = resolveConfig(options.config);
+  if (!cfg.meta.accessToken) {
     return { success: false, error: 'META_WHATSAPP_ACCESS_TOKEN ontbreekt' };
   }
 
@@ -268,9 +327,9 @@ export async function listWhatsAppBusinessAccounts({ businessId } = {}) {
     : `/me/businesses`;
 
   try {
-    const response = await fetch(endpoint(target), {
+    const response = await fetch(endpoint(target, cfg), {
       method: 'GET',
-      headers: authHeaders(),
+      headers: authHeaders(cfg),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -282,11 +341,49 @@ export async function listWhatsAppBusinessAccounts({ businessId } = {}) {
   }
 }
 
+/**
+ * Haal de WhatsApp Business Account (WABA) ID op die bij het geconfigureerde
+ * phone number hoort. Read-only GET — handig om META_WHATSAPP_BUSINESS_ACCOUNT_ID
+ * te vinden zonder iets te wijzigen.
+ */
+export async function getWabaForPhoneNumber(
+  { phoneNumberId } = {},
+  options = {},
+) {
+  const cfg = resolveConfig(options.config);
+  const pid = phoneNumberId || cfg.meta.phoneNumberId;
+  if (!cfg.meta.accessToken) {
+    return { success: false, error: 'META_WHATSAPP_ACCESS_TOKEN ontbreekt' };
+  }
+  if (!pid) {
+    return { success: false, error: 'Geen phone number ID (META_WHATSAPP_PHONE_NUMBER_ID)' };
+  }
+  try {
+    const response = await fetch(
+      endpoint(`/${pid}?fields=whatsapp_business_account`, cfg),
+      { method: 'GET', headers: authHeaders(cfg) },
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data?.error?.message || `HTTP ${response.status}`, errorDetail: data?.error };
+    }
+    return {
+      success: true,
+      wabaId: data?.whatsapp_business_account?.id || null,
+      wabaName: data?.whatsapp_business_account?.name || null,
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 export default {
   testConnection,
   sendTemplate,
   listMessageTemplates,
   listPhoneNumbers,
   listWhatsAppBusinessAccounts,
+  getWabaForPhoneNumber,
   verifyWebhook,
+  assertSafeEndpoint,
 };

@@ -11,13 +11,25 @@ export function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isLogin = pathname === "/login";
-  const isAuthApi =
-    pathname.startsWith("/api/auth/") || pathname === "/api/auth/login";
+  const isAuthApi = pathname.startsWith("/api/auth/");
+  const isWhatsAppPublic =
+    pathname.startsWith("/whatsapp/onboard") ||
+    pathname === "/api/whatsapp-webhook" ||
+    pathname === "/api/whatsapp-onboard";
   const cookie = request.cookies.get(COOKIE_NAME);
+
+  if (isWhatsAppPublic) {
+    return NextResponse.next();
+  }
+
+  // API routes: JWT / bearer / cookie checked in route handlers
+  if (pathname.startsWith("/api/v1/") || pathname.startsWith("/api/whatsapp-test-send")) {
+    return NextResponse.next();
+  }
 
   if (isLogin) {
     if (cookie?.value === "1") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/platform", request.url));
     }
     return NextResponse.next();
   }
@@ -26,7 +38,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/dashboard") || pathname === "/") {
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/t/") || pathname.startsWith("/platform") || pathname === "/") {
     if (cookie?.value !== "1") {
       const loginUrl = new URL("/login", request.url);
       if (pathname !== "/") {
@@ -40,5 +52,18 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard", "/dashboard/:path*", "/login", "/api/auth/:path*"],
+  matcher: [
+    "/",
+    "/platform",
+    "/dashboard",
+    "/dashboard/:path*",
+    "/t/:path*",
+    "/login",
+    "/api/auth/:path*",
+    "/whatsapp/onboard",
+    "/api/whatsapp-webhook",
+    "/api/whatsapp-onboard",
+    "/api/whatsapp-test-send",
+    "/api/v1/:path*",
+  ],
 };

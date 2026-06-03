@@ -19,6 +19,7 @@
  */
 
 import { config } from './config.js';
+import { listTenantIds } from './tenant-store.js';
 import {
   sendWhatsAppForStage,
   planStagesForTreatment,
@@ -51,6 +52,7 @@ async function getRedis() {
  * @param {boolean} [input.dryRun]      Forceer dry-run regardless of config
  */
 export async function onTreatmentProcessed(input) {
+  const clientId = input.clientId || process.env.CLIENT_ID || 'cocon';
   const {
     email,
     firstName,
@@ -60,7 +62,7 @@ export async function onTreatmentProcessed(input) {
     dryRun = false,
   } = input;
 
-  const planned = planStagesForTreatment({ treatmentType, treatmentDate });
+  const planned = planStagesForTreatment({ treatmentType, treatmentDate, clientId });
   const summary = {
     email,
     treatmentType,
@@ -77,6 +79,7 @@ export async function onTreatmentProcessed(input) {
       treatmentType,
       firstName,
       email,
+      clientId,
     });
     summary.aftercare = result;
   }
@@ -110,16 +113,26 @@ export async function onTreatmentProcessed(input) {
  *   member: JSON({email, firstName, treatmentType, stage})
  *   score:  unix-seconds van scheduledDate
  */
-export async function schedulePendingSend({ stage, treatmentType, scheduledDate, email, firstName, lastName }) {
+export async function schedulePendingSend({
+  stage,
+  treatmentType,
+  scheduledDate,
+  email,
+  firstName,
+  lastName,
+  clientId,
+}) {
   const redis = await getRedis();
   if (!redis) {
     console.warn('[wa-hook] Geen Redis — kan refresh-stage niet plannen voor', email);
     return { scheduled: false, reason: 'redis-not-configured' };
   }
+  const cid = clientId || process.env.CLIENT_ID || 'cocon';
   const score = Math.floor(new Date(scheduledDate).getTime() / 1000);
-  const member = JSON.stringify({ stage, treatmentType, email, firstName, lastName });
-  await redis.zadd('wa:schedule', { score, member });
-  return { scheduled: true, score, member };
+  const member = JSON.stringify({ stage, treatmentType, email, firstName, lastName, clientId: cid });
+  const scheduleKey = `wa:${cid}:schedule`;
+  await redis.zadd(scheduleKey, { score, member });
+  return { scheduled: true, score, member, scheduleKey };
 }
 
 /**
@@ -142,53 +155,86 @@ export async function runScheduledSends({ now = new Date() } = {}) {
   }
 
   const nowScore = Math.floor(now.getTime() / 1000);
-  const due = await redis.zrange('wa:schedule', 0, nowScore, { byScore: true });
+  const tenantIds = await listTenantIds();
 
-  for (const raw of due) {
+  for (const cid of tenantIds) {
+    const scheduleKey = `wa:${cid}:schedule`;
+    const due = await redis.zrange(scheduleKey, 0, nowScore, { byScore: true });
+
+    for (const raw of due) {
+      report.checked += 1;
+      let entry;
+      try {
+        entry = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      } catch {
+        report.failed += 1;
+        report.details.push({ raw, error: 'invalid-json' });
+        await redis.zrem(scheduleKey, raw);
+        continue;
+      }
+
+      const result = await sendWhatsAppForStage({
+        stage: entry.stage,
+        treatmentType: entry.treatmentType,
+        firstName: entry.firstName,
+        email: entry.email,
+        clientId: entry.clientId || cid,
+      });
+
+      if (result.ok) {
+        report.sent += 1;
+        await redis.zrem(scheduleKey, raw);
+      } else if (result.reason === 'template-not-approved' || result.reason?.startsWith('template-not-approved:')) {
+        report.skipped += 1;
+      } else if (result.reason === 'already-sent') {
+        report.skipped += 1;
+        await redis.zrem(scheduleKey, raw);
+      } else if (result.reason?.startsWith('no-opt-in')) {
+        report.skipped += 1;
+        await redis.zrem(scheduleKey, raw);
+        await logSend(
+          {
+            to: '',
+            templateName: '',
+            stage: entry.stage,
+            treatmentType: entry.treatmentType,
+            email: entry.email,
+            success: false,
+            error: result.reason,
+          },
+          { clientId: entry.clientId || cid },
+        );
+      } else {
+        report.failed += 1;
+      }
+
+      report.details.push({ entry, result });
+    }
+  }
+
+  // Legacy global schedule (pre multi-tenant)
+  const legacyDue = await redis.zrange('wa:schedule', 0, nowScore, { byScore: true });
+  for (const raw of legacyDue) {
     report.checked += 1;
     let entry;
     try {
       entry = typeof raw === 'string' ? JSON.parse(raw) : raw;
     } catch {
       report.failed += 1;
-      report.details.push({ raw, error: 'invalid-json' });
       await redis.zrem('wa:schedule', raw);
       continue;
     }
-
     const result = await sendWhatsAppForStage({
       stage: entry.stage,
       treatmentType: entry.treatmentType,
       firstName: entry.firstName,
       email: entry.email,
+      clientId: entry.clientId || process.env.CLIENT_ID || 'cocon',
     });
-
-    if (result.ok) {
-      report.sent += 1;
+    if (result.ok || result.reason === 'already-sent' || result.reason?.startsWith('no-opt-in')) {
       await redis.zrem('wa:schedule', raw);
-    } else if (result.reason === 'template-not-approved' || result.reason?.startsWith('template-not-approved:')) {
-      // Bewaar in queue tot template approved is — niet zinvol nu te retry-en
-      report.skipped += 1;
-    } else if (result.reason === 'already-sent') {
-      report.skipped += 1;
-      await redis.zrem('wa:schedule', raw);
-    } else if (result.reason?.startsWith('no-opt-in')) {
-      report.skipped += 1;
-      await redis.zrem('wa:schedule', raw);
-      await logSend({
-        to: '',
-        templateName: '',
-        stage: entry.stage,
-        treatmentType: entry.treatmentType,
-        email: entry.email,
-        success: false,
-        error: result.reason,
-      });
-    } else {
-      report.failed += 1;
     }
-
-    report.details.push({ entry, result });
+    report.details.push({ entry, result, legacy: true });
   }
 
   return report;

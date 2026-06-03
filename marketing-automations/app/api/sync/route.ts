@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runSalonizedDailySync } from "../../../src/salonized-daily-sync.js";
+import { authorizeApiRequest, unauthorizedResponse } from "@/lib/api-auth";
 
 export const maxDuration = 300;
 
-function isAuthorized(request: NextRequest) {
-  const token = process.env.SYNC_API_TOKEN ?? "";
-  if (!token) return false;
-  const authHeader = request.headers.get("authorization") ?? "";
-  return authHeader === `Bearer ${token}`;
-}
-
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await authorizeApiRequest(request);
+  if (!auth.ok) return unauthorizedResponse(auth);
 
   const icalUrl = process.env.SALONIZED_ICAL_URL ?? "";
   if (!icalUrl) {

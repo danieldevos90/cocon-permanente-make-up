@@ -42,7 +42,7 @@ function toHtml(overview: Record<string, unknown>) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cocon Sync Health</title>
+  <title>${process.env.NEXT_PUBLIC_PLATFORM_NAME || "Marketing Automations"} Sync Health</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 24px; color: #111; }
     h1, h2 { margin: 0 0 12px 0; }

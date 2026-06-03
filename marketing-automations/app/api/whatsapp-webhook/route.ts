@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiLog } from "@/lib/api-log";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest) {
     const { verifyWebhook } = await import("whatsapp-automations/src/whatsapp-client.js");
     const result = verifyWebhook({ mode, token, challenge });
     if (result.ok && challenge) {
+      apiLog("wa-webhook", "GET verify OK", { mode });
       return new NextResponse(challenge, { status: 200, headers: { "Content-Type": "text/plain" } });
     }
     console.warn("[wa-webhook] Handshake mismatch — check META_WHATSAPP_WEBHOOK_VERIFY_TOKEN");
@@ -73,20 +75,35 @@ export async function POST(request: NextRequest) {
       console.warn("[wa-webhook] Signature mismatch — request afkomst onbekend");
     }
 
+    const { resolveClientFromWebhookPayload } = await import(
+      "whatsapp-automations/src/tenant-store.js"
+    );
+    const clientId = await resolveClientFromWebhookPayload(payload);
+
     const { messages, statuses } = parseInboundWebhook(payload);
+    apiLog("wa-webhook", "POST event", {
+      clientId,
+      signatureOk,
+      messages: messages.length,
+      statuses: statuses.length,
+    });
 
     for (const msg of messages) {
-      await logInbound({
-        ...msg,
-        signatureVerified: signatureOk,
-      });
+      await logInbound(
+        {
+          ...msg,
+          signatureVerified: signatureOk,
+        },
+        { clientId }
+      );
     }
     for (const st of statuses) {
-      await logStatus(st);
+      await logStatus(st, { clientId });
     }
 
     return NextResponse.json({
       ok: true,
+      clientId,
       received: { messages: messages.length, statuses: statuses.length },
     });
   } catch (error) {

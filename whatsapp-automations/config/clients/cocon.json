@@ -1,0 +1,26 @@
+{
+  "id": "cocon",
+  "displayName": "Cocon Cosmetics",
+  "displayPhone": "+31 6 23943507",
+  "onboardContactName": "Daniela",
+  "templatePrefix": "cocon",
+  "senderName": "Cocon Cosmetics",
+  "treatmentTypes": ["wenkbrauwen", "eyeliner", "lippen"],
+  "messageTiming": {
+    "aftercare": 0,
+    "browsRefresh": 300,
+    "lipsRefresh": 300
+  },
+  "urls": {
+    "booking": "https://www.coconpermanentemakeup.nl/afspraak-maken",
+    "aftercare": {
+      "wenkbrauwen": "https://www.coconpermanentemakeup.nl/kennisbank/nazorg-permanente-make-up-wenkbrauwen/",
+      "eyeliner": "https://www.coconpermanentemakeup.nl/kennisbank/nazorg-permanente-make-up-eyeliner/",
+      "lippen": "https://www.coconpermanentemakeup.nl/kennisbank/nazorg-permanente-make-up-lippen/"
+    }
+  },
+  "integrations": {
+    "mailchimp": true,
+    "salonized": true
+  }
+}

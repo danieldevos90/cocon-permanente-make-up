@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authorizeApiRequest, unauthorizedResponse } from "@/lib/api-auth";
 
 export const maxDuration = 300;
 import { runSalonizedDailySync, runJourneyEmails } from "../../../src/salonized-daily-sync.js";
@@ -71,15 +72,12 @@ async function handleCronSync(request: NextRequest) {
   const log = (msg: string) => console.log(`[cron-sync] ${msg}`);
 
   try {
-    const cronSecret = process.env.CRON_SECRET ?? "";
-    const authHeader = request.headers.get("authorization") ?? "";
-    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-      log("Unauthorized — check CRON_SECRET env var");
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    const auth = await authorizeApiRequest(request);
+    if (!auth.ok) {
+      log(`Unauthorized (${auth.error})`);
+      return unauthorizedResponse(auth);
     }
+    log(`Authorized via ${auth.via}`);
 
     const icalUrl = process.env.SALONIZED_ICAL_URL ?? "";
     if (!icalUrl) {
