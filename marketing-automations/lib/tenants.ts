@@ -5,6 +5,8 @@
 export type TenantSummary = {
   id: string;
   displayName: string;
+  description?: string;
+  isTestTenant?: boolean;
   displayPhone?: string;
   wabaId?: string;
   phoneNumberId?: string;
@@ -50,6 +52,8 @@ export async function loadTenantSummaries(): Promise<TenantSummary[]> {
     out.push({
       id,
       displayName: client.displayName || id,
+      description: client.description,
+      isTestTenant: Boolean(client.isTestTenant),
       displayPhone: client.displayPhone,
       wabaId: tenant?.wabaId,
       phoneNumberId: tenant?.phoneNumberId,
@@ -57,6 +61,11 @@ export async function loadTenantSummaries(): Promise<TenantSummary[]> {
       onboardUrl: onboardUrlForClient(id, host, gate),
     });
   }
+  out.sort((a, b) => {
+    if (a.isTestTenant && !b.isTestTenant) return -1;
+    if (!a.isTestTenant && b.isTestTenant) return 1;
+    return a.displayName.localeCompare(b.displayName, "nl");
+  });
   return out;
 }
 

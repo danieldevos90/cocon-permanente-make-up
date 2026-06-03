@@ -9,6 +9,7 @@
  */
 
 import { config } from './config.js';
+import { getClientById } from './client-config.js';
 
 let redisPromise = null;
 
@@ -154,6 +155,10 @@ export async function listTenantIds() {
 export async function seedTenantFromEnv(clientId) {
   const existing = await getTenant(clientId);
   if (existing?.phoneNumberId && existing?.accessToken) return existing;
+
+  const client = getClientById(clientId);
+  const defaultId = process.env.CLIENT_ID || process.env.DEFAULT_CLIENT_ID || 'cocon';
+  if (client.envSeed === false || clientId !== defaultId) return existing;
 
   const wabaId = process.env.META_WHATSAPP_BUSINESS_ACCOUNT_ID || '';
   const phoneNumberId = process.env.META_WHATSAPP_PHONE_NUMBER_ID || '';

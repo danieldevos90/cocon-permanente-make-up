@@ -248,7 +248,23 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {!showMailchimp && (
+        {activeClient === "marketing-test" && (
+          <Card className="border-amber-200 bg-amber-50/50">
+            <CardHeader>
+              <CardTitle className="text-base">WhatsApp marketing automation test</CardTitle>
+              <CardDescription>
+                Gebruik deze tenant om onboard, templates, webhook, dry-run en test sends te
+                valideren. Productie-mail en Salonized draaien alleen op{" "}
+                <Link href="/t/cocon/dashboard" className="underline">
+                  Cocon
+                </Link>
+                . API: <code className="text-xs">client=marketing-test</code> in JWT-requests.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
+
+        {!showMailchimp && activeClient !== "marketing-test" && (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">E-mail (Mailchimp)</CardTitle>

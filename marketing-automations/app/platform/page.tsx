@@ -10,6 +10,8 @@ import { CheckCircle2, XCircle, LogOut, MessageCircle, Plus } from "lucide-react
 type Tenant = {
   id: string;
   displayName: string;
+  description?: string;
+  isTestTenant?: boolean;
   displayPhone?: string;
   wabaId?: string;
   phoneNumberId?: string;
@@ -45,7 +47,7 @@ export default function PlatformPage() {
           <div>
             <h1 className="text-2xl font-semibold">{platformName}</h1>
             <p className="text-sm text-muted-foreground">
-              Kies een tenant — elk bedrijf heeft eigen WhatsApp WABA en dashboard.
+              Kies een tenant — productie (Cocon) of de algemene WhatsApp marketing test.
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={logout}>
@@ -64,10 +66,18 @@ export default function PlatformPage() {
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <MessageCircle className="h-5 w-5 text-green-600" />
                     {t.displayName}
+                    {t.isTestTenant && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                        Test
+                      </span>
+                    )}
                   </CardTitle>
                   <CardDescription>
                     Tenant <code className="text-xs">{t.id}</code>
                     {t.displayPhone ? ` · ${t.displayPhone}` : ""}
+                    {t.description ? (
+                      <span className="mt-1 block text-xs">{t.description}</span>
+                    ) : null}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-wrap items-center gap-3">
