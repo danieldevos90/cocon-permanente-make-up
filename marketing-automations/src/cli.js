@@ -237,7 +237,7 @@ program
       console.log(chalk.white(`   Planned updates: ${report.totals.plannedUpdates}`));
       console.log(chalk.white(`   Updated: ${report.totals.updated}`));
       console.log(chalk.white(`   Skipped (no match): ${report.totals.skippedNoMatch}`));
-      console.log(chalk.white(`   Skipped (ambiguous): ${report.totals.skippedAmbiguous}`));
+      console.log(chalk.white(`   Resolved (ambiguous → most recent): ${report.totals.resolvedAmbiguous || 0}`));
       console.log(chalk.white(`   Skipped (older/equal date): ${report.totals.skippedOlderOrEqual}`));
       console.log(chalk.white(`   Skipped (unknown treatment): ${report.totals.skippedUnknownTreatment}`));
       console.log(chalk.white(`   Errors: ${report.totals.errors}`));

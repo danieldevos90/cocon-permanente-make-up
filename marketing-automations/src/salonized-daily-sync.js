@@ -62,6 +62,24 @@ const RENEW_CYCLE_KEYWORDS = [
   'touch up',
 ];
 
+/** Non-PMU salon services — skip automation (no email/WhatsApp journey). */
+const NON_PMU_SERVICE_KEYWORDS = [
+  'lash lift',
+  'lash-lift',
+  'lashlift',
+  'browlamination',
+  'browlift',
+  'brow lift',
+  'tint',
+  'shape (wax)',
+  'only shape',
+  'hybrid tint',
+  'gelaat',
+  'nagel',
+];
+
+const NEW_TREATMENT_KEYWORDS = ['nieuwe behandeling', 'eerste behandeling'];
+
 const MIN_HOURS_AFTER_APPOINTMENT = 3;
 
 function normalizeName(value) {
@@ -95,13 +113,78 @@ function splitName(fullName = '') {
   };
 }
 
+function detectPmuTypeInText(text) {
+  if (
+    text.includes('wenkbrauw') ||
+    text.includes(' wb ') ||
+    text.startsWith('wb ') ||
+    text.endsWith(' wb')
+  ) {
+    return 'wenkbrauwen';
+  }
+  if (text.includes('eyeliner')) return 'eyeliner';
+  if (
+    text.includes('lippen') ||
+    text.includes('lipblush') ||
+    text.includes(' lips') ||
+    text.endsWith(' lips') ||
+    text.includes('lip blush')
+  ) {
+    return 'lippen';
+  }
+  return '';
+}
+
+function segmentPriority(segment) {
+  const text = segment.toLowerCase();
+  if (NEW_TREATMENT_KEYWORDS.some(keyword => text.includes(keyword))) return 3;
+  if (isRenewCycleAppointment(segment)) return 2;
+  return 1;
+}
+
 function inferTreatment(summary = '') {
   const text = summary.toLowerCase();
-  if (text.includes('laser')) return 'laser';
-  if (text.includes('eyeliner')) return 'eyeliner';
-  if (text.includes('lip')) return 'lippen';
-  if (text.includes('wenkbrauw') || text.includes('brow') || text.includes(' wb ') || text.startsWith('wb ') || text.endsWith(' wb')) return 'wenkbrauwen';
-  return '';
+  if (NON_PMU_SERVICE_KEYWORDS.some(keyword => text.includes(keyword))) return '';
+
+  const segments = summary.split(',').map(segment => segment.trim()).filter(Boolean);
+  const candidates = [];
+
+  for (let index = 0; index < segments.length; index += 1) {
+    const segment = segments[index];
+    const type = detectPmuTypeInText(segment.toLowerCase());
+    if (!type) continue;
+    candidates.push({
+      type,
+      priority: segmentPriority(segment),
+      order: index,
+    });
+  }
+
+  if (!candidates.length) return '';
+
+  candidates.sort((a, b) => b.priority - a.priority || a.order - b.order);
+  return candidates[0].type;
+}
+
+export function memberRecencyScore(member) {
+  const lastChanged = Date.parse(member?.last_changed || '');
+  if (!Number.isNaN(lastChanged)) return lastChanged;
+
+  const merge = member?.merge_fields || {};
+  const dateCandidates = [merge.LASTEMAILD, merge.LASTTRTDT, merge.TDATE].filter(Boolean);
+  const parsedDates = dateCandidates
+    .map(value => Date.parse(value))
+    .filter(timestamp => !Number.isNaN(timestamp));
+  if (parsedDates.length) return Math.max(...parsedDates);
+
+  const signup = Date.parse(member?.timestamp_signup || '');
+  return Number.isNaN(signup) ? 0 : signup;
+}
+
+export function pickMostRecentMember(members = []) {
+  if (!members.length) return null;
+  if (members.length === 1) return members[0];
+  return [...members].sort((a, b) => memberRecencyScore(b) - memberRecencyScore(a))[0];
 }
 
 function isLikelyInternalEvent(summary = '', description = '') {
@@ -326,6 +409,7 @@ export async function runSalonizedDailySync({
         plannedUpdates: 0,
         skippedNoMatch: 0,
         skippedAmbiguous: 0,
+        resolvedAmbiguous: 0,
         skippedOlderOrEqual: 0,
         skippedUnknownTreatment: 0,
         skippedFollowup: 0,
@@ -341,6 +425,7 @@ export async function runSalonizedDailySync({
         plannedUpdates: [],
         skippedNoMatch: [],
         skippedAmbiguous: [],
+        resolvedAmbiguous: [],
         skippedOlderOrEqual: [],
         skippedUnknownTreatment: [],
         skippedFollowup: [],
@@ -386,6 +471,7 @@ export async function runSalonizedDailySync({
       plannedUpdates: 0,
       skippedNoMatch: 0,
       skippedAmbiguous: 0,
+      resolvedAmbiguous: 0,
       skippedOlderOrEqual: 0,
       skippedUnknownTreatment: 0,
       skippedFollowup: 0,
@@ -401,6 +487,7 @@ export async function runSalonizedDailySync({
       plannedUpdates: [],
       skippedNoMatch: [],
       skippedAmbiguous: [],
+      resolvedAmbiguous: [],
       skippedOlderOrEqual: [],
       skippedUnknownTreatment: [],
       skippedFollowup: [],
@@ -449,6 +536,7 @@ export async function runSalonizedDailySync({
       continue;
     }
 
+    let member = null;
     if (matchingMembers.length === 0) {
       report.totals.skippedNoMatch += 1;
       report.details.skippedNoMatch.push({
@@ -460,16 +548,22 @@ export async function runSalonizedDailySync({
     }
 
     if (matchingMembers.length > 1) {
-      report.totals.skippedAmbiguous += 1;
-      report.details.skippedAmbiguous.push({
+      member = pickMostRecentMember(matchingMembers);
+      report.totals.resolvedAmbiguous += 1;
+      report.details.resolvedAmbiguous.push({
         name: `${appointment.firstName} ${appointment.lastName}`.trim(),
-        candidates: matchingMembers.map(m => m.email_address),
+        chosen: member.email_address,
+        candidates: matchingMembers.map(candidate => ({
+          email: candidate.email_address,
+          lastChanged: candidate.last_changed || null,
+          score: memberRecencyScore(candidate),
+        })),
         uid: appointment.uid,
       });
-      continue;
+    } else {
+      member = matchingMembers[0];
     }
 
-    const member = matchingMembers[0];
     const existingDate = member?.merge_fields?.LASTTRTDT || member?.merge_fields?.TDATE || '';
     if (existingDate && existingDate >= dayIso) {
       report.totals.skippedOlderOrEqual += 1;
