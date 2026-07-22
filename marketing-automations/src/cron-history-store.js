@@ -29,8 +29,10 @@ export function listRecentDateStrings({ days = 90 } = {}) {
  * @param {number} [limit]
  */
 export async function listCronDates(redis, limit = 60) {
+  const safeLimit = Math.min(Math.max(Number(limit) || 60, 1), 90);
+
   try {
-    const indexed = await redis.zrange(CRON_INDEX_KEY, 0, limit - 1, { rev: true });
+    const indexed = await redis.zrange(CRON_INDEX_KEY, 0, safeLimit - 1, { rev: true });
     if (indexed?.length) {
       return indexed.map(String);
     }
@@ -39,12 +41,42 @@ export async function listCronDates(redis, limit = 60) {
   }
 
   const dates = [];
-  for (const dateStr of listRecentDateStrings({ days: 90 })) {
-    const len = await redis.llen(cronKeyForDate(dateStr));
-    if (len > 0) dates.push(dateStr);
-    if (dates.length >= limit) break;
+  const scanDays = Math.min(safeLimit, 30);
+  const dateStrings = listRecentDateStrings({ days: scanDays });
+  const chunkSize = 15;
+
+  for (let index = 0; index < dateStrings.length; index += chunkSize) {
+    const chunk = dateStrings.slice(index, index + chunkSize);
+    const pipeline = redis.pipeline();
+    for (const dateStr of chunk) {
+      pipeline.llen(cronKeyForDate(dateStr));
+    }
+
+    let lengths = [];
+    try {
+      const result = await pipeline.exec();
+      lengths = Array.isArray(result) ? result : [];
+    } catch {
+      for (const dateStr of chunk) {
+        try {
+          const len = await redis.llen(cronKeyForDate(dateStr));
+          if (Number(len) > 0) dates.push(dateStr);
+        } catch {
+          // skip unreadable key
+        }
+      }
+      if (dates.length >= safeLimit) break;
+      continue;
+    }
+
+    for (let offset = 0; offset < chunk.length; offset += 1) {
+      const len = Number(lengths[offset] ?? 0);
+      if (len > 0) dates.push(chunk[offset]);
+    }
+    if (dates.length >= safeLimit) break;
   }
-  return dates;
+
+  return dates.slice(0, safeLimit);
 }
 
 /**
@@ -92,10 +124,11 @@ export async function appendCronRun(redis, dateStr, run) {
 
 /**
  * @param {import('@upstash/redis').Redis} redis
- * @param {{ limit?: number }} [opts]
+ * @param {{ days?: number }} [opts]
  */
-export async function loadCronHistoryEntries(redis, { limit = 60 } = {}) {
-  const dates = await listCronDates(redis, limit);
+export async function loadCronHistoryEntries(redis, { days = 60 } = {}) {
+  const safeDays = Math.min(Math.max(Number(days) || 60, 1), 90);
+  const dates = await listCronDates(redis, safeDays);
   const entries = [];
 
   for (const dateStr of dates) {

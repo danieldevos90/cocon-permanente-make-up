@@ -18,18 +18,17 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const days = Math.min(Math.max(Number(url.searchParams.get("days") ?? 60), 1), 90);
     const redis = new Redis({ url: REDIS_URL, token: REDIS_TOKEN });
-    const entries = await loadCronHistoryEntries(redis, { limit: days });
+    const entries = await loadCronHistoryEntries(redis, { days });
 
     return NextResponse.json({ entries, configured: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("[api/cron-history]", error);
-    return NextResponse.json(
-      {
-        entries: [],
-        configured: true,
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({
+      entries: [],
+      configured: true,
+      error: message,
+      warning: "Cron history tijdelijk niet beschikbaar (Redis).",
+    });
   }
 }

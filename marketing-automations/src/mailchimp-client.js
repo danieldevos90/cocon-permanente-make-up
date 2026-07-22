@@ -186,6 +186,22 @@ export async function getSubscriber(email) {
 }
 
 /**
+ * Archive (soft-delete) a list member — removes from active audience.
+ */
+export async function archiveListMember(email) {
+  const client = initMailchimp();
+  const listId = config.mailchimp.listId;
+  const subscriberHash = getSubscriberHash(email);
+
+  try {
+    await client.lists.deleteListMember(listId, subscriberHash);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+/**
  * Get all subscribers with a specific tag
  */
 export async function getSubscribersByTag(tag) {
@@ -272,6 +288,7 @@ export async function listAudienceMembers({ count = 200, statuses = ['subscribed
               'members.merge_fields.LASTTRTDT',
               'members.merge_fields.TREATMENT',
               'members.merge_fields.LASTTRT',
+              'members.merge_fields.LASTEMAIL',
               'members.merge_fields.LASTEMAILD',
               'members.last_changed',
               'members.timestamp_signup',
@@ -822,6 +839,7 @@ export default {
   addTagsToSubscriber,
   setSubscriberTags,
   getSubscriber,
+  archiveListMember,
   getSubscribersByTag,
   listAudienceMembers,
   searchAudienceMembers,
